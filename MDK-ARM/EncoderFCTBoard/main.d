@@ -44,3 +44,4 @@ encoderfctboard\main.o: ..\user_config\inc\uart_config.h
 encoderfctboard\main.o: ..\user_function\inc\modbus_function.h
 encoderfctboard\main.o: ..\user_function\inc\relay_control.h
 encoderfctboard\main.o: ..\user_function\inc\DigitalTube_Control.h
+encoderfctboard\main.o: ..\user_function\inc\Flash_Storage.h

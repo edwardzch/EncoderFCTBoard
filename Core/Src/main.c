@@ -31,6 +31,7 @@
 #include "modbus_function.h"
 #include "relay_control.h"
 #include "DigitalTube_Control.h"
+#include "Flash_Storage.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,6 +53,7 @@
 
 /* USER CODE BEGIN PV */
 uint32_t testcnt = 0;
+uint8_t errcnt = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -105,6 +107,12 @@ int main(void)
 	Relay_AllOff();
 	//dma1_channel1_config();
 	DTC_Init();
+    // 加载 Flash 参数
+    // Load_PA_From_Flash (使用新模块函数) -> 增加返回值判断
+    if (Flash_LoadParams(PA_Buffer, PA_SIZE) != 0) {
+        DTC_SetError(1); // Err.01: Flash 空或 CRC 错误
+    }
+    
 	HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
 
@@ -123,7 +131,7 @@ int main(void)
     }		
 		if(testcnt){
 			testcnt = 0;
-			DTC_SetError(1);
+			DTC_SetError(errcnt);
 		}
   }
   /* USER CODE END 3 */

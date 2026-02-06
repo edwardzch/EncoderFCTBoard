@@ -10,6 +10,8 @@ extern "C" {
 #include "stm32g4xx_hal.h"
 
 #define delay_ms HAL_Delay
+
+#define PWR_CTRL_Enable() 					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET)
 /* exported functions ------------------------------------------------------- */
 void delay_us(uint32_t us);
 

@@ -10,6 +10,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "iap_function.h"
+#include "delay_function.h"
 
 volatile strModBus ModBus = {0};
 
@@ -299,6 +300,10 @@ void ModBus_SlaveRx06(void)
                         Relay_Off(ModBus.Slave.Rx.DataAddr);
                     ModBus_SlaveReturnTx06();
                     break;
+								case 0x0009:
+									PWR_CTRL_Enable();
+									ModBus_SlaveReturnTx06();
+								break;
                 case 0x00FF:  // 全部打开
                     Relay_AllOn();
                     ModBus_SlaveReturnTx06();                       

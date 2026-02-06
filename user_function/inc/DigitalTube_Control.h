@@ -67,17 +67,9 @@ typedef enum {
     DTC_MODE_ANIMATION = 0,                     // 开机动画模式
     DTC_MODE_SELECT,                            // 参数选择模式 (PA 001)
     DTC_MODE_EDIT,                              // 参数编辑模式 (数值)
-    DTC_MODE_ERROR                              // 故障报错模式
+    DTC_MODE_ERROR,                             // 故障报错模式
+    DTC_MODE_MESSAGE                            // 消息提示模式 (donE)
 } DTC_DispMode_t;
-
-// 开机动画子状态
-typedef enum {
-    ANIM_TYPEWRITER = 0,                        // 打字机阶段 (E -> Et...)
-    ANIM_BLINK,                                 // 闪烁阶段
-    ANIM_DONE                                   // 动画完成
-} DTC_AnimState_t;
-
-// ================= 结构体定义 =================
 
 // 单个参数的属性配置
 typedef struct {
@@ -87,6 +79,13 @@ typedef struct {
     int32_t      Min;                           // 最小值限制
     int32_t      Max;                           // 最大值限制
 } DTC_ParamConfig_t;
+
+// 开机动画子状态
+typedef enum {
+    ANIM_TYPEWRITER = 0,                        // 打字机阶段 (E -> Et...)
+    ANIM_WAIT_KEY,                              // 等待按键阶段 (Etest 常亮)
+    ANIM_DONE                                   // 动画完成
+} DTC_AnimState_t;
 
 // 全局运行状态
 typedef struct {
@@ -110,6 +109,7 @@ typedef struct {
     // 动画专用变量
     DTC_AnimState_t AnimState;                  // 动画子状态
     uint16_t        AnimTimer;                  // 动画计时器
+    uint16_t        MsgTimer;                   // 消息计时器
     uint8_t         AnimStep;                   // 动画步骤索引
 } DTC_State_t;
 

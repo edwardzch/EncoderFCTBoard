@@ -1,7 +1,7 @@
 Dependencies for Project 'EncoderFCTBoard', Target 'EncoderFCTBoard': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
 F (startup_stm32g491xx.s)(0x6984612D)(--cpu Cortex-M4.fp.sp -g --apcs=interwork -I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include--pd "__UVISION_VERSION SETA 535" --pd "_RTE_ SETA 1" --pd "STM32G491xx SETA 1" --pd "_RTE_ SETA 1"--list startup_stm32g491xx.lst --xref -o encoderfctboard\startup_stm32g491xx.o --depend encoderfctboard\startup_stm32g491xx.d)
-F (../Core/Src/main.c)(0x6985A92A)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\main.o --omf_browse encoderfctboard\main.crf --depend encoderfctboard\main.d)
+F (../Core/Src/main.c)(0x6985B6E4)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\main.o --omf_browse encoderfctboard\main.crf --depend encoderfctboard\main.d)
 I (../Core/Inc/main.h)(0x6984612A)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h)(0x68A561C1)
 I (../Core/Inc/stm32g4xx_hal_conf.h)(0x69846129)
@@ -45,7 +45,8 @@ I (..\user_function\inc\iap_function.h)(0x68B6B510)
 I (..\user_config\inc\uart_config.h)(0x69844D21)
 I (..\user_function\inc\modbus_function.h)(0x68F608DB)
 I (..\user_function\inc\relay_control.h)(0x69842A57)
-I (..\user_function\inc\DigitalTube_Control.h)(0x69859D54)
+I (..\user_function\inc\DigitalTube_Control.h)(0x6985B873)
+I (..\user_function\inc\Flash_Storage.h)(0x6985B697)
 F (../Core/Src/gpio.c)(0x69846126)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\gpio.o --omf_browse encoderfctboard\gpio.crf --depend encoderfctboard\gpio.d)
 I (../Core/Inc/gpio.h)(0x68A58739)
 I (../Core/Inc/main.h)(0x6984612A)
@@ -264,7 +265,7 @@ I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h)(0x68A561C1)
 I (../Core/Inc/stm32g4xx_it.h)(0x69846129)
 I (..\user_config\inc\uart_config.h)(0x69844D21)
 I (..\user_function\inc\modbus_function.h)(0x68F608DB)
-I (..\user_function\inc\DigitalTube_Control.h)(0x69859D54)
+I (..\user_function\inc\DigitalTube_Control.h)(0x6985B873)
 F (../Core/Src/stm32g4xx_hal_msp.c)(0x68A5873A)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\stm32g4xx_hal_msp.o --omf_browse encoderfctboard\stm32g4xx_hal_msp.crf --depend encoderfctboard\stm32g4xx_hal_msp.d)
 I (../Core/Inc/main.h)(0x6984612A)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h)(0x68A561C1)
@@ -1022,7 +1023,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x6025237E)
 I (C:\Keil_v5\ARM\ARMCC\include\stdarg.h)(0x60252376)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x60252374)
 F (..\user_function\src\delay_function.c)(0x69840C76)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\delay_function.o --omf_browse encoderfctboard\delay_function.crf --depend encoderfctboard\delay_function.d)
-I (..\user_function\inc\delay_function.h)(0x685BCDE0)
+I (..\user_function\inc\delay_function.h)(0x6985B82D)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h)(0x68A561C1)
 I (../Core/Inc/stm32g4xx_hal_conf.h)(0x69846129)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc.h)(0x68A561C1)
@@ -1094,7 +1095,7 @@ I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h)(0x68A561C1)
 I (C:\Keil_v5\ARM\ARMCC\include\stdarg.h)(0x60252376)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x6025237E)
 I (..\user_config\inc\uart_config.h)(0x69844D21)
-F (..\user_function\src\modbus_function.c)(0x698451C0)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\modbus_function.o --omf_browse encoderfctboard\modbus_function.crf --depend encoderfctboard\modbus_function.d)
+F (..\user_function\src\modbus_function.c)(0x6985B82D)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\modbus_function.o --omf_browse encoderfctboard\modbus_function.crf --depend encoderfctboard\modbus_function.d)
 I (..\user_function\inc\modbus_function.h)(0x68F608DB)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h)(0x68A561C1)
 I (../Core/Inc/stm32g4xx_hal_conf.h)(0x69846129)
@@ -1137,6 +1138,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x6025237E)
 I (C:\Keil_v5\ARM\ARMCC\include\stdarg.h)(0x60252376)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x60252374)
 I (..\user_function\inc\iap_function.h)(0x68B6B510)
+I (..\user_function\inc\delay_function.h)(0x6985B82D)
 F (..\user_function\src\relay_control.c)(0x69842A59)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\relay_control.o --omf_browse encoderfctboard\relay_control.crf --depend encoderfctboard\relay_control.d)
 I (..\user_function\inc\relay_control.h)(0x69842A57)
 I (../Core/Inc/main.h)(0x6984612A)
@@ -1173,8 +1175,46 @@ I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim.h)(0x68A561C1)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h)(0x68A561C1)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h)(0x68A561C1)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h)(0x68A561C1)
-F (..\user_function\src\DigitalTube_Control.c)(0x69859F8C)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\digitaltube_control.o --omf_browse encoderfctboard\digitaltube_control.crf --depend encoderfctboard\digitaltube_control.d)
-I (..\user_function\inc\DigitalTube_Control.h)(0x69859D54)
+F (..\user_function\src\DigitalTube_Control.c)(0x6985BEDB)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\digitaltube_control.o --omf_browse encoderfctboard\digitaltube_control.crf --depend encoderfctboard\digitaltube_control.d)
+I (..\user_function\inc\DigitalTube_Control.h)(0x6985B873)
+I (../Core/Inc/main.h)(0x6984612A)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h)(0x68A561C1)
+I (../Core/Inc/stm32g4xx_hal_conf.h)(0x69846129)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h)(0x68A561C1)
+I (../Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g4xx.h)(0x68A561C1)
+I (../Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g491xx.h)(0x68A561C1)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x68A56120)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025237E)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x68A56120)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x68A56120)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x68A56120)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x68A56120)
+I (../Drivers/CMSIS/Device/ST/STM32G4xx/Include/system_stm32g4xx.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x68A561C1)
+I (C:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x6025237E)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc_ex.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_gpio.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_gpio_ex.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_dma.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_dma_ex.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_cortex.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_exti.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ex.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ramfunc.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr_ex.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_spi.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_spi_ex.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h)(0x68A561C1)
+I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h)(0x68A561C1)
+I (..\user_function\inc\Flash_Storage.h)(0x6985B697)
+I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x6025237E)
+F (..\user_function\src\Flash_Storage.c)(0x6985B7B5)(--c99 -c --cpu Cortex-M4.fp.sp -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ..\user_config\inc -I ..\user_function\inc-I.\RTE\_EncoderFCTBoard-IC:\Users\zhangch64\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\zhangch64\AppData\Local\Arm\Packs\Keil\STM32G4xx_DFP\1.5.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32G491xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G491xx-o encoderfctboard\flash_storage.o --omf_browse encoderfctboard\flash_storage.crf --depend encoderfctboard\flash_storage.d)
+I (..\user_function\inc\Flash_Storage.h)(0x6985B697)
 I (../Core/Inc/main.h)(0x6984612A)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h)(0x68A561C1)
 I (../Core/Inc/stm32g4xx_hal_conf.h)(0x69846129)

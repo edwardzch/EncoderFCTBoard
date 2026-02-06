@@ -5,6 +5,7 @@
 * @date      2026-02-06
 ****************************************************************************************/
 #include "DigitalTube_Control.h"
+#include "Flash_Storage.h"
 #include <string.h>
 
 // 引用外部 SPI 句柄
@@ -21,7 +22,7 @@ const uint8_t DTC_SegTable[] = {
     0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8, 
     0x80, 0x90, 0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8E, 
     0xBF, 0xFF, 0x89, 0xC7, 0x8C, 0x86, 0xF7, 0xAF, 
-    0x87, 0x92 
+    0x87, 0x92, 0xA3, 0xAB
 };
 
 // 字库索引宏定义
@@ -37,6 +38,8 @@ const uint8_t DTC_SegTable[] = {
 #define SEG_b           11
 #define SEG_t           24
 #define SEG_S           25
+#define SEG_o           26
+#define SEG_n           27
 
 // 【自定义】最高位分页符号 (0xFE = 上横杠)
 // 注意：此值直接作为段码发送，不查 SegTable
@@ -82,7 +85,8 @@ static DTC_ParamConfig_t DTC_GetConfig(uint8_t group, uint16_t index)
         cfg.Max = 0xFFFF;
     }
     if (group == 1 && index == 0) { // DP000: 2进制
-        cfg.Format = FMT_BIN; 
+				cfg.Width = BIT_32; 
+        cfg.Format = FMT_DEC; 
         cfg.Min = 0; 
         cfg.Max = 0xF;
     }
@@ -122,6 +126,8 @@ static void DTC_Update_Buffer(void)
         DTC_Dev.RawData[0] = DTC_Dev.ParamNum % 10;
         return;
     }
+
+
 
     // --- 3. 编辑/查看数值模式 ---
     DTC_ParamConfig_t cfg = DTC_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
@@ -247,6 +253,9 @@ static void DTC_Apply_Edit(uint8_t is_up)
     }
     // B. 在编辑界面：修改数值内容
     else {
+        // 新增: dP 参数组 (GroupIdx == 1) 为只读，不允许修改数值
+        if (DTC_Dev.GroupIdx == 1) return;
+
         DTC_ParamConfig_t cfg = DTC_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
         int64_t step = 1; 
         
@@ -287,13 +296,45 @@ static void DTC_Apply_Edit(uint8_t is_up)
 ****************************************************************************************/
 static void DTC_Key_Logic(void)
 {
-    uint8_t key_now = 0; 
     uint32_t idr = DTC_KEY_PORT->IDR;
+    
+    // 读取原始按键状态 (0为按下)
+    uint8_t k1_press = !(idr & PIN_MODE);
+    uint8_t k2_press = !(idr & PIN_UP);
+    uint8_t k3_press = !(idr & PIN_DOWN);
+    uint8_t k4_press = !(idr & PIN_SHIFT);
 
-    if (!(idr & PIN_MODE))       key_now = 1;
-    else if (!(idr & PIN_UP))    key_now = 2;
-    else if (!(idr & PIN_DOWN))  key_now = 3;
-    else if (!(idr & PIN_SHIFT)) key_now = 4;
+    // --- 优先处理特殊组合键: 复位报错 (Key 2 + Key 3) ---
+    if (k2_press && k3_press) {
+        if (DTC_Dev.Mode == DTC_MODE_ERROR) {
+            DTC_Dev.KeyTimer++;
+            // 需要持续按下一小段时间防止误触 (比如50ms)
+            if (DTC_Dev.KeyTimer >= 50 && !DTC_Dev.LongPressDone) {
+                 DTC_Dev.LongPressDone = 1;
+                 DTC_Dev.Mode = DTC_MODE_SELECT;
+                 DTC_Dev.ErrCode = 0;
+                 DTC_Update_Buffer();
+            }
+        }
+        return; // 处理组合键时屏蔽其他单键
+    }
+
+    // --- 处理开机动画退出 (Key 1) ---
+    if (DTC_Dev.Mode == DTC_MODE_ANIMATION && DTC_Dev.AnimState == ANIM_WAIT_KEY) {
+        if (k1_press) {
+            DTC_Dev.AnimState = ANIM_DONE;
+            DTC_Dev.Mode = DTC_MODE_SELECT;
+            DTC_Update_Buffer();
+        }
+        return; 
+    }
+
+    // --- 常规单键逻辑 (仅当无组合键时) ---
+    uint8_t key_now = 0;
+    if (k1_press) key_now = 1;
+    else if (k2_press) key_now = 2;
+    else if (k3_press) key_now = 3;
+    else if (k4_press) key_now = 4;
 
     if (key_now != 0) {
         // --- 按键按下时刻 ---
@@ -325,13 +366,14 @@ static void DTC_Key_Logic(void)
                 else DP_Buffer[DTC_Dev.ParamNum] = DTC_Dev.EditVal;
                 
                 DTC_SaveParams_Callback(); // 触发外部保存
-                DTC_Dev.Mode = DTC_MODE_SELECT;
+                // DTC_Dev.Mode = DTC_MODE_SELECT; // 移除：由回调函数决定下一模式(donE)
             }
             DTC_Update_Buffer();
         }
 
         // --- 连发逻辑 (Key 2/3) ---
-        if (DTC_Dev.KeyTimer >= KEY_LONG_MS && (key_now == 2 || key_now == 3)) {
+        // 只有在非错误模式下才处理加减连发
+        if (DTC_Dev.Mode != DTC_MODE_ERROR && DTC_Dev.KeyTimer >= KEY_LONG_MS && (key_now == 2 || key_now == 3)) {
             DTC_Dev.RepeatTimer++;
             if (DTC_Dev.RepeatTimer >= DTC_Dev.CurrentSpeed) {
                 DTC_Dev.RepeatTimer = 0;
@@ -346,36 +388,54 @@ static void DTC_Key_Logic(void)
         if (DTC_Dev.LastKey != 0) {
             // 如果未触发过长按，且时间超过消抖，则判定为短按
             if (!DTC_Dev.LongPressDone && DTC_Dev.KeyTimer >= KEY_DEBOUNCE_MS) {
-                switch (DTC_Dev.LastKey) {
-                    case 1: // Mod: 切换参数组 或 放弃编辑退出
-                        if (DTC_Dev.Mode == DTC_MODE_EDIT) {
-                            DTC_Dev.Mode = DTC_MODE_SELECT; // 不保存，直接退
-                        } else {
-                            DTC_Dev.GroupIdx = !DTC_Dev.GroupIdx;
-                            DTC_Dev.ParamNum = 0;
-                        }
-                        DTC_Update_Buffer();
-                        break;
-                    case 2: DTC_Apply_Edit(1); break; // Up: 加
-                    case 3: DTC_Apply_Edit(0); break; // Down: 减
-                    case 4: // Shift: 短按
-                        if (DTC_Dev.Mode == DTC_MODE_SELECT) {
-                            // 选择界面：左移光标 (个->十->百)
-                            if (++DTC_Dev.EditBit > 2) DTC_Dev.EditBit = 0;
-                        } 
-                        else if (DTC_Dev.Mode == DTC_MODE_EDIT) {
-                            // 编辑界面：
-                            DTC_ParamConfig_t cfg = DTC_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
-                            if (cfg.Format == FMT_DEC && cfg.Width == BIT_32) {
-                                // 32位十进制：切换分页 (低->中->高)
-                                if (++DTC_Dev.Page > PAGE_HIGH) DTC_Dev.Page = PAGE_LOW;
+                // 错误模式下屏蔽除复位外的单键操作
+                if (DTC_Dev.Mode == DTC_MODE_ERROR) {
+                     // 暂不响应单键，由组合键复位
+                }
+                else {
+                    switch (DTC_Dev.LastKey) {
+                        case 1: // Mod: 切换参数组 或 放弃编辑退出
+                            if (DTC_Dev.Mode == DTC_MODE_EDIT) {
+                                DTC_Dev.Mode = DTC_MODE_SELECT; // 不保存，直接退
                             } else {
-                                // 其他格式：移位光标
-                                if (++DTC_Dev.EditBit > 3) DTC_Dev.EditBit = 0;
+                                DTC_Dev.GroupIdx = !DTC_Dev.GroupIdx;
+                                DTC_Dev.ParamNum = 0;
                             }
                             DTC_Update_Buffer();
-                        }
-                        break;
+                            break;
+                        case 2: DTC_Apply_Edit(1); break; // Up: 加
+                        case 3: DTC_Apply_Edit(0); break; // Down: 减
+                        case 4: // Shift: 短按
+                            if (DTC_Dev.Mode == DTC_MODE_SELECT) {
+                                // 选择界面：左移光标 (个->十->百)
+                                if (++DTC_Dev.EditBit > 2) DTC_Dev.EditBit = 0;
+                            } 
+                            else if (DTC_Dev.Mode == DTC_MODE_EDIT) {
+                                // 编辑界面：
+                                DTC_ParamConfig_t cfg = DTC_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
+                                
+                                // 新增: dP组只允许翻页，不允许移位编辑
+                                if (DTC_Dev.GroupIdx == 1) {
+                                    if (cfg.Format == FMT_DEC && cfg.Width == BIT_32) {
+                                         // 32位允许切换分页查看
+                                         if (++DTC_Dev.Page > PAGE_HIGH) DTC_Dev.Page = PAGE_LOW;
+                                    }
+                                    // 其他格式(16位等)不允许任何操作(只读)
+                                }
+                                else {
+                                    // PA组: 允许翻页或移位
+                                    if (cfg.Format == FMT_DEC && cfg.Width == BIT_32) {
+                                        // 32位十进制：切换分页 (低->中->高)
+                                        if (++DTC_Dev.Page > PAGE_HIGH) DTC_Dev.Page = PAGE_LOW;
+                                    } else {
+                                        // 其他格式：移位光标
+                                        if (++DTC_Dev.EditBit > 3) DTC_Dev.EditBit = 0;
+                                    }
+                                }
+                                DTC_Update_Buffer();
+                            }
+                            break;
+                    }
                 }
             }
             DTC_Dev.LastKey = 0; 
@@ -408,33 +468,16 @@ static void DTC_HandleStartupAnimation(void)
             if (DTC_Dev.AnimStep >= 4) DTC_Dev.RawData[1] = SEG_S;
             if (DTC_Dev.AnimStep >= 5) DTC_Dev.RawData[0] = SEG_t;
             
-            if (DTC_Dev.AnimStep >= 5) { // 切换到闪烁阶段
-                DTC_Dev.AnimState = ANIM_BLINK;
+            if (DTC_Dev.AnimStep >= 5) { // 切换到等待模式
+                DTC_Dev.AnimState = ANIM_WAIT_KEY;
                 DTC_Dev.AnimStep = 0; 
                 DTC_Dev.AnimTimer = 0;
             }
         }
     }
-    // 阶段2：整体闪烁3次
-    else if (DTC_Dev.AnimState == ANIM_BLINK) {
-        DTC_Dev.AnimTimer++;
-        if (DTC_Dev.AnimTimer >= 300) { // 300ms 翻转
-            DTC_Dev.AnimTimer = 0;
-            DTC_Dev.AnimStep++;
-            
-            if (DTC_Dev.AnimStep > 6) { // 6次翻转 = 3次闪烁
-                DTC_Dev.AnimState = ANIM_DONE;
-                DTC_Dev.Mode = DTC_MODE_SELECT; // 进入主界面
-                DTC_Update_Buffer();
-            } else {
-                if (DTC_Dev.AnimStep % 2 != 0) {
-                    memset(DTC_Dev.RawData, SEG_OFF, 5); // 灭
-                } else {
-                    // 亮 Etest
-                    DTC_Dev.RawData[4]=SEG_E; DTC_Dev.RawData[3]=SEG_t; DTC_Dev.RawData[2]=SEG_E; DTC_Dev.RawData[1]=SEG_S; DTC_Dev.RawData[0]=SEG_t;
-                }
-            }
-        }
+    // 阶段2：等待 Key1 确认退出 (由 Key_Logic 处理退出逻辑)
+    else if (DTC_Dev.AnimState == ANIM_WAIT_KEY) {
+        // 保持显示 Etest，什么都不需要做
     }
 }
 
@@ -462,10 +505,6 @@ void DTC_Init(void)
     DTC_Dev.AnimState = ANIM_TYPEWRITER;
     DTC_Dev.AnimStep = 0;
     DTC_Dev.AnimTimer = 0;
-    
-    // 初始化测试数据
-    PA_Buffer[0] = 1234567890; // 测试32位大数
-    PA_Buffer[1] = 0xABCD;     // 测试Hex
 }
 
 /****************************************************************************************
@@ -483,6 +522,10 @@ void DTC_ScanHandler(void)
     // 1. 优先处理动画
     if (DTC_Dev.Mode == DTC_MODE_ANIMATION) {
         DTC_HandleStartupAnimation();
+        // 允许在等待按键阶段扫描按键
+        if (DTC_Dev.AnimState == ANIM_WAIT_KEY) {
+             DTC_Key_Logic();
+        }
     } else {
         DTC_Key_Logic(); 
     }
@@ -494,36 +537,75 @@ void DTC_ScanHandler(void)
         char_code = DTC_SegTable[DTC_Dev.RawData[scan_idx]];
     }
     
-    // 3. DP 闪烁光标逻辑 (核心修改部分)
+    // Err模式下 Err.20 固定点亮中间小数点 (先设置，再看是否被闪烁熄灭)
+    if (DTC_Dev.Mode == DTC_MODE_ERROR && scan_idx == 2) char_code &= 0x7F;
+
+    // 3. DP 闪烁光标逻辑 / 错误全局闪烁
+    DTC_Dev.BlinkCnt++;
+    // 3. DP 闪烁光标逻辑 / 错误全局闪烁
     DTC_Dev.BlinkCnt++;
     if (DTC_Dev.BlinkCnt >= 400) DTC_Dev.BlinkCnt = 0;
-
-    // 只有在非动画模式下才处理闪烁
-    if (DTC_Dev.Mode != DTC_MODE_ANIMATION) {
-        uint8_t blink_pos = 0xFF; // 0xFF表示不闪烁
-
-        // 情况A: 选择界面 (PA 001)
-        // EditBit 0->个位(RawData[0]), 1->十位(RawData[1]), 2->百位(RawData[2])
-        if (DTC_Dev.Mode == DTC_MODE_SELECT) {
-            blink_pos = DTC_Dev.EditBit; 
-        } 
-        // 情况B: 编辑界面 (数值)
-        else if (DTC_Dev.Mode == DTC_MODE_EDIT) {
-            DTC_ParamConfig_t cfg = DTC_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
-            // 32位分页模式通常不闪烁位(因为在翻页)，其他格式闪烁编辑位
-            if (!(cfg.Format == FMT_DEC && cfg.Width == BIT_32)) {
-                blink_pos = DTC_Dev.EditBit;
-            }
+    
+    // --- 处理消息模式计时 ---
+    if (DTC_Dev.Mode == DTC_MODE_MESSAGE) {
+        DTC_Dev.MsgTimer++;
+        if (DTC_Dev.MsgTimer >= 1200) { // 300ms * 4 = 1.2s (闪烁2次)
+            DTC_Dev.MsgTimer = 0;
+            DTC_Dev.Mode = DTC_MODE_SELECT; // 退出编辑
+            DTC_Update_Buffer();
         }
-
-        // 执行闪烁: 周期前200ms点亮DP
-        if (scan_idx == blink_pos && DTC_Dev.BlinkCnt < 200) {
-            char_code &= 0x7F; // 点亮 DP
+        
+        // 闪烁逻辑: 300ms 灭, 300ms 亮
+        // 0-299: OFF
+        // 300-599: ON
+        // 600-899: OFF
+        // 900-1199: ON
+        if ((DTC_Dev.MsgTimer / 300) % 2 == 0) {
+            char_code = DTC_SegTable[SEG_OFF];
         }
     }
-    
-    // Err模式下 Err.20 固定点亮中间小数点
-    if (DTC_Dev.Mode == DTC_MODE_ERROR && scan_idx == 2) char_code &= 0x7F;
+
+    // 只有在非动画模式下才处理
+    if (DTC_Dev.Mode != DTC_MODE_ANIMATION) {
+       
+        // ---- A. 故障报错整屏闪烁 ----
+        if (DTC_Dev.Mode == DTC_MODE_ERROR) {
+            // 亮/灭 周期
+             if (DTC_Dev.BlinkCnt >= 200) {
+                 // 熄灭所有段 (包含小数点)
+                 char_code = DTC_SegTable[SEG_OFF]; 
+             }
+        }
+        else {
+             // ---- B. 光标位闪烁 ----
+            uint8_t blink_pos = 0xFF; // 0xFF表示不闪烁
+
+            // 情况A: 选择界面 (PA 001)
+            // EditBit 0->个位(RawData[0]), 1->十位(RawData[1]), 2->百位(RawData[2])
+            if (DTC_Dev.Mode == DTC_MODE_SELECT) {
+                blink_pos = DTC_Dev.EditBit; 
+            } 
+            // 情况B: 编辑界面 (数值)
+            else if (DTC_Dev.Mode == DTC_MODE_EDIT) {
+                // 如果是 dP 组，强制不闪烁 (只读)
+                if (DTC_Dev.GroupIdx == 1) {
+                    blink_pos = 0xFF;
+                }
+                else {
+                    DTC_ParamConfig_t cfg = DTC_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
+                    // 32位分页模式通常不闪烁位(因为在翻页)，其他格式闪烁编辑位
+                    if (!(cfg.Format == FMT_DEC && cfg.Width == BIT_32)) {
+                        blink_pos = DTC_Dev.EditBit;
+                    }
+                }
+            }
+
+            // 执行闪烁: 周期前200ms点亮DP (这里是 blink on, 加上去)
+            if (scan_idx == blink_pos && DTC_Dev.BlinkCnt < 200) {
+                char_code &= 0x7F; // 点亮 DP
+            }
+        }
+    }
 
     // 4. DMA 发送
     DTC_DMA_Transmitter(char_code, DTC_PosTable[scan_idx]);
@@ -545,7 +627,25 @@ void DTC_SetError(uint16_t code)
     DTC_Update_Buffer(); 
 }
 
-// 弱定义回调函数
-__weak void DTC_SaveParams_Callback(void) {}
+#include "Flash_Storage.h"
+
+// ... (Existing code) ...
+
+// 弱定义回调函数 -> 强定义实现
+// __weak void DTC_SaveParams_Callback(void) {} 
+void DTC_SaveParams_Callback(void) 
+{
+    // 1. 先切换到消息提示模式 (避免 Flash 写入时卡在旧数值)
+    DTC_Dev.Mode = DTC_MODE_MESSAGE;
+    DTC_Dev.MsgTimer = 0;
+    DTC_Update_Buffer();
+    
+    // 延时一小段时间，确保 DMA 把 "donE" 发送出去
+    // (因为 Flash 操作会暂停 CPU，导致数码管停留在最后一帧)
+    HAL_Delay(10); 
+    
+    // 2. 保存参数到 Flash (此时数码管显示 donE)
+    Flash_SaveParams(PA_Buffer, PA_SIZE);
+}
 	
-	
+

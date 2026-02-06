@@ -276,7 +276,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8005000</StartAddress>
-                <Size>0x3b000</Size>
+                <Size>0x3a000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -582,6 +582,11 @@
               <FileName>DigitalTube_Control.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user_function\src\DigitalTube_Control.c</FilePath>
+            </File>
+            <File>
+              <FileName>Flash_Storage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_function\src\Flash_Storage.c</FilePath>
             </File>
           </Files>
         </Group>

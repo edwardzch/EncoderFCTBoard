@@ -35,4 +35,5 @@ encoderfctboard\digitaltube_control.o: ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32
 encoderfctboard\digitaltube_control.o: ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h
 encoderfctboard\digitaltube_control.o: ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h
 encoderfctboard\digitaltube_control.o: ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h
+encoderfctboard\digitaltube_control.o: ..\user_function\inc\Flash_Storage.h
 encoderfctboard\digitaltube_control.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
