@@ -1,0 +1,25 @@
+# ================= Keil MDK 编译产物 =================
+MDK-ARM/EncoderFCTBoard/*.o
+MDK-ARM/EncoderFCTBoard/*.d
+MDK-ARM/EncoderFCTBoard/*.crf
+MDK-ARM/EncoderFCTBoard/*.axf
+MDK-ARM/EncoderFCTBoard/*.hex
+MDK-ARM/EncoderFCTBoard/*.bin
+MDK-ARM/EncoderFCTBoard/*.map
+MDK-ARM/EncoderFCTBoard/*.lnp
+MDK-ARM/EncoderFCTBoard/*.htm
+MDK-ARM/EncoderFCTBoard/*.dep
+MDK-ARM/EncoderFCTBoard/*.build_log.htm
+MDK-ARM/EncoderFCTBoard/*.sct
+MDK-ARM/EncoderFCTBoard/*.lst
+
+# ================= Keil 用户界面配置 =================
+MDK-ARM/*.uvguix.*
+MDK-ARM/JLinkLog.txt
+MDK-ARM/JLinkSettings.ini
+
+# ================= 通用 =================
+*.bak
+*.tmp
+Thumbs.db
+.DS_Store
