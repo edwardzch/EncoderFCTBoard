@@ -40,3 +40,4 @@ encoderfctboard\uart_config.o: ..\user_function\inc\modbus_function.h
 encoderfctboard\uart_config.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 encoderfctboard\uart_config.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
 encoderfctboard\uart_config.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+encoderfctboard\uart_config.o: ..\user_function\inc\encoder_driver.h

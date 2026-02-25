@@ -1,0 +1,319 @@
+<?xml version="1.0"?>
+<settings>
+    <DebugChecksum>
+        <Checksum>871653034</Checksum>
+    </DebugChecksum>
+    <Exceptions>
+        <StopOnUncaught>_ 0</StopOnUncaught>
+        <StopOnThrow>_ 0</StopOnThrow>
+    </Exceptions>
+    <CodeCoverage>
+        <ShowSource>0</ShowSource>
+        <HideCovered>0</HideCovered>
+        <Enabled>_ 0</Enabled>
+    </CodeCoverage>
+    <Stack>
+        <FillEnabled>0</FillEnabled>
+        <OverflowWarningsEnabled>1</OverflowWarningsEnabled>
+        <WarningThreshold>90</WarningThreshold>
+        <SpWarningsEnabled>1</SpWarningsEnabled>
+        <WarnLogOnly>1</WarnLogOnly>
+        <UseTrigger>1</UseTrigger>
+        <TriggerName>main</TriggerName>
+        <LimitSize>0</LimitSize>
+        <ByteLimit>50</ByteLimit>
+    </Stack>
+    <CallStack>
+        <ShowArgs>0</ShowArgs>
+    </CallStack>
+    <Disassembly>
+        <MixedMode>1</MixedMode>
+        <InstrCount>0</InstrCount>
+    </Disassembly>
+    <JLinkDriver>
+        <TraceBufferSize>0x00010000</TraceBufferSize>
+        <TraceStallIfFIFOFull>0x00000000</TraceStallIfFIFOFull>
+        <TracePortSize>0x00000000</TracePortSize>
+        <CStepIntDis>_ 0</CStepIntDis>
+        <LeaveTargetRunning>_ 0</LeaveTargetRunning>
+    </JLinkDriver>
+    <SWOTraceHWSettings>
+        <OverrideDefaultClocks>0</OverrideDefaultClocks>
+        <CpuClock>100000000</CpuClock>
+        <ClockAutoDetect>0</ClockAutoDetect>
+        <ClockWanted>2000000</ClockWanted>
+        <JtagSpeed>2000000</JtagSpeed>
+        <Prescaler>50</Prescaler>
+        <TimeStampPrescIndex>0</TimeStampPrescIndex>
+        <TimeStampPrescData>0</TimeStampPrescData>
+        <PcSampCYCTAP>1</PcSampCYCTAP>
+        <PcSampPOSTCNT>15</PcSampPOSTCNT>
+        <PcSampIndex>0</PcSampIndex>
+        <DataLogMode>0</DataLogMode>
+        <ITMportsEnable>0</ITMportsEnable>
+        <ITMportsTermIO>0</ITMportsTermIO>
+        <ITMportsLogFile>0</ITMportsLogFile>
+        <ITMlogFile>$PROJ_DIR$\ITM.log</ITMlogFile>
+    </SWOTraceHWSettings>
+    <Log_file>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+        <Category>_ 0</Category>
+    </Log_file>
+    <Disassemble_mode>
+        <mode>0</mode>
+    </Disassemble_mode>
+    <InterruptStripe>
+        <Sort>1</Sort>
+    </InterruptStripe>
+    <Registers>
+        <regBase0>FTM0_MOD 10</regBase0>
+    </Registers>
+    <Interrupts>
+        <Enabled>1</Enabled>
+    </Interrupts>
+    <MemConfig>
+        <Base>1</Base>
+        <Manual>0</Manual>
+        <Ddf>1</Ddf>
+        <TypeViol>0</TypeViol>
+        <Stop>1</Stop>
+    </MemConfig>
+    <Simulator>
+        <Freq>10000000</Freq>
+        <FreqHi>0</FreqHi>
+        <MultiCoreRunAll>1</MultiCoreRunAll>
+    </Simulator>
+    <RecentFlashDownload>
+        <Path>D:\1130220108\1encoder\ADI\program\ADA4571_Encoder_2020103031_smartabs\EWARM\Debug\Exe\Encoder_kv30_ada4571.out</Path>
+    </RecentFlashDownload>
+    <struct_types>
+        <Fmt0>strModBus-ADR	4	0</Fmt0>
+        <Fmt1>strModBus-Busy0x03	4	0</Fmt1>
+        <Fmt2>strModBus-Busy0x06	4	0</Fmt2>
+        <Fmt3>strModBus-CMD	4	0</Fmt3>
+        <Fmt4>strModBus-EncoderErrCnt	3	0</Fmt4>
+        <Fmt5>strModBus-RXCRC	4	0</Fmt5>
+        <Fmt6>strModBus-RXCRCHigh	4	0</Fmt6>
+        <Fmt7>strModBus-RXCRCLow	4	0</Fmt7>
+        <Fmt8>strModBus-RXDataAddr	4	0</Fmt8>
+        <Fmt9>strModBus-RXDataAddrHigh	4	0</Fmt9>
+        <Fmt10>strModBus-RXDataAddrLow	4	0</Fmt10>
+        <Fmt11>strModBus-RXDataCountHigh	4	0</Fmt11>
+        <Fmt12>strModBus-RXDataCountLow	4	0</Fmt12>
+        <Fmt13>strModBus-RXDataSize	4	0</Fmt13>
+        <Fmt14>strModBus-TXCRCHigh	4	0</Fmt14>
+        <Fmt15>strModBus-TXCRCLow	4	0</Fmt15>
+        <Fmt16>strModBus-TXDataAddr	4	0</Fmt16>
+        <Fmt17>strModBus-TXDataAddrHigh	4	0</Fmt17>
+        <Fmt18>strModBus-TXDataAddrLow	4	0</Fmt18>
+        <Fmt19>strModBus-TXDataCount	4	0</Fmt19>
+        <Fmt20>strModBus-TXDataCountHigh	4	0</Fmt20>
+        <Fmt21>strModBus-TXDataCountLow	4	0</Fmt21>
+        <Fmt22>strModBus-TXDataHigh	4	0</Fmt22>
+        <Fmt23>strModBus-TXDataLow	4	0</Fmt23>
+        <Fmt24>strModBus-TXDataSize	3	0</Fmt24>
+        <Fmt25>strSMART-Absolute	3	0</Fmt25>
+        <Fmt26>strSMART-Address	3	0</Fmt26>
+        <Fmt27>strSMART-Busy	4	0</Fmt27>
+        <Fmt28>strSMART-CRC	4	0</Fmt28>
+        <Fmt29>strSMART-CRC_Check_Error	4	0</Fmt29>
+        <Fmt30>strSMART-CalStatus	4	0</Fmt30>
+        <Fmt31>strSMART-Data	3	0</Fmt31>
+        <Fmt32>strSMART-DefineFinish	4	0</Fmt32>
+        <Fmt33>strSMART-EncoderID	3	0</Fmt33>
+        <Fmt34>strSMART-NVM_STA	4	0</Fmt34>
+        <Fmt35>strSMART-Offset	3	0</Fmt35>
+        <Fmt36>strSMART-RequstID	4	0</Fmt36>
+        <Fmt37>strSMART-SpeedCnt	3	0</Fmt37>
+        <Fmt38>strSMART-SpeedErrorCnt	3	0</Fmt38>
+        <Fmt39>strSMART-SpeedPassCnt	3	0</Fmt39>
+        <Fmt40>strSMART-WarmTonic_STATUS	4	0</Fmt40>
+        <Fmt41>strSMART-ZERO_Flag	4	0</Fmt41>
+        <Fmt42>strTamagawa-GoodCnt	4	0</Fmt42>
+        <Fmt43>strTamagawa-NGCnt	3	0</Fmt43>
+        <Fmt44>strTamagawa-POS1High	4	0</Fmt44>
+        <Fmt45>strTamagawa-POS1Low	4	0</Fmt45>
+        <Fmt46>strTamagawa-POS2High	4	0</Fmt46>
+        <Fmt47>strTamagawa-POS2Low	4	0</Fmt47>
+        <Fmt48>strTamagawa-POSLow	3	0</Fmt48>
+    </struct_types>
+    <array_types>
+        <Fmt0>int[2]	3	0</Fmt0>
+        <Fmt1>uint8_t[100]	4	0</Fmt1>
+        <Fmt2>uint8_t[128]	4	0</Fmt2>
+        <Fmt3>uint8_t[1539]	4	0</Fmt3>
+        <Fmt4>uint8_t[1568]	4	0</Fmt4>
+        <Fmt5>uint8_t[16]	4	0</Fmt5>
+        <Fmt6>uint8_t[256]	4	0</Fmt6>
+        <Fmt7>uint8_t[32]	4	0</Fmt7>
+        <Fmt8>uint8_t[58]	4	0</Fmt8>
+        <Fmt9>uint8_t[70]	4	0</Fmt9>
+        <Fmt10>uint8_t[9]	3	0</Fmt10>
+    </array_types>
+    <watch_formats>
+        <Fmt0>{W}1:gnUart1TxData	0	2</Fmt0>
+        <Fmt1>{W}42:ADC0FS	3	0</Fmt1>
+        <Fmt2>{W}42:ADC0OFS	3	0</Fmt2>
+        <Fmt3>{W}42:ADC1OFS	3	0</Fmt3>
+        <Fmt4>{W}42:AveADC0Offset1	3	0</Fmt4>
+        <Fmt5>{W}42:Calibration_Mode	4	0</Fmt5>
+        <Fmt6>{W}42:CycleCnt	3	0</Fmt6>
+        <Fmt7>{W}42:DI1_DATA	4	0</Fmt7>
+        <Fmt8>{W}42:DI1_DATA_Flag	4	0</Fmt8>
+        <Fmt9>{W}42:DI2_DATA	4	0</Fmt9>
+        <Fmt10>{W}42:DI3_DATA	4	0</Fmt10>
+        <Fmt11>{W}42:DI4_DATA	4	0</Fmt11>
+        <Fmt12>{W}42:DriverDisenableSon	4	0</Fmt12>
+        <Fmt13>{W}42:Enc_Tx0xDA_Cnt	4	0</Fmt13>
+        <Fmt14>{W}42:Firmware_Version	3	0</Fmt14>
+        <Fmt15>{W}42:Flag_0x02	4	0</Fmt15>
+        <Fmt16>{W}42:Flag_0x52	4	0</Fmt16>
+        <Fmt17>{W}42:Flag_0xF2	4	0</Fmt17>
+        <Fmt18>{W}42:Hall_Cnt	3	0</Fmt18>
+        <Fmt19>{W}42:I2C_Road4AFlag_Check	3	0</Fmt19>
+        <Fmt20>{W}42:MT6835_ANGLE0	4	0</Fmt20>
+        <Fmt21>{W}42:MT6835_ANGLE1	4	0</Fmt21>
+        <Fmt22>{W}42:MT6835_ANGLE2	4	0</Fmt22>
+        <Fmt23>{W}42:MT6835_DefineCnt	4	0</Fmt23>
+        <Fmt24>{W}42:MT6835_STATUS	4	0</Fmt24>
+        <Fmt25>{W}42:ModBusCalibrationStep	4	0</Fmt25>
+        <Fmt26>{W}42:ModBus_RxSpeed_Flag	4	0</Fmt26>
+        <Fmt27>{W}42:Motor_SpdCnt	3	0</Fmt27>
+        <Fmt28>{W}42:RTU_07	4	0</Fmt28>
+        <Fmt29>{W}42:Read_CNT	4	0</Fmt29>
+        <Fmt30>{W}42:Text	3	0</Fmt30>
+        <Fmt31>{W}42:UART1_Len	3	0</Fmt31>
+        <Fmt32>{W}42:UARTCnt	3	0</Fmt32>
+        <Fmt33>{W}42:UniformSpeedCnt	3	0</Fmt33>
+        <Fmt34>{W}42:Work_Alarm	4	0</Fmt34>
+        <Fmt35>{W}42:check_num	4	0</Fmt35>
+        <Fmt36>{W}42:low_bufNum	3	0</Fmt36>
+        <Fmt37>{W}42:result	4	0</Fmt37>
+    </watch_formats>
+    <Trace1>
+        <Enabled>0</Enabled>
+        <ShowSource>1</ShowSource>
+    </Trace1>
+    <Trace2>
+        <Enabled>0</Enabled>
+        <ShowSource>0</ShowSource>
+    </Trace2>
+    <SWOTraceWindow>
+        <PcSampling>0</PcSampling>
+        <InterruptLogs>0</InterruptLogs>
+        <ForcedTimeStamps>0</ForcedTimeStamps>
+        <EventCPI>0</EventCPI>
+        <EventEXC>0</EventEXC>
+        <EventFOLD>0</EventFOLD>
+        <EventLSU>0</EventLSU>
+        <EventSLEEP>0</EventSLEEP>
+    </SWOTraceWindow>
+    <PowerLog>
+        <Title_0>I0</Title_0>
+        <Symbol_0>0 4 0</Symbol_0>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <LiveEnabled>0</LiveEnabled>
+        <LiveFile>PowerLogLive.log</LiveFile>
+    </PowerLog>
+    <DataLog>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+    </DataLog>
+    <InterruptLog>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+        <SumSortOrder>0</SumSortOrder>
+    </InterruptLog>
+    <EventLog>
+        <Title_0>Ch3</Title_0>
+        <Symbol_0>0 4 1</Symbol_0>
+        <Title_1>Ch2</Title_1>
+        <Symbol_1>0 4 1</Symbol_1>
+        <Title_2>Ch1</Title_2>
+        <Symbol_2>0 4 1</Symbol_2>
+        <Title_3>Ch0</Title_3>
+        <Symbol_3>0 4 1</Symbol_3>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+        <SumSortOrder>0</SumSortOrder>
+    </EventLog>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
+    <LogFile>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+        <Category>_ 0</Category>
+    </LogFile>
+    <DriverProfiling>
+        <Enabled>0</Enabled>
+        <Mode>1</Mode>
+        <Graph>0</Graph>
+        <Symbiont>0</Symbiont>
+        <Exclusions />
+    </DriverProfiling>
+    <CallStackLog>
+        <Enabled>0</Enabled>
+    </CallStackLog>
+    <CallStackStripe>
+        <ShowTiming>1</ShowTiming>
+    </CallStackStripe>
+    <PowerProbe>
+        <Frequency>10000</Frequency>
+        <Probe0>I0</Probe0>
+        <ProbeSetup0>2 1 1 2 0 0</ProbeSetup0>
+    </PowerProbe>
+    <DisassembleMode>
+        <mode>0</mode>
+    </DisassembleMode>
+    <Breakpoints2>
+        <Count>0</Count>
+    </Breakpoints2>
+    <Aliases>
+        <A0>_ "C:\Users\Administrator\Desktop\kv30\test2\startup_MKV30F12810.s" "C:\Users\Administrator\Desktop\kv30\test2\startup\startup_MKV30F12810.s"</A0>
+        <A1>_ "D:\ADA4571_Encoder_20200703(V1.21)\Project\src\main.c" "D:\Works\ADI\7_AMR\1_software\ADA4571_Encoder_20201201(V1.22)\Project\src\main.c"</A1>
+        <A2>_ "D:\Works\3_ADI\7_AMR\1_software\ADA4571_Encoder_20200311(V1.18)\Drivers\KV30_HAL_Driver\src\fsl_adc16.c" "D:\Works\ADI\7_AMR\1_software\ADA4571_Encoder_20201201(V1.22)\Drivers\KV30_HAL_Driver\src\fsl_adc16.c"</A2>
+        <A3>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\BSP\src\adc.c" ""</A3>
+        <A4>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\BSP\src\clock_config.c" ""</A4>
+        <A5>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\BSP\src\eeprom.c" ""</A5>
+        <A6>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\BSP\src\ftm.c" ""</A6>
+        <A7>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\BSP\src\ioport.c" ""</A7>
+        <A8>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\BSP\src\smartabs.c" ""</A8>
+        <A9>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\CMSIS\Device\system_MKV30F12810.c" ""</A9>
+        <A10>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\inc\fsl_clock.h" ""</A10>
+        <A11>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\inc\fsl_pdb.h" ""</A11>
+        <A12>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\src\fsl_adc16.c" ""</A12>
+        <A13>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\src\fsl_clock.c" ""</A13>
+        <A14>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\src\fsl_dmamux.c" ""</A14>
+        <A15>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\src\fsl_edma.c" ""</A15>
+        <A16>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\src\fsl_ftm.c" ""</A16>
+        <A17>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\src\fsl_i2c.c" ""</A17>
+        <A18>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\src\fsl_pdb.c" ""</A18>
+        <A19>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\src\fsl_uart.c" ""</A19>
+        <A20>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Drivers\KV30_HAL_Driver\src\fsl_uart_edma.c" ""</A20>
+        <A21>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\EWARM\startup_MKV30F12810.s" ""</A21>
+        <A22>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200117D\Project\src\main.c" ""</A22>
+        <A23>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200128B\Drivers\KV30_HAL_Driver\src\fsl_adc16.c" ""</A23>
+        <A24>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200130\BSP\src\clock_config.c" ""</A24>
+        <A25>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200130\Drivers\CMSIS\Device\system_MKV30F12810.c" ""</A25>
+        <A26>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200130\Drivers\KV30_HAL_Driver\src\fsl_clock.c" ""</A26>
+        <A27>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200130\Drivers\KV30_HAL_Driver\src\fsl_i2c.c" ""</A27>
+        <A28>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200130\Drivers\KV30_HAL_Driver\src\fsl_uart.c" ""</A28>
+        <A29>_ "D:\Works\ADI\7_AMR\1_software\DORNA_Encoder_20200130\EWARM\startup_MKV30F12810.s" ""</A29>
+        <Count>30</Count>
+        <SuppressDialog>1</SuppressDialog>
+    </Aliases>
+</settings>

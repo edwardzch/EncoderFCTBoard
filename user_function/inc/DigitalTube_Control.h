@@ -2,16 +2,13 @@
 * @file      DigitalTube_Control.h
 * @brief     数码管驱动头文件 (包含属性配置、状态机定义与硬件映射)
 * @author    Gemini
-* @date      2026-02-06
+* @date      2026-02-09
 ****************************************************************************************/
 #ifndef __DIGITALTUBE_CONTROL_H
 #define __DIGITALTUBE_CONTROL_H
 
 #include "main.h"
-
-// ================= 缓冲区大小定义 =================
-#define PA_SIZE 50                              // PA 参数组容量
-#define DP_SIZE 50                              // dP 参数组容量
+#include "Parameter_Module.h" // 包含参数定义
 
 // ================= 硬件引脚映射 =================
 // 锁存引脚 (RCLK/NSS)
@@ -36,25 +33,6 @@
 
 // ================= 枚举定义 =================
 
-// 数据显示进制
-typedef enum { 
-    FMT_DEC = 0,                                // 十进制
-    FMT_HEX,                                    // 十六进制 (H.)
-    FMT_BIN                                     // 二进制 (b.)
-} DTC_Format_t;
-
-// 数据符号属性
-typedef enum { 
-    SIGNED = 0,                                 // 有符号
-    UNSIGNED                                    // 无符号
-} DTC_Sign_t;
-
-// 数据位宽属性
-typedef enum { 
-    BIT_16 = 0,                                 // 16位数据
-    BIT_32                                      // 32位数据 (启用分页)
-} DTC_Width_t; 
-
 // 32位数据分页状态
 typedef enum { 
     PAGE_LOW = 0,                               // 低位页 (_ 1234)
@@ -70,15 +48,6 @@ typedef enum {
     DTC_MODE_ERROR,                             // 故障报错模式
     DTC_MODE_MESSAGE                            // 消息提示模式 (donE)
 } DTC_DispMode_t;
-
-// 单个参数的属性配置
-typedef struct {
-    DTC_Sign_t   Sign;                          // 符号属性
-    DTC_Format_t Format;                        // 显示进制
-    DTC_Width_t  Width;                         // 数据位宽
-    int32_t      Min;                           // 最小值限制
-    int32_t      Max;                           // 最大值限制
-} DTC_ParamConfig_t;
 
 // 开机动画子状态
 typedef enum {
@@ -104,7 +73,7 @@ typedef struct {
     uint16_t CurrentSpeed;                      // 当前连发速度
     uint8_t  LastKey;                           // 上一次按下的键值
     uint8_t  LongPressDone;                     // 长按已处理标志
-    uint16_t ErrCode;                           // 错误代码
+    uint16_t ErrCode;                           // 错误代码 (或临时数据)
 
     // 动画专用变量
     DTC_AnimState_t AnimState;                  // 动画子状态
@@ -117,11 +86,6 @@ typedef struct {
 void DTC_Init(void);                            // 初始化函数
 void DTC_ScanHandler(void);                     // 扫描中断处理函数 (1ms)
 void DTC_SetError(uint16_t code);               // 报错显示函数
+void DTC_SaveParams_Callback(void);             // 保存回调
 
-// 用户需实现的回调函数 (模拟 Flash 保存)
-void DTC_SaveParams_Callback(void); 
-
-extern int32_t PA_Buffer[PA_SIZE];              // PA 参数数组
-extern int32_t DP_Buffer[DP_SIZE];              // dP 参数数组
-
-#endif
+#endif /* __DIGITALTUBE_CONTROL_H */

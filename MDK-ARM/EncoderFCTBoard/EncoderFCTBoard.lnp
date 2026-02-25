@@ -35,6 +35,17 @@
 "encoderfctboard\relay_control.o"
 "encoderfctboard\digitaltube_control.o"
 "encoderfctboard\flash_storage.o"
+"encoderfctboard\parameter_module.o"
+"encoderfctboard\encoder_driver.o"
+"encoderfctboard\encoder_modbus.o"
+"encoderfctboard\encoder_multiturnmag.o"
+"encoderfctboard\encoder_mgtmag.o"
+"encoderfctboard\encoder_multiturnopt.o"
+"encoderfctboard\encoder_nxpmag.o"
+"encoderfctboard\encoder_sensar.o"
+"encoderfctboard\encoder_tamagawa.o"
+"encoderfctboard\encoder_dispatcher.o"
+"encoderfctboard\encoder_speed.o"
 --strict --scatter "EncoderFCTBoard\EncoderFCTBoard.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

@@ -1,0 +1,999 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <fileVersion>4</fileVersion>
+    <fileChecksum>546930687</fileChecksum>
+    <configuration>
+        <name>Debug</name>
+        <outputs>
+            <file>$PROJ_DIR$\..\BSP\src\Function.c</file>
+            <file>$PROJ_DIR$\startup_MKV30F12810.s</file>
+            <file>$PROJ_DIR$\..\BSP\src\SensAREncoder.c</file>
+            <file>$PROJ_DIR$\..\BSP\src\MultiturnOpticalEncoder.c</file>
+            <file>$PROJ_DIR$\..\BSP\src\iap_function.c</file>
+            <file>$PROJ_DIR$\..\BSP\src\ModBus.c</file>
+            <file>$PROJ_DIR$\..\Project\src\main.c</file>
+            <file>$PROJ_DIR$\..\BSP\src\TamagawaEncoder.c</file>
+            <file>$PROJ_DIR$\..\BSP\src\MGTMagneticEncoder.c</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_adc16.c</file>
+            <file>$PROJ_DIR$\..\BSP\src\NXPMagneticEncoder.c</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\system_MKV30F12810.c</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_clock.c</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_dmamux.c</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_dspi.c</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_edma.c</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_ftm.c</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_gpio.c</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_i2c.c</file>
+            <file>$PROJ_DIR$\..\BSP\src\MultiturnMagneticEncoder.c</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_pdb.c</file>
+            <file>$PROJ_DIR$\Debug\Obj\clock_config.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\MGTMagneticEncoder.__cstat.et</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\MKV30F12810_features.h</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_flash.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_i2c.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\cmsis_compiler.h</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_edma.h</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_clock.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\23bitAbsoluteEncoderFCT.pbd</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_adc16.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_edma.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_smc.__cstat.et</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_dspi.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_gpio.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\MGTMagneticEncoder.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\MultiturnOpticalEncoder.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\NXPMagneticEncoder.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\Function.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\ModBus.__cstat.et</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_adc16.h</file>
+            <file>$PROJ_DIR$\..\UserConfig\inc\gpio_config.h</file>
+            <file>$PROJ_DIR$\..\BSP\inc\SensAREncoder.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_dspi.o</file>
+            <file>$PROJ_DIR$\..\BSP\src\MT6835_NLC.lib</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_ftfx_features.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\uart_config.__cstat.et</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_pdb.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stddef.h</file>
+            <file>$PROJ_DIR$\Debug\Exe\23bitAbsoluteEncoderFCTV2.2.bin</file>
+            <file>$PROJ_DIR$\Debug\Obj\TamagawaEncoder.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_edma.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_i2c.__cstat.et</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\assert.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\MultiturnMagneticEncoder.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_ftm.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\system_MKV30F12810.pbi</file>
+            <file>$PROJ_DIR$\..\BSP\inc\MGTMagneticEncoder.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_clock.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\main.o</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_ftfx_cache.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\uart_config.o</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_ftfx_utilities.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_adc16.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_dspi.__cstat.et</file>
+            <file>$PROJ_DIR$\..\UserConfig\inc\uart_config.h</file>
+            <file>$PROJ_DIR$\..\BSP\inc\iap_function.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_uart.o</file>
+            <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\ModBus.pbi</file>
+            <file>$TOOLKIT_DIR$\lib\dl7M_tln.a</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_pit.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_gpio.o</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\system_MKV30F12810.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_uart.pbi</file>
+            <file>$PROJ_DIR$\..\BSP\inc\Function.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_i2c.o</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_ftfx_adapter.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\Function.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\cmsis_version.h</file>
+            <file>$PROJ_DIR$\..\BSP\inc\NXPMagneticEncoder.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\MultiturnMagneticEncoder.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\system_MKV30F12810.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\startup_MKV30F12810.o</file>
+            <file>$PROJ_DIR$\..\BSP\inc\TamagawaEncoder.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\iap_function.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\NXPMagneticEncoder.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_smc.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product_stdlib.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\pit_congfig.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\gpio_config.__cstat.et</file>
+            <file>$TOOLKIT_DIR$\inc\c\math.h</file>
+            <file>$PROJ_DIR$\..\UserConfig\inc\clock_config.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\Function.__cstat.et</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\cmsis_iccarm.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\TamagawaEncoder.o</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\main.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_dspi.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\SensAREncoder.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\pit_congfig.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\List\Encoder_kv30_ada4571.map</file>
+            <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
+            <file>$PROJ_DIR$\Debug\Exe\Encoder_kv30_ada4571.out</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_gpio.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_ftm.pbi</file>
+            <file>$PROJ_DIR$\..\..\EncoderTest_V2.1\EWARM\MKV30F128_APP.icf</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_uart_edma.h</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_smc.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_pdb.__cstat.et</file>
+            <file>$PROJ_DIR$\..\BSP\inc\MultiturnMagneticEncoder.h</file>
+            <file>$PROJ_DIR$\..\BSP\inc\MultiturnOpticalEncoder.h</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_i2c.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\MultiturnMagneticEncoder.__cstat.et</file>
+            <file>$TOOLKIT_DIR$\lib\m7M_tls.a</file>
+            <file>$TOOLKIT_DIR$\inc\c\iccarm_builtin.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_uart.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_dmamux.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_uart.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\system_MKV30F12810.__cstat.et</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_clock.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_port.h</file>
+            <file>$TOOLKIT_DIR$\lib\shb_l.a</file>
+            <file>$PROJ_DIR$\Debug\Obj\gpio_config.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_dmamux.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\core_cm4.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_adc16.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_edma.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_common.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_dmamux.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_pdb.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_pit.o</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\fsl_device_registers.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_smc.o</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\MKV30F12810.h</file>
+            <file>$PROJ_DIR$\..\UserConfig\inc\pit_config.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\clock_config.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\NXPMagneticEncoder.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_gpio.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_clock.o</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdarg.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\gpio_config.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\MGTMagneticEncoder.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\iap_function.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\clock_config.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_pit.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_dmamux.o</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_ftm.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_uart_edma.pbi</file>
+            <file>$PROJ_DIR$\..\UserConfig\src\uart_config.c</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_ftfx_controller.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\SensAREncoder.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_pit.c</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_uart_edma.__cstat.et</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_smc.c</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_ftm.__cstat.et</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_pdb.o</file>
+            <file>$PROJ_DIR$\Debug\Obj\MultiturnOpticalEncoder.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\ModBus.o</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_uart_edma.c</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_pit.pbi</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_uart.c</file>
+            <file>$PROJ_DIR$\..\UserConfig\src\clock_config.c</file>
+            <file>$PROJ_DIR$\..\BSP\inc\ModBus.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\SensAREncoder.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\pit_congfig.pbi</file>
+            <file>$PROJ_DIR$\Debug\Obj\iap_function.o</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_common_arm.h</file>
+            <file>$PROJ_DIR$\Debug\Obj\uart_config.pbi</file>
+            <file>$PROJ_DIR$\..\UserConfig\src\gpio_config.c</file>
+            <file>$PROJ_DIR$\..\UserConfig\src\pit_congfig.c</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_float_setup.h</file>
+            <file>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\inc\fsl_ftfx_flash.h</file>
+            <file>$PROJ_DIR$\..\ReadMe.txt</file>
+            <file>$PROJ_DIR$\Debug\Obj\TamagawaEncoder.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\MultiturnOpticalEncoder.__cstat.et</file>
+            <file>$PROJ_DIR$\Debug\Obj\fsl_uart_edma.o</file>
+        </outputs>
+        <file>
+            <name>[ROOT_NODE]</name>
+            <outputs>
+                <tool>
+                    <name>ILINK</name>
+                    <file> 109 107</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\BSP\src\Function.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 38</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 83</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 98</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 72 52 71 55 76 101 102 153 127 41 97 136 56 124 45 166 93 49 141 143 133 84 26 99 121 78 23 178 28 110 129 144 75 68 125 113 27 132 80 60 85 116 117 89 42 174</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 55 97 85 136 144 42 71 124 143 84 27 113 132 127 80 117 52 110 72 141 45 125 129 149 41 68 60 116 89 174 102 153 76 101 56 166 49 78 26 99 121 75 178 93 23 133 28</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\startup_MKV30F12810.s</name>
+            <outputs>
+                <tool>
+                    <name>AARM</name>
+                    <file> 88</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\BSP\src\SensAREncoder.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 105</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 161</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 175</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 72 52 71 55 76 101 102 153 127 42 97 136 56 124 45 166 93 49 141 143 133 84 26 99 121 78 23 178 28 129 110 125 113 27 132 80</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 136 132 166 102 71 129 84 80 52 27 56 93 127 55 125 45 49 178 23 133 110 149 42 153 76 101 97 113 124 72 141 143 78 26 99 121 28</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\BSP\src\MultiturnOpticalEncoder.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 36</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 168</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 186</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 41 97 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 110 129 144 75 68 125 113 27 132 117 80 42 174</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 55 136 97 45 52 113 125 80 49 178 143 84 132 68 174 129 56 166 71 102 78 26 99 121 75 110 27 144 117 42 124 72 141 76 101 153 93 23 133 28 41</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\BSP\src\iap_function.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 177</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 152</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 90</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 45 52 71 55 76 101 124 72 102 153 143 133 84 26 99 121 78 24 63 160 46 136 56 166 93 49 141 23 178 28 82 65 183 69 68 97 129 110 125 113 27 132</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 28 97 101 63 52 102 136 24 71 45 141 72 68 76 133 84 160 113 124 143 69 55 153 78 26 99 121 46 110 132 125 183 65 82 56 166 49 178 93 23 129 27</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\BSP\src\ModBus.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 169</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 73</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 39</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 72 52 71 55 76 101 102 153 127 144 97 136 56 124 45 166 93 49 141 143 133 84 26 99 121 78 23 178 28 75 41 110 129 68 125 113 27 132 80 89 85 60 117 116 42 174 69</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 23 71 129 85 55 45 52 113 110 41 42 49 178 133 97 136 27 132 124 127 80 117 69 75 56 166 93 102 28 125 149 144 68 89 60 116 174 153 76 101 72 141 143 78 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Project\src\main.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 62</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 138</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 103</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 127 52 71 55 76 101 102 96 182 97 136 56 124 45 72 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 68 129 110 125 113 27 132 144 75 41 174 80 89 42 60 116 85 117</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 97 125 110 45 52 113 89 136 144 85 102 101 49 178 71 143 84 27 129 174 60 76 56 166 78 26 99 121 132 96 68 41 80 42 116 117 55 182 124 72 141 153 93 23 133 28 127 75</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\BSP\src\TamagawaEncoder.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 100</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 51</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 185</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 41 97 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 110 129 144 75 68 125 113 27 132 89 80 174</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 101 27 141 52 153 80 110 72 102 125 132 68 124 76 71 93 45 28 129 144 89 174 97 136 56 166 49 178 55 23 133 113 41 143 78 84 26 99 121 75</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\BSP\src\MGTMagneticEncoder.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 151</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 35</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 22</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 41 97 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 110 129 144 75 68 125 113 27 132 60 80 174</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 72 110 52 71 97 133 125 80 141 101 153 23 99 136 132 27 68 124 76 102 93 26 121 75 129 113 144 60 174 56 45 166 49 178 55 143 78 84 41 28</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_adc16.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 30</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 66</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 134</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 40 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 124 102 71 136 76 93 72 141 52 101 153 23 133 45 28 56 166 49 178 55 143 78 40 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\BSP\src\NXPMagneticEncoder.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 146</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 91</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 37</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 41 97 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 110 129 144 75 68 125 113 27 132 85 80 174</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 136 55 45 97 52 113 125 110 80 49 178 143 68 129 56 166 71 102 78 84 132 144 85 174 124 72 141 76 101 153 93 23 133 26 99 121 75 27 41 28</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\CMSIS\Device\system_MKV30F12810.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 87</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 59</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 126</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 45 52 71 55 76 101 141 143 133 84 26 99 121 78 23</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 45 52 71 141 55 23 133 76 101 143 78 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_clock.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 148</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 128</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 61</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 28 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 71 78 166 102 56 52 136 45 49 178 55 143 124 72 141 76 101 153 93 23 133 28 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_dmamux.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 156</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 123</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 137</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 132 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 71 78 166 102 136 56 52 45 49 178 55 143 28 124 72 141 76 101 153 93 23 133 132 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_dspi.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 43</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 104</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 67</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 33 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 71 124 102 76 93 45 28 136 72 141 52 101 153 23 133 33 56 166 49 178 55 143 78 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_edma.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 31</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 135</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 53</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 27 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 124 71 102 72 141 52 76 93 45 28 136 56 166 49 178 55 101 153 23 133 27 143 78 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_ftm.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 58</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 111</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 165</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 157 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 52 56 71 166 102 78 45 49 178 55 143 28 136 124 72 141 76 101 153 93 23 133 157 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_gpio.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 77</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 147</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 34</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 110 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 55 45 52 136 49 178 143 56 166 71 102 78 28 124 72 141 76 101 153 93 23 133 110 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_i2c.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 81</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 25</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 54</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 118 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 166 71 102 78 56 52 136 45 49 178 55 143 28 124 72 141 76 101 153 93 23 133 118 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\BSP\src\MultiturnMagneticEncoder.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 86</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 57</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 119</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 41 97 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 110 129 144 75 68 125 113 27 132 116 80 174</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 110 27 102 125 124 80 71 132 68 76 93 45 28 129 144 116 174 72 141 52 101 153 23 133 97 136 113 41 56 166 49 178 55 143 78 84 26 99 121 75</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_pdb.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 167</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 139</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 115</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 48 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 71 78 166 102 56 52 45 49 178 55 143 28 136 124 72 141 76 101 153 93 23 133 48 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\Debug\Exe\Encoder_kv30_ada4571.out</name>
+            <outputs>
+                <tool>
+                    <name>OBJCOPY</name>
+                    <file> 50</file>
+                </tool>
+                <tool>
+                    <name>ILINK</name>
+                    <file> 107</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ILINK</name>
+                    <file> 112 145 30 148 156 43 31 58 77 81 167 140 142 70 187 38 150 177 62 151 169 86 36 146 94 105 88 87 100 64 44 130 108 120 74</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\UserConfig\src\uart_config.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 64</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 179</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 47</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 68 97 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 129 110 125 113 27 132 174</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 133 125 52 136 97 72 71 141 101 153 23 26 121 129 27 124 76 102 93 99 113 174 110 132 56 45 166 49 178 55 143 78 84 68 28</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_pit.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 140</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 171</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 155</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 75 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 71 124 102 136 76 93 72 141 52 101 153 23 133 45 28 56 166 49 178 55 143 78 75 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_smc.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 142</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 92</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 32</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 114 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 78 71 166 102 136 56 52 45 49 178 55 143 28 124 72 141 76 101 153 93 23 133 114 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_uart_edma.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 187</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 158</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 163</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 113 125 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 27</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 45 52 84 55 125 49 178 143 56 166 71 102 78 136 27 124 72 141 76 101 153 93 23 133 26 99 121 113 28</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\KV30_HAL_Driver\src\fsl_uart.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 70</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 79</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 122</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 125 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 52 56 71 166 102 78 45 49 178 55 143 28 136 124 72 141 76 101 153 93 23 133 125 84 26 99 121</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\UserConfig\src\clock_config.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 145</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 154</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 21</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 114 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 97</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 101 141 23 52 153 99 136 72 71 133 124 76 102 93 26 121 97 56 45 166 49 178 55 143 78 84 114 28</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\UserConfig\src\gpio_config.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 150</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 131</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 95</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 41 97 110 129</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 52 153 141 101 23 45 72 71 133 110 124 76 102 93 41 56 166 49 178 55 143 78 28 136 84 26 99 121 97 129</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\UserConfig\src\pit_congfig.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 94</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 176</file>
+                </tool>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 106</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 136 56 52 71 55 76 101 124 45 72 102 153 166 93 49 141 143 133 84 26 99 121 78 23 178 28 144 97 75</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 52 56 71 166 102 78 45 28 49 178 55 143 136 144 124 72 141 76 101 153 93 23 133 75 84 26 99 121 97</file>
+                </tool>
+            </inputs>
+        </file>
+    </configuration>
+    <configuration>
+        <name>Release</name>
+        <outputs />
+        <forcedrebuild>
+            <name>[MULTI_TOOL]</name>
+            <tool>ILINK</tool>
+        </forcedrebuild>
+    </configuration>
+</project>

@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include "encoder_driver.h"
 
 volatile strUsart1  Usart1 = {0};
 
@@ -25,11 +26,10 @@ void uart_config(void)
     // 开启 DMA 发送完成中断 (DMA1_Channel2 用于 USART1_TX)
     DMA1_Channel2->CCR |= DMA_CCR_TCIE;
     
-    // 开启 RXNE 接收中断和 IDLE 空闲中断
-    USART1->CR1 |= USART_CR1_RXNEIE | USART_CR1_IDLEIE;
-    
     // 设置为接收模式
     Usart1RxEnable();
+	
+		RS485_RX_ENABLE();
 }
 
 /**************************************************************************************

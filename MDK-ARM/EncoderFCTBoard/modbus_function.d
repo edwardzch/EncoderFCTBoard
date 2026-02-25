@@ -43,3 +43,7 @@ encoderfctboard\modbus_function.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
 encoderfctboard\modbus_function.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 encoderfctboard\modbus_function.o: ..\user_function\inc\iap_function.h
 encoderfctboard\modbus_function.o: ..\user_function\inc\delay_function.h
+encoderfctboard\modbus_function.o: ..\user_function\inc\encoder_modbus.h
+encoderfctboard\modbus_function.o: ..\user_function\inc\encoder_driver.h
+encoderfctboard\modbus_function.o: ..\user_function\inc\Encoder_MultiturnMag.h
+encoderfctboard\modbus_function.o: ..\user_function\inc\Encoder_SensAR.h

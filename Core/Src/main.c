@@ -32,6 +32,7 @@
 #include "relay_control.h"
 #include "DigitalTube_Control.h"
 #include "Flash_Storage.h"
+#include "Parameter_Module.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,13 +106,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	uart_config();
 	Relay_AllOff();
-	//dma1_channel1_config();
-	DTC_Init();
-    // 加载 Flash 参数
-    // Load_PA_From_Flash (使用新模块函数) -> 增加返回值判断
-    if (Flash_LoadParams(PA_Buffer, PA_SIZE) != 0) {
-        DTC_SetError(1); // Err.01: Flash 空或 CRC 错误
-    }
+  PM_Init();  // 初始化参数模块 (自动加载Flash)
+	DTC_Init(); // 初始化数码管   
     
 	HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */

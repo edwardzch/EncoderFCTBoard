@@ -11,6 +11,12 @@
 #include <stdio.h>
 #include "iap_function.h"
 #include "delay_function.h"
+#include "encoder_modbus.h"  // 编码器测试模块
+#include "encoder_driver.h"   // TIM1_Stop_Direct
+#include "Encoder_MultiturnMag.h"  // g_MotorEncoder
+#include "Encoder_SensAR.h"        // g_SensAR
+
+extern volatile uint8_t Work_Alarm;
 
 volatile strModBus ModBus = {0};
 
@@ -52,6 +58,7 @@ uint16_t Modbus_CRC16(volatile uint8_t * Data, uint8_t Len)
 * 输入参量：exception_code 异常码
 * 输出参量：无
 ****************************************************************************************/
+/*
 void ModBus_Slave_SendErrorResponse(uint8_t exception_code)
 {   
     Usart1.TxData[0] = ModBus.Slave.ADDR;
@@ -64,6 +71,7 @@ void ModBus_Slave_SendErrorResponse(uint8_t exception_code)
     Usart1.Tx.DataSize = 5;
     Usart1TransmitterDMA(&Usart1.Tx);
 }
+*/
 
 /****************************************************************************************
 * 函数名称：ModBus_SlaveRx03DataCollation
@@ -136,16 +144,41 @@ void ModBus_SlaveRx03(void)
     if(Usart1.DataCnt == 8){
         ModBus_SlaveRx03DataCollation();
         if(Usart1.RxData[6] != ModBus.Slave.Rx.CRCLow || Usart1.RxData[7] != ModBus.Slave.Rx.CRCHigh){
-            ModBus_Slave_SendErrorResponse(0x01); // CRC 校验错误
+            ModBus_Crc_Error(); // CRC 校验错误
         }else{
-            if ((ModBus.Slave.Rx.DataAddr + ModBus.Slave.Rx.DataSize) <= MODBUS_REGISTER_COUNT) {
-                 ModBus_SlaveReturnTx03(ModBus.Slave.Rx.DataAddr, ModBus.Slave.Rx.DataSize);
+            // 检查是否为编码器模块地址 (0x01xx)
+            if (EncoderModbus_IsMyAddress(ModBus.Slave.Rx.DataAddr)) {
+                // 编码器模块处理
+                uint16_t i;
+                uint8_t data_bytes = ModBus.Slave.Rx.DataSize * 2;
+                uint8_t frame_len_no_crc = 3 + data_bytes;
+                
+                Usart1.TxData[0] = ModBus.Slave.ADDR;
+                Usart1.TxData[1] = ModBus.Slave.CMD;
+                Usart1.TxData[2] = data_bytes;
+                
+                for (i = 0; i < ModBus.Slave.Rx.DataSize; i++) {
+                    uint16_t regValue = EncoderModbus_ReadReg(ModBus.Slave.Rx.DataAddr + i);
+                    Usart1.TxData[3 + i * 2] = (uint8_t)(regValue >> 8);
+                    Usart1.TxData[4 + i * 2] = (uint8_t)(regValue & 0xFF);
+                }
+                
+                uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, frame_len_no_crc);
+                Usart1.TxData[frame_len_no_crc] = (uint8_t)(crc & 0xFF);
+                Usart1.TxData[frame_len_no_crc + 1] = (uint8_t)(crc >> 8);
+                
+                Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+                Usart1.Tx.DataSize = frame_len_no_crc + 2;
+                Usart1TransmitterDMA(&Usart1.Tx);
+            } else if (ModBus.Slave.Rx.DataAddr >= MODBUS_REG_BASE_ADDR && 
+                       (ModBus.Slave.Rx.DataAddr - MODBUS_REG_BASE_ADDR + ModBus.Slave.Rx.DataSize) <= MODBUS_REGISTER_COUNT) {
+                 ModBus_SlaveReturnTx03(ModBus.Slave.Rx.DataAddr - MODBUS_REG_BASE_ADDR, ModBus.Slave.Rx.DataSize);
             } else {
-                 ModBus_Slave_SendErrorResponse(0x02); // 非法数据地址
+                 Communication_Address_Error(); // 非法数据地址
             } 
         }
     }else{
-        ModBus_Slave_SendErrorResponse(0x03); // 非法数据值 (用于长度错误)
+        Communication_Length_Error(); // 长度错误
     }
 }
 
@@ -214,7 +247,7 @@ void ModBus_SlaveRx04(void)
     if (Usart1.DataCnt == 8) {
         ModBus_SlaveRx04DataCollation();
         if (Usart1.RxData[6] != ModBus.Slave.Rx.CRCLow || Usart1.RxData[7] != ModBus.Slave.Rx.CRCHigh) {
-            ModBus_Slave_SendErrorResponse(0x01); // CRC 校验错误
+            ModBus_Crc_Error(); // CRC 校验错误
         } else {
             if ((ModBus.Slave.Rx.DataAddr + ModBus.Slave.Rx.DataSize) <= MODBUS_REGISTER_COUNT) {                            
                 for (i = 0; i < ModBus.Slave.Rx.DataSize; i++) {
@@ -224,11 +257,11 @@ void ModBus_SlaveRx04(void)
                 }                            
                 ModBus_SlaveReturnTx04(ModBus.Slave.Rx.DataAddr, ModBus.Slave.Rx.DataSize);
             } else {
-                 ModBus_Slave_SendErrorResponse(0x02); // 非法数据地址
+                 Communication_Address_Error(); // 非法数据地址
             }                   
         }
     } else {
-        ModBus_Slave_SendErrorResponse(0x03); // 非法数据值 (用于长度错误)
+        Communication_Length_Error(); // 长度错误
     }
 }
 
@@ -278,49 +311,50 @@ void ModBus_SlaveRx06(void)
     if(Usart1.DataCnt == 8){
         ModBus_SlaveRx06DataCollation();
         if(Usart1.RxData[6] != ModBus.Slave.Rx.CRCLow || Usart1.RxData[7] != ModBus.Slave.Rx.CRCHigh){
-            ModBus_Slave_SendErrorResponse(0x01); // CRC 校验错误
+            ModBus_Crc_Error(); // CRC 校验错误
         }else{
-            // 先判断特殊命令地址
-            switch(ModBus.Slave.Rx.DataAddr){
-                case 0x0000:  // 全部关闭
-                    Relay_AllOff();
-                    ModBus_SlaveReturnTx06();
-                    break;
-                case 0x0001:  // 继电器1-8
-                case 0x0002:
-                case 0x0003:
-                case 0x0004:
-                case 0x0005:
-                case 0x0006:
-                case 0x0007:
-                case 0x0008:
-                    if(ModBus.Slave.Rx.Data[0])
-                        Relay_On(ModBus.Slave.Rx.DataAddr);
-                    else
-                        Relay_Off(ModBus.Slave.Rx.DataAddr);
-                    ModBus_SlaveReturnTx06();
-                    break;
-								case 0x0009:
-									PWR_CTRL_Enable();
-									ModBus_SlaveReturnTx06();
-								break;
-                case 0x00FF:  // 全部打开
-                    Relay_AllOn();
-                    ModBus_SlaveReturnTx06();                       
-                    break;
-                default:
-                    // 普通寄存器写入，需要检查范围
-                    if ((ModBus.Slave.Rx.DataAddr + 1) <= MODBUS_REGISTER_COUNT) {
-                        ModBus.Slave.DisplayRegisters[ModBus.Slave.Rx.DataAddr] = ModBus.Slave.Rx.Data[0];
-                        ModBus_SlaveReturnTx06();
-                    } else {
-                        ModBus_Slave_SendErrorResponse(0x02); // 非法数据地址
-                    }
-                    break;                          
+            // 检查是否为编码器模块地址 (0x00xx-0x07xx)
+            if (EncoderModbus_IsMyAddress(ModBus.Slave.Rx.DataAddr)) {
+                EncoderModbus_WriteReg(ModBus.Slave.Rx.DataAddr, ModBus.Slave.Rx.Data[0]);
+                ModBus_SlaveReturnTx06();
+            }
+            // 普通寄存器地址 (0x1000+)
+            else if (ModBus.Slave.Rx.DataAddr >= MODBUS_REG_BASE_ADDR &&
+                     (ModBus.Slave.Rx.DataAddr - MODBUS_REG_BASE_ADDR + 1) <= MODBUS_REGISTER_COUNT) {
+                uint16_t idx = ModBus.Slave.Rx.DataAddr - MODBUS_REG_BASE_ADDR;
+                ModBus.Slave.DisplayRegisters[idx] = ModBus.Slave.Rx.Data[0];
+                
+                // 继电器控制 (地址 0x1000-0x1009 触发硬件动作)
+                switch (ModBus.Slave.Rx.DataAddr) {
+                    case 0x1000:  // 全部关闭
+                        Relay_AllOff();
+                        break;
+                    case 0x1001:  // 继电器1-8
+                    case 0x1002:
+                    case 0x1003:
+                    case 0x1004:
+                    case 0x1005:
+                    case 0x1006:
+                    case 0x1007:
+                    case 0x1008:
+                        if (ModBus.Slave.Rx.Data[0])
+                            Relay_On(idx);
+                        else
+                            Relay_Off(idx);
+                        break;
+                    case 0x1009:
+                        PWR_CTRL_Enable();
+                        break;
+                    default:
+                        break;  // 其他地址只写寄存器，无硬件动作
+                }
+                ModBus_SlaveReturnTx06();
+            } else {
+                Communication_Address_Error(); // 非法数据地址
             }
         }
     }else{
-        ModBus_Slave_SendErrorResponse(0x03); // 非法数据值 (用于长度错误)
+        Communication_Length_Error(); // 长度错误
     }
 }
 
@@ -400,22 +434,24 @@ void ModBus_SlaveRx10(void)
         uint16_t crc_calc = Modbus_CRC16((uint8_t *)Usart1.RxData, expected_len - 2);
 
         if (crc_calc != crc_received) {
-            ModBus_Slave_SendErrorResponse(0x01); // CRC 校验错误
+            ModBus_Crc_Error(); // CRC 校验错误
         } else {
             ModBus_SlaveRx10DataCollation();
             uint16_t reg_count = ((uint16_t)ModBus.Slave.Rx.DataCountHigh << 8) | ModBus.Slave.Rx.DataCountLow;
             
-            if ((ModBus.Slave.Rx.DataAddr + reg_count) <= MODBUS_REGISTER_COUNT) {
+            if (ModBus.Slave.Rx.DataAddr >= MODBUS_REG_BASE_ADDR &&
+                (ModBus.Slave.Rx.DataAddr - MODBUS_REG_BASE_ADDR + reg_count) <= MODBUS_REGISTER_COUNT) {
+                uint16_t base_idx = ModBus.Slave.Rx.DataAddr - MODBUS_REG_BASE_ADDR;
                 for (uint16_t i = 0; i < reg_count; i++) {
-                    ModBus.Slave.DisplayRegisters[ModBus.Slave.Rx.DataAddr + i] = ModBus.Slave.Rx.Data[i];
+                    ModBus.Slave.DisplayRegisters[base_idx + i] = ModBus.Slave.Rx.Data[i];
                 }
                 ModBus_SlaveReturnTx10();
             } else {
-                ModBus_Slave_SendErrorResponse(0x02); // 非法地址
+                Communication_Length_Error(); // 长度错误
             }               
         }
     } else {
-        ModBus_Slave_SendErrorResponse(0x03); // 长度错误
+        Communication_Length_Error(); // 长度错误
     }
 }
 
@@ -426,33 +462,59 @@ void ModBus_SlaveRx10(void)
 * 输出参量：无
 * 编写日期：2025-8-27
 ****************************************************************************************/
+/****************************************************************************************
+* 函数名称：ModBus_SlaveRx
+* 函数功能：Modbus 从机接收处理函数 (含错误优先检查与指令分发)
+* 输入参量：无
+* 输出参量：无
+* 编写日期：2025-8-27
+****************************************************************************************/
 void ModBus_SlaveRx(void)
 {
-    DisableUARTReceive(&huart1);
+    // ================= 1. 优先检查错误标志 (用户逻辑) =================
+    // DC/EC 错误优先级最高, 拦截所有指令
+    if (ModBus.Error.bit.DC) {
+        Encoder_Timeout();
+        goto RX_END;
+    } 
+    if (ModBus.Error.bit.EC) {
+        Encoder_CrcError();
+        goto RX_END;
+    }
+		
+    if (ModBus.Error.bit.SN) {
+        SNDigitsAreIncorrect();
+        goto RX_END;
+    }
+
+    // ================= 2. 正常接收处理 =================
     ModBus.Slave.ADDR = Usart1.RxData[0];
     ModBus.Slave.CMD = Usart1.RxData[1];
-    
-    if(ModBus.Slave.ADDR == 3 ){ // 站地址检查
-        switch(ModBus.Slave.CMD){
-            case 0x03:
+
+    // 判断是否为本机地址 (Modbus)
+    if (ModBus.Slave.ADDR == 0x01) {
+        switch (ModBus.Slave.CMD) {
+            case MODBUS_FUNC_READ_HOLDING_REGISTERS: // 03H
                 ModBus_SlaveRx03();
-            break;
-            case 0x04:
-                ModBus_SlaveRx04();
-            break;
-            case 0x06:
+                break;
+            case MODBUS_FUNC_WRITE_SINGLE_REGISTER:   // 06H
                 ModBus_SlaveRx06();
-            break;
-            case 0x10:
+                break;
+            case MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS: // 10H
                 ModBus_SlaveRx10();
-            break;
+                break;
             default:
-                ModBus_Slave_SendErrorResponse(0x05); // 功能码不支持
-            break;
-        }       
-    }else{
-        EnableUARTReceive(&huart1);
+                Communication_FunctionCode_Error(); // 功能码不支持
+                break;
+        }
+    } else {
+        Communication_SlaveAddress_Error(); // 非法地址
     }
+
+RX_END:
+    // 错误处理或 Modbus 处理完毕后清除接收缓冲, 重新使能接收
+    memset((char *)Usart1.RxData, 0, sizeof(Usart1.RxData)); 
+    EnableUARTReceive(&huart1);
 }
 
 /****************************************************************************************
@@ -480,6 +542,9 @@ void Usart1_ReceiveStringHandler(void)
 ****************************************************************************************/
 void Usart1_SendStringHandler(void)
 {
+    // 错误检查已在 ModBus_SlaveRx 中完成
+
+    // ================= 板卡通用命令 =================
     if(strcmp((char *)Usart1.RxData, "Board Status") == 0){
         Usart1_Print("Relay: K1:%s K2:%s K3:%s K4:%s K5:%s K6:%s K7:%s K8:%s\n",
                      Relay_GetStatus(1) ? "ON" : "OFF",
@@ -492,23 +557,185 @@ void Usart1_SendStringHandler(void)
                      Relay_GetStatus(8) ? "ON" : "OFF");
     }else if(strcmp((char *)Usart1.RxData, "Board Info") == 0){
         Usart1_Print("MCU: STM32G491CCU6\n");
-        Usart1_Print("FW: V2.0\n");
-        Usart1_Print("HW: Encoder FCT Board V1.0\n");
+        Usart1_Print("FW: V%0.1f\n", FirmwareVersion);
+        Usart1_Print("HW: Encoder FCT Board V%0.1f\n", HardwareVersion);
         Usart1_Print("K1-K8 -> PA0-PA7\n");
     }else if(strcmp((char *)Usart1.RxData, "Firmware Update") == 0){
         IAP_RequestUpdate();
     }else if(strcmp((char *)Usart1.RxData, "Firmware version") == 0){
-        Usart1_Print("V2.0\r\n");
+        Usart1_Print("STM32G4_APP_FCT_%0.1f\r\n", FirmwareVersion);
     }else if(strcmp((char *)Usart1.RxData, "Relay AllOn") == 0){
         Relay_AllOn();
         Usart1_Print("OK\r\n");
     }else if(strcmp((char *)Usart1.RxData, "Relay AllOff") == 0){
         Relay_AllOff();
         Usart1_Print("OK\r\n");
+    }
+    // ================= 3. 编码器 ASCII 命令 =================
+    else if(strcmp((char *)Usart1.RxData, "GetPrdInfoData") == 0){
+        Usart1_Print("%s", g_SensAR.PrdInfo);
+    }else if(strcmp((char *)Usart1.RxData, "GetVERData") == 0){
+        Usart1_Print("%s", g_SensAR.Version);
+    }else if(strcmp((char *)Usart1.RxData, "EncoderPowerOff") == 0){
+        TIM1_Stop_Direct(); 
+        Usart1_Print("OK\r\n");
+    }else if(strncmp((char *)Usart1.RxData, "SN:DL", 5) == 0){
+        // SN 写入: "SN:DLx..." 格式, 第6个字符为 HWRev 数据
+        // Usart1.DataCnt 包含 \r\n (虽然被替换为 \0), 但计数未变
+        // 最小长度: "SN:DLx" + \r\n = 8
+        if(Usart1.DataCnt >= 8){  
+            g_MotorEncoder.HWRevData = Usart1.RxData[5] - '0';
+            ModBus.Error.bit.SN = 0; // 清除 SN 错误
+            Usart1_Print("OK\r\n");
+        }else{
+            ModBus.Error.bit.SN = 1; // 设置 SN 错误
+        }
+    }else if(strcmp((char *)Usart1.RxData, "GetHWRev") == 0){
+        Usart1_Print("%s", g_MotorEncoder.HWRevBuffer);
+    }else if(strcmp((char *)Usart1.RxData, "GetFWRev") == 0){
+        Usart1_Print("%s", g_MotorEncoder.FWRevBuffer);
     }else{
         EnableUARTReceive(&huart1);
     }
     
     memset((char *)Usart1.RxData, 0, sizeof(Usart1.RxData)); 
+}
+
+// ================= 错误处理函数 (移植自旧项目) =================
+// 注意: RTU_CRC 替换为 Modbus_CRC16, 串口相关使用了 Usart1TransmitterDMA
+
+void Encoder_Timeout(void)
+{   
+    Work_Alarm = 0x01;
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD | 0x80;            
+    Usart1.TxData[2] = Work_Alarm | 0x50;
+    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, 3);
+    Usart1.TxData[3] = (uint8_t)(crc & 0xFF);
+    Usart1.TxData[4] = (uint8_t)((crc >> 8) & 0xFF);
+    
+    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+    Usart1.Tx.DataSize = 5;
+    Usart1TransmitterDMA(&Usart1.Tx);
+}
+
+void Encoder_CrcError(void)
+{
+    Work_Alarm = 0x02;
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD | 0x80;            
+    Usart1.TxData[2] = Work_Alarm | 0x50;
+    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, 3);
+    Usart1.TxData[3] = (uint8_t)(crc & 0xFF);
+    Usart1.TxData[4] = (uint8_t)((crc >> 8) & 0xFF);
+    
+    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+    Usart1.Tx.DataSize = 5;
+    Usart1TransmitterDMA(&Usart1.Tx);
+}
+
+void Communication_Address_Error(void)
+{
+    Work_Alarm = 0x03;
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD | 0x80;            
+    Usart1.TxData[2] = Work_Alarm | 0x50;
+    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, 3);
+    Usart1.TxData[3] = (uint8_t)(crc & 0xFF);
+    Usart1.TxData[4] = (uint8_t)((crc >> 8) & 0xFF);
+    
+    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+    Usart1.Tx.DataSize = 5;
+    Usart1TransmitterDMA(&Usart1.Tx);
+}
+
+void ModBus_Crc_Error(void)
+{
+    Work_Alarm = 0x04;
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD | 0x80;            
+    Usart1.TxData[2] = Work_Alarm | 0x50;
+    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, 3);
+    Usart1.TxData[3] = (uint8_t)(crc & 0xFF);
+    Usart1.TxData[4] = (uint8_t)((crc >> 8) & 0xFF);
+    
+    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+    Usart1.Tx.DataSize = 5;
+    Usart1TransmitterDMA(&Usart1.Tx);
+}
+
+void Communication_Length_Error(void)
+{
+    Work_Alarm = 0x07;
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD | 0x80;            
+    Usart1.TxData[2] = Work_Alarm | 0x50;
+    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, 3);
+    Usart1.TxData[3] = (uint8_t)(crc & 0xFF);
+    Usart1.TxData[4] = (uint8_t)((crc >> 8) & 0xFF);
+    
+    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+    Usart1.Tx.DataSize = 5;
+    Usart1TransmitterDMA(&Usart1.Tx);
+}
+
+void Communication_FunctionCode_Error(void)
+{
+    Work_Alarm = 0x08;
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD | 0x80;            
+    Usart1.TxData[2] = Work_Alarm | 0x50;
+    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, 3);
+    Usart1.TxData[3] = (uint8_t)(crc & 0xFF);
+    Usart1.TxData[4] = (uint8_t)((crc >> 8) & 0xFF);
+    
+    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+    Usart1.Tx.DataSize = 5;
+    Usart1TransmitterDMA(&Usart1.Tx);
+}
+
+void Communication_SlaveAddress_Error(void)
+{
+    Work_Alarm = 0x09;
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD | 0x80;            
+    Usart1.TxData[2] = Work_Alarm | 0x50;
+    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, 3);
+    Usart1.TxData[3] = (uint8_t)(crc & 0xFF);
+    Usart1.TxData[4] = (uint8_t)((crc >> 8) & 0xFF);
+    
+    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+    Usart1.Tx.DataSize = 5;
+    Usart1TransmitterDMA(&Usart1.Tx);
+}
+
+void NotSetEncoderType(void)
+{
+    Work_Alarm = 0x05;
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD | 0x80;            
+    Usart1.TxData[2] = Work_Alarm | 0x50;
+    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, 3);
+    Usart1.TxData[3] = (uint8_t)(crc & 0xFF);
+    Usart1.TxData[4] = (uint8_t)((crc >> 8) & 0xFF);
+    
+    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+    Usart1.Tx.DataSize = 5;
+    Usart1TransmitterDMA(&Usart1.Tx);
+}
+
+void SNDigitsAreIncorrect(void)
+{
+    Work_Alarm = 0x06;
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD | 0x80;            
+    Usart1.TxData[2] = Work_Alarm | 0x50;
+    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, 3);
+    Usart1.TxData[3] = (uint8_t)(crc & 0xFF);
+    Usart1.TxData[4] = (uint8_t)((crc >> 8) & 0xFF);
+    
+    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+    Usart1.Tx.DataSize = 5;
+    Usart1TransmitterDMA(&Usart1.Tx);
 }
 

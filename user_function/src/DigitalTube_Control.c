@@ -1,20 +1,21 @@
 /****************************************************************************************
 * @file      DigitalTube_Control.c
-* @brief     数码管控制源文件 (动画/分页/编辑/保存完整逻辑)
+* @brief     数码管控制源文件 (动画/分页/编辑/保存完整逻辑 - 模块化版)
 * @author    Gemini
-* @date      2026-02-06
+* @date      2026-02-09
 ****************************************************************************************/
 #include "DigitalTube_Control.h"
 #include "Flash_Storage.h"
+#include "Parameter_Module.h" // 引用参数模块
 #include <string.h>
 
 // 引用外部 SPI 句柄
 extern SPI_HandleTypeDef hspi2;
+// 引用外部报警变量
+extern volatile uint8_t Work_Alarm;
 
 // 全局变量定义
 DTC_State_t DTC_Dev;
-int32_t PA_Buffer[PA_SIZE];
-int32_t DP_Buffer[DP_SIZE];
 
 // 字库表 (共阳极段码)
 // 索引: 0-15(0-F), 16(-), 17(Off), 18(H), 19(L), 20(P), 21(E), 22(_), 23(r), 24(t), 25(S)
@@ -42,7 +43,6 @@ const uint8_t DTC_SegTable[] = {
 #define SEG_n           27
 
 // 【自定义】最高位分页符号 (0xFE = 上横杠)
-// 注意：此值直接作为段码发送，不查 SegTable
 #define SEG_HIGH_FLAG   0xFE 
 
 // 位选码表
@@ -54,51 +54,11 @@ static uint8_t DTC_DMA_Buffer[2];
 // ================= 内部辅助函数 =================
 
 /****************************************************************************************
-* 函数名称：DTC_GetConfig
-* 函数功能：模拟获取每个参数的属性配置 (实际可替换为查表)
-* 输入参量：
-* - group：参数组索引
-* - index：参数编号
-* 输出参量：
-* - DTC_ParamConfig_t：参数属性结构体
-* 编写日期：2026-02-06
-****************************************************************************************/
-static DTC_ParamConfig_t DTC_GetConfig(uint8_t group, uint16_t index)
-{
-    DTC_ParamConfig_t cfg;
-    // 默认配置: 16位有符号十进制
-    cfg.Sign = SIGNED;
-    cfg.Format = FMT_DEC;
-    cfg.Width = BIT_16;
-    cfg.Min = -9999;
-    cfg.Max = 9999;
-
-    // 自定义特殊参数示例
-    if (group == 0 && index == 0) { // PA000: 32位大数
-        cfg.Width = BIT_32; 
-        cfg.Min = -2000000000; 
-        cfg.Max = 2000000000; 
-    }
-    if (group == 0 && index == 1) { // PA001: 16进制
-        cfg.Format = FMT_HEX; 
-        cfg.Min = 0; 
-        cfg.Max = 0xFFFF;
-    }
-    if (group == 1 && index == 0) { // DP000: 2进制
-				cfg.Width = BIT_32; 
-        cfg.Format = FMT_DEC; 
-        cfg.Min = 0; 
-        cfg.Max = 0xF;
-    }
-    return cfg;
-}
-
-/****************************************************************************************
 * 函数名称：DTC_Update_Buffer
 * 函数功能：根据当前模式和数据刷新显存
 * 输入参量：无
 * 输出参量：无
-* 编写日期：2026-02-06
+* 编写日期：2026-02-09
 ****************************************************************************************/
 static void DTC_Update_Buffer(void)
 {
@@ -116,7 +76,7 @@ static void DTC_Update_Buffer(void)
         DTC_Dev.RawData[0] = DTC_Dev.ErrCode % 10;
         return;
     }
-
+    
     // --- 2. 选择界面 (PA 001) ---
     if (DTC_Dev.Mode == DTC_MODE_SELECT) {
         DTC_Dev.RawData[4] = (DTC_Dev.GroupIdx == 0) ? SEG_P : SEG_d;
@@ -127,10 +87,9 @@ static void DTC_Update_Buffer(void)
         return;
     }
 
-
-
     // --- 3. 编辑/查看数值模式 ---
-    DTC_ParamConfig_t cfg = DTC_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
+    // 使用 PM 模块获取配置
+    PM_ParamConfig_t cfg = PM_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
     int32_t val = DTC_Dev.EditVal;
 
     // A. HEX 格式 (H.xxxx)
@@ -142,6 +101,8 @@ static void DTC_Update_Buffer(void)
     }
     // B. BIN 格式 (b.xxxx)
     else if (cfg.Format == FMT_BIN) {
+        // Bin 格式下不需要光标位移 (或者固定位移?) 
+        // 修正: 32位Bin显不下，假设只有低4位
         DTC_Dev.RawData[4] = SEG_b;
         for(int i=0; i<4; i++) { 
             DTC_Dev.RawData[i] = (val >> i) & 1; 
@@ -193,11 +154,6 @@ static void DTC_Update_Buffer(void)
 /****************************************************************************************
 * 函数名称：DTC_DMA_Transmitter
 * 函数功能：底层 DMA 传输 (阻塞式)
-* 输入参量：
-* - seg：段码数据
-* - pos：位选数据
-* 输出参量：无
-* 编写日期：2026-02-06
 ****************************************************************************************/
 static void DTC_DMA_Transmitter(uint8_t seg, uint8_t pos)
 {
@@ -226,11 +182,11 @@ static void DTC_DMA_Transmitter(uint8_t seg, uint8_t pos)
 
 /****************************************************************************************
 * 函数名称：DTC_Apply_Edit
-* 函数功能：执行参数数值的加减运算
+* 函数功能：执行参数数值的加减运算以 (含Clamp逻辑)
 * 输入参量：
 * - is_up：1为加，0为减
 * 输出参量：无
-* 编写日期：2026-02-06
+* 编写日期：2026-02-09
 ****************************************************************************************/
 static void DTC_Apply_Edit(uint8_t is_up)
 {
@@ -253,10 +209,10 @@ static void DTC_Apply_Edit(uint8_t is_up)
     }
     // B. 在编辑界面：修改数值内容
     else {
-        // 新增: dP 参数组 (GroupIdx == 1) 为只读，不允许修改数值
+        // dP 参数组 (GroupIdx == 1) 为只读，不允许修改数值
         if (DTC_Dev.GroupIdx == 1) return;
 
-        DTC_ParamConfig_t cfg = DTC_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
+        PM_ParamConfig_t cfg = PM_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
         int64_t step = 1; 
         
         if (cfg.Format == FMT_DEC) {
@@ -278,9 +234,11 @@ static void DTC_Apply_Edit(uint8_t is_up)
         int64_t temp = DTC_Dev.EditVal;
         if (is_up) temp += step; else temp -= step;
 
-        // 极值限制
-        if (temp > cfg.Max) temp = cfg.Min; 
-        else if (temp < cfg.Min) temp = cfg.Max;
+        // 极值限制与钳位逻辑 (Clamping)
+        // 用户需求: 当千位调整导致数值越界时，自动变为边界值(例如 1234 -> 6234(X) -> 6000)
+        // 且到达边界后不再继续增加/减少。
+        if (temp > cfg.Max) temp = cfg.Max; 
+        else if (temp < cfg.Min) temp = cfg.Min;
         
         DTC_Dev.EditVal = (int32_t)temp;
     }
@@ -290,9 +248,6 @@ static void DTC_Apply_Edit(uint8_t is_up)
 /****************************************************************************************
 * 函数名称：DTC_Key_Logic
 * 函数功能：按键处理状态机 (含长短按复用、连发加速)
-* 输入参量：无
-* 输出参量：无
-* 编写日期：2026-02-06
 ****************************************************************************************/
 static void DTC_Key_Logic(void)
 {
@@ -313,6 +268,7 @@ static void DTC_Key_Logic(void)
                  DTC_Dev.LongPressDone = 1;
                  DTC_Dev.Mode = DTC_MODE_SELECT;
                  DTC_Dev.ErrCode = 0;
+                 Work_Alarm = 0;
                  DTC_Update_Buffer();
             }
         }
@@ -324,6 +280,11 @@ static void DTC_Key_Logic(void)
         if (k1_press) {
             DTC_Dev.AnimState = ANIM_DONE;
             DTC_Dev.Mode = DTC_MODE_SELECT;
+            
+            // 关键修复: 抑制按键释放逻辑，防止首次进入Select模式时触发组切换
+            DTC_Dev.LastKey = 1; 
+            DTC_Dev.LongPressDone = 1; 
+            
             DTC_Update_Buffer();
         }
         return; 
@@ -355,9 +316,12 @@ static void DTC_Key_Logic(void)
             if (DTC_Dev.Mode == DTC_MODE_SELECT) {
                 // 长按：进入编辑模式
                 DTC_Dev.Mode = DTC_MODE_EDIT;
-                // 从Buffer加载数据到临时编辑变量
+                // 从 Parameter Module 加载数据到临时编辑变量
                 DTC_Dev.EditVal = (DTC_Dev.GroupIdx == 0) ? PA_Buffer[DTC_Dev.ParamNum] : DP_Buffer[DTC_Dev.ParamNum];
                 DTC_Dev.Page = PAGE_LOW; 
+                
+                // 暂存 Select 模式下的光标位置 (借用 ErrCode)
+                DTC_Dev.ErrCode = DTC_Dev.EditBit; 
                 DTC_Dev.EditBit = 0;     
             }
             else if (DTC_Dev.Mode == DTC_MODE_EDIT) {
@@ -366,7 +330,10 @@ static void DTC_Key_Logic(void)
                 else DP_Buffer[DTC_Dev.ParamNum] = DTC_Dev.EditVal;
                 
                 DTC_SaveParams_Callback(); // 触发外部保存
-                // DTC_Dev.Mode = DTC_MODE_SELECT; // 移除：由回调函数决定下一模式(donE)
+                
+                // 恢复光标位置
+                 DTC_Dev.EditBit = DTC_Dev.ErrCode; 
+                 DTC_Dev.ErrCode = 0;
             }
             DTC_Update_Buffer();
         }
@@ -397,6 +364,10 @@ static void DTC_Key_Logic(void)
                         case 1: // Mod: 切换参数组 或 放弃编辑退出
                             if (DTC_Dev.Mode == DTC_MODE_EDIT) {
                                 DTC_Dev.Mode = DTC_MODE_SELECT; // 不保存，直接退
+                                
+                                // 恢复光标位置
+                                DTC_Dev.EditBit = DTC_Dev.ErrCode; 
+                                DTC_Dev.ErrCode = 0;
                             } else {
                                 DTC_Dev.GroupIdx = !DTC_Dev.GroupIdx;
                                 DTC_Dev.ParamNum = 0;
@@ -412,15 +383,14 @@ static void DTC_Key_Logic(void)
                             } 
                             else if (DTC_Dev.Mode == DTC_MODE_EDIT) {
                                 // 编辑界面：
-                                DTC_ParamConfig_t cfg = DTC_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
+                                PM_ParamConfig_t cfg = PM_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
                                 
-                                // 新增: dP组只允许翻页，不允许移位编辑
+                                // dP组只允许翻页，不允许移位编辑
                                 if (DTC_Dev.GroupIdx == 1) {
                                     if (cfg.Format == FMT_DEC && cfg.Width == BIT_32) {
                                          // 32位允许切换分页查看
                                          if (++DTC_Dev.Page > PAGE_HIGH) DTC_Dev.Page = PAGE_LOW;
                                     }
-                                    // 其他格式(16位等)不允许任何操作(只读)
                                 }
                                 else {
                                     // PA组: 允许翻页或移位
@@ -446,10 +416,7 @@ static void DTC_Key_Logic(void)
 
 /****************************************************************************************
 * 函数名称：DTC_HandleStartupAnimation
-* 函数功能：执行开机动画 (打字机效果 + 闪烁)
-* 输入参量：无
-* 输出参量：无
-* 编写日期：2026-02-06
+* 函数功能：执行开机动画
 ****************************************************************************************/
 static void DTC_HandleStartupAnimation(void)
 {
@@ -486,9 +453,6 @@ static void DTC_HandleStartupAnimation(void)
 /****************************************************************************************
 * 函数名称：DTC_Init
 * 函数功能：初始化硬件寄存器与软件状态
-* 输入参量：无
-* 输出参量：无
-* 编写日期：2026-02-06
 ****************************************************************************************/
 void DTC_Init(void)
 {
@@ -509,15 +473,36 @@ void DTC_Init(void)
 
 /****************************************************************************************
 * 函数名称：DTC_ScanHandler
-* 函数功能：定时扫描处理函数 (需在 1ms 定时器中断中调用)
-* 输入参量：无
-* 输出参量：无
-* 编写日期：2026-02-06
 ****************************************************************************************/
 void DTC_ScanHandler(void)
 {
     static uint8_t scan_idx = 0;
+    static uint8_t last_alarm = 0;
     uint8_t char_code;
+
+    // --- 0. 全局报警监测 (Work_Alarm) ---
+    // 优先级最高: 只要有报警，强制切到错误模式
+    if (Work_Alarm != last_alarm) {
+        if (Work_Alarm != 0) {
+            DTC_Dev.Mode = DTC_MODE_ERROR;
+            DTC_Dev.ErrCode = Work_Alarm;
+            DTC_Update_Buffer();
+        } else {
+             // 报警解除，恢复默认
+             if (DTC_Dev.Mode == DTC_MODE_ERROR) {
+                 DTC_Dev.Mode = DTC_MODE_SELECT;
+                 DTC_Dev.ErrCode = 0;
+                 DTC_Update_Buffer();
+             }
+        }
+        last_alarm = Work_Alarm;
+    }
+    // 持续强制 (防止按键切出)
+    if (Work_Alarm != 0 && DTC_Dev.Mode != DTC_MODE_ERROR) {
+        DTC_Dev.Mode = DTC_MODE_ERROR;
+        DTC_Dev.ErrCode = Work_Alarm;
+        DTC_Update_Buffer();
+    }
 
     // 1. 优先处理动画
     if (DTC_Dev.Mode == DTC_MODE_ANIMATION) {
@@ -537,11 +522,9 @@ void DTC_ScanHandler(void)
         char_code = DTC_SegTable[DTC_Dev.RawData[scan_idx]];
     }
     
-    // Err模式下 Err.20 固定点亮中间小数点 (先设置，再看是否被闪烁熄灭)
+    // Err模式下 Err.20 固定点亮中间小数点
     if (DTC_Dev.Mode == DTC_MODE_ERROR && scan_idx == 2) char_code &= 0x7F;
 
-    // 3. DP 闪烁光标逻辑 / 错误全局闪烁
-    DTC_Dev.BlinkCnt++;
     // 3. DP 闪烁光标逻辑 / 错误全局闪烁
     DTC_Dev.BlinkCnt++;
     if (DTC_Dev.BlinkCnt >= 400) DTC_Dev.BlinkCnt = 0;
@@ -556,10 +539,6 @@ void DTC_ScanHandler(void)
         }
         
         // 闪烁逻辑: 300ms 灭, 300ms 亮
-        // 0-299: OFF
-        // 300-599: ON
-        // 600-899: OFF
-        // 900-1199: ON
         if ((DTC_Dev.MsgTimer / 300) % 2 == 0) {
             char_code = DTC_SegTable[SEG_OFF];
         }
@@ -570,18 +549,15 @@ void DTC_ScanHandler(void)
        
         // ---- A. 故障报错整屏闪烁 ----
         if (DTC_Dev.Mode == DTC_MODE_ERROR) {
-            // 亮/灭 周期
              if (DTC_Dev.BlinkCnt >= 200) {
-                 // 熄灭所有段 (包含小数点)
                  char_code = DTC_SegTable[SEG_OFF]; 
              }
         }
         else {
              // ---- B. 光标位闪烁 ----
-            uint8_t blink_pos = 0xFF; // 0xFF表示不闪烁
+            uint8_t blink_pos = 0xFF; 
 
             // 情况A: 选择界面 (PA 001)
-            // EditBit 0->个位(RawData[0]), 1->十位(RawData[1]), 2->百位(RawData[2])
             if (DTC_Dev.Mode == DTC_MODE_SELECT) {
                 blink_pos = DTC_Dev.EditBit; 
             } 
@@ -592,7 +568,7 @@ void DTC_ScanHandler(void)
                     blink_pos = 0xFF;
                 }
                 else {
-                    DTC_ParamConfig_t cfg = DTC_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
+                    PM_ParamConfig_t cfg = PM_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
                     // 32位分页模式通常不闪烁位(因为在翻页)，其他格式闪烁编辑位
                     if (!(cfg.Format == FMT_DEC && cfg.Width == BIT_32)) {
                         blink_pos = DTC_Dev.EditBit;
@@ -600,7 +576,7 @@ void DTC_ScanHandler(void)
                 }
             }
 
-            // 执行闪烁: 周期前200ms点亮DP (这里是 blink on, 加上去)
+            // 执行闪烁
             if (scan_idx == blink_pos && DTC_Dev.BlinkCnt < 200) {
                 char_code &= 0x7F; // 点亮 DP
             }
@@ -615,10 +591,6 @@ void DTC_ScanHandler(void)
 
 /****************************************************************************************
 * 函数名称：DTC_SetError
-* 函数功能：进入故障显示模式
-* 输入参量：code - 错误代码
-* 输出参量：无
-* 编写日期：2026-02-06
 ****************************************************************************************/
 void DTC_SetError(uint16_t code) 
 { 
@@ -627,25 +599,23 @@ void DTC_SetError(uint16_t code)
     DTC_Update_Buffer(); 
 }
 
-#include "Flash_Storage.h"
-
-// ... (Existing code) ...
-
-// 弱定义回调函数 -> 强定义实现
-// __weak void DTC_SaveParams_Callback(void) {} 
+/****************************************************************************************
+* 函数名称：DTC_SaveParams_Callback
+****************************************************************************************/
 void DTC_SaveParams_Callback(void) 
 {
-    // 1. 先切换到消息提示模式 (避免 Flash 写入时卡在旧数值)
+    // 1. 先切换到消息提示模式
     DTC_Dev.Mode = DTC_MODE_MESSAGE;
     DTC_Dev.MsgTimer = 0;
-    DTC_Update_Buffer();
     
-    // 延时一小段时间，确保 DMA 把 "donE" 发送出去
-    // (因为 Flash 操作会暂停 CPU，导致数码管停留在最后一帧)
-    HAL_Delay(10); 
+    // 确保 Flash 写入期间数码管全灭
+    DTC_RCLK_L(); 
+    uint8_t temp_buf[2] = {0, 0xFF}; // Pos=0, Seg=OFF
+    HAL_SPI_Transmit(&hspi2, temp_buf, 2, 10);
+    DTC_RCLK_H();
     
-    // 2. 保存参数到 Flash (此时数码管显示 donE)
-    Flash_SaveParams(PA_Buffer, PA_SIZE);
+    HAL_Delay(5); 
+    
+    // 2. 保存参数到 Flash (调用 PM 模块接口)
+    PM_SaveParams();
 }
-	
-

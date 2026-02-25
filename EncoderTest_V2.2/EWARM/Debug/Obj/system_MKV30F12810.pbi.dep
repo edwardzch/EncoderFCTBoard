@@ -1,0 +1,17 @@
+system_MKV30F12810.pbi: \
+  D:\Works\ADI\7_AMR\1_software\ADA4571_Encoder_20201201(V1.22)\Drivers\CMSIS\Device\system_MKV30F12810.c \
+  D:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\stdint.h \
+  D:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\ycheck.h \
+  D:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\yvals.h \
+  D:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\DLib_Defaults.h \
+  D:\\Program\ Files\ (x86)\\IAR\ Systems\\Embedded\ Workbench\ 8.3\\arm\\inc\\c\\DLib_Config_Normal.h \
+  D:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\DLib_Product.h \
+  D:\Works\ADI\7_AMR\1_software\ADA4571_Encoder_20201201(V1.22)\Drivers\CMSIS\Device/fsl_device_registers.h \
+  D:\Works\ADI\7_AMR\1_software\ADA4571_Encoder_20201201(V1.22)\Drivers\CMSIS\Device/MKV30F12810.h \
+  D:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\CMSIS\Core\Include\core_cm4.h \
+  D:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\CMSIS\Core\Include/cmsis_version.h \
+  D:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\CMSIS\Core\Include/cmsis_compiler.h \
+  D:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\CMSIS\Core\Include\cmsis_iccarm.h \
+  D:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\iccarm_builtin.h \
+  D:\Works\ADI\7_AMR\1_software\ADA4571_Encoder_20201201(V1.22)\Drivers\CMSIS\Device/system_MKV30F12810.h \
+  D:\Works\ADI\7_AMR\1_software\ADA4571_Encoder_20201201(V1.22)\Drivers\CMSIS\Device/MKV30F12810_features.h

@@ -1,0 +1,252 @@
+<?xml version="1.0"?>
+<settings>
+    <Stack>
+        <FillEnabled>0</FillEnabled>
+        <OverflowWarningsEnabled>1</OverflowWarningsEnabled>
+        <WarningThreshold>90</WarningThreshold>
+        <SpWarningsEnabled>1</SpWarningsEnabled>
+        <WarnLogOnly>1</WarnLogOnly>
+        <UseTrigger>1</UseTrigger>
+        <TriggerName>main</TriggerName>
+        <LimitSize>0</LimitSize>
+        <ByteLimit>50</ByteLimit>
+    </Stack>
+    <JLinkDriver>
+        <CStepIntDis>_ 0</CStepIntDis>
+        <LeaveTargetRunning>_ 0</LeaveTargetRunning>
+    </JLinkDriver>
+    <DebugChecksum>
+        <Checksum>3635211004</Checksum>
+    </DebugChecksum>
+    <Exceptions>
+        <StopOnUncaught>_ 0</StopOnUncaught>
+        <StopOnThrow>_ 0</StopOnThrow>
+    </Exceptions>
+    <CodeCoverage>
+        <Enabled>_ 0</Enabled>
+    </CodeCoverage>
+    <Disassembly>
+        <MixedMode>1</MixedMode>
+        <InstrCount>0</InstrCount>
+    </Disassembly>
+    <CallStack>
+        <ShowArgs>0</ShowArgs>
+    </CallStack>
+    <SWOTraceHWSettings>
+        <OverrideDefaultClocks>0</OverrideDefaultClocks>
+        <CpuClock>100000000</CpuClock>
+        <ClockAutoDetect>0</ClockAutoDetect>
+        <ClockWanted>2000000</ClockWanted>
+        <JtagSpeed>2000000</JtagSpeed>
+        <Prescaler>50</Prescaler>
+        <TimeStampPrescIndex>0</TimeStampPrescIndex>
+        <TimeStampPrescData>0</TimeStampPrescData>
+        <PcSampCYCTAP>1</PcSampCYCTAP>
+        <PcSampPOSTCNT>15</PcSampPOSTCNT>
+        <PcSampIndex>0</PcSampIndex>
+        <DataLogMode>0</DataLogMode>
+        <ITMportsEnable>0</ITMportsEnable>
+        <ITMportsTermIO>0</ITMportsTermIO>
+        <ITMportsLogFile>0</ITMportsLogFile>
+        <ITMlogFile>$PROJ_DIR$\ITM.log</ITMlogFile>
+    </SWOTraceHWSettings>
+    <struct_types>
+        <Fmt0>strICPNH2612-LEDAdjustDACData	3	0</Fmt0>
+        <Fmt1>strICPNH2612-MNSAnalogResult	3	0</Fmt1>
+        <Fmt2>strMGTEep-Address	4	0</Fmt2>
+        <Fmt3>strMGTEep-Data	4	0</Fmt3>
+        <Fmt4>strMGTEep-ReturnAddress	3	0</Fmt4>
+        <Fmt5>strMGTEep-ReturnPage	4	0</Fmt5>
+        <Fmt6>strMGTEep-SetAddress	4	0</Fmt6>
+        <Fmt7>strMGTEep-SetPage	4	0</Fmt7>
+        <Fmt8>strMGTEnc-Firmware	4	0</Fmt8>
+        <Fmt9>strMGTEnc-FirmwareVersion	3	0</Fmt9>
+        <Fmt10>strMT6835Addr-Reg0x11	4	0</Fmt10>
+        <Fmt11>strMT6835Addr-Reg0x11_True	4	0</Fmt11>
+        <Fmt12>strMT6835Addr-Reg0x12	4	0</Fmt12>
+        <Fmt13>strMT6835Addr-Reg0x12_True	4	0</Fmt13>
+        <Fmt14>strMT6835Addr-Reg0xDA	4	0</Fmt14>
+        <Fmt15>strMT6835Addr-Reg0xDA_True	4	0</Fmt15>
+        <Fmt16>strMT6835Addr-Reg0xEA	4	0</Fmt16>
+        <Fmt17>strMT6835Addr-Reg0xEA_True	4	0</Fmt17>
+        <Fmt18>strMT6835Addr-Reg0xEC	4	0</Fmt18>
+        <Fmt19>strMT6835Addr-Reg0xEC_True	4	0</Fmt19>
+        <Fmt20>strMT6835Addr-TestRegData	4	0</Fmt20>
+        <Fmt21>strMULMGTCNT-CF02	4	0</Fmt21>
+        <Fmt22>strMULMGTCNT-CF25	4	0</Fmt22>
+        <Fmt23>strMULMGTCNT-CF62	4	0</Fmt23>
+        <Fmt24>strMULMGTEep-Page	4	0</Fmt24>
+        <Fmt25>strMULMGTEep-ReturnAddress	4	0</Fmt25>
+        <Fmt26>strMULMGTEep-ReturnDNum	4	0</Fmt26>
+        <Fmt27>strMULMGTEep-ReturnPage	4	0</Fmt27>
+        <Fmt28>strMULMGTEep-SetDNum	4	0</Fmt28>
+        <Fmt29>strMULMGTEep-SetPage	4	0</Fmt29>
+        <Fmt30>strMULMGTEnc-BatteryVoltage	4	0</Fmt30>
+        <Fmt31>strMULMGTEnc-FirmwareVersion	4	0</Fmt31>
+        <Fmt32>strMULMGTEnc-InternalAlarm1	4	0</Fmt32>
+        <Fmt33>strMULMGTEnc-InternalAlarm2	4	0</Fmt33>
+        <Fmt34>strMULMGTEnc-InternalAlarm3	4	0</Fmt34>
+        <Fmt35>strMULMGTEnc-Status0x6D	4	0</Fmt35>
+        <Fmt36>strMULMGTEnc-Temperature	3	0</Fmt36>
+        <Fmt37>strMULMGTEnc-XorCrcData	4	0</Fmt37>
+        <Fmt38>strMULMGTHALL-Check	4	0</Fmt38>
+        <Fmt39>strMULMGTHALL-Cnt	4	0</Fmt39>
+        <Fmt40>strMULMGTHALL-Result	4	0</Fmt40>
+        <Fmt41>strMULMGTHALL-Sector	4	0</Fmt41>
+        <Fmt42>strServoEncoder-HWRevAddr	4	0</Fmt42>
+        <Fmt43>strServoMotor-EncoderType	4	0</Fmt43>
+        <Fmt44>strTmgwEnc-ResolutionID	4	0</Fmt44>
+        <Fmt45>strTxData-DataCnt	4	0</Fmt45>
+        <Fmt46>struct strMT6835AddrRegBit-Bit11	4	0</Fmt46>
+        <Fmt47>struct strMT6835AddrRegBit-Bit12	4	0</Fmt47>
+        <Fmt48>struct strMT6835AddrRegBit-BitDA	4	0</Fmt48>
+        <Fmt49>struct strMT6835AddrRegBit-BitEA	4	0</Fmt49>
+        <Fmt50>struct strMT6835AddrRegBit-BitEC	4	0</Fmt50>
+        <Fmt51>struct strMT6835AddrRegBit-Res	4	0</Fmt51>
+        <Fmt52>struct strMULMGTALMC-BA	4	0</Fmt52>
+        <Fmt53>struct strMULMGTALMC-BE	4	0</Fmt53>
+        <Fmt54>struct strMULMGTALMC-CE	4	0</Fmt54>
+        <Fmt55>struct strMULMGTALMC-FS	4	0</Fmt55>
+        <Fmt56>struct strMULMGTALMC-ME	4	0</Fmt56>
+        <Fmt57>struct strMULMGTALMC-OF	4	0</Fmt57>
+        <Fmt58>struct strMULMGTALMC-OH	4	0</Fmt58>
+        <Fmt59>struct strMULMGTALMC-OS	4	0</Fmt59>
+        <Fmt60>struct strMULMGTSF-ca0	4	0</Fmt60>
+        <Fmt61>struct strMULMGTSF-ca1	4	0</Fmt61>
+        <Fmt62>struct strMULMGTSF-dd0	4	0</Fmt62>
+        <Fmt63>struct strMULMGTSF-dd1	4	0</Fmt63>
+        <Fmt64>struct strMULMGTSF-dd2	4	0</Fmt64>
+        <Fmt65>struct strMULMGTSF-dd3	4	0</Fmt65>
+        <Fmt66>struct strMULMGTSF-ea0	4	0</Fmt66>
+        <Fmt67>struct strMULMGTSF-ea1	4	0</Fmt67>
+        <Fmt68>uniMULMGTSF-all	4	0</Fmt68>
+        <Fmt69>uniRegBit-all	4	0</Fmt69>
+    </struct_types>
+    <array_types>
+        <Fmt0>uint8_t[100]	4	0</Fmt0>
+        <Fmt1>uint8_t[11]	4	0</Fmt1>
+        <Fmt2>uint8_t[128]	4	0</Fmt2>
+        <Fmt3>uint8_t[16]	4	0</Fmt3>
+        <Fmt4>uint8_t[20]	4	0</Fmt4>
+        <Fmt5>uint8_t[4]	4	0</Fmt5>
+        <Fmt6>uint8_t[50]	5	0</Fmt6>
+        <Fmt7>uint8_t[5]	4	0</Fmt7>
+    </array_types>
+    <watch_formats>
+        <Fmt0>{W}42:Enc_PowerOn_Flag	4	0</Fmt0>
+        <Fmt1>{W}42:EncoderTestItem	4	0</Fmt1>
+        <Fmt2>{W}42:EncoderType	4	0</Fmt2>
+        <Fmt3>{W}42:Position_H5	3	0</Fmt3>
+        <Fmt4>{W}42:Position_H6	3	0</Fmt4>
+        <Fmt5>{W}42:Work_Alarm	4	0</Fmt5>
+        <Fmt6>{W}42:Work_AlarmCnt	3	0</Fmt6>
+    </watch_formats>
+    <Trace1>
+        <Enabled>0</Enabled>
+        <ShowSource>1</ShowSource>
+    </Trace1>
+    <Trace2>
+        <Enabled>0</Enabled>
+        <ShowSource>0</ShowSource>
+    </Trace2>
+    <SWOTraceWindow>
+        <PcSampling>0</PcSampling>
+        <InterruptLogs>0</InterruptLogs>
+        <ForcedTimeStamps>0</ForcedTimeStamps>
+        <EventCPI>0</EventCPI>
+        <EventEXC>0</EventEXC>
+        <EventFOLD>0</EventFOLD>
+        <EventLSU>0</EventLSU>
+        <EventSLEEP>0</EventSLEEP>
+    </SWOTraceWindow>
+    <PowerLog>
+        <Title_0>I0</Title_0>
+        <Symbol_0>0 4 0</Symbol_0>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <LiveEnabled>0</LiveEnabled>
+        <LiveFile>PowerLogLive.log</LiveFile>
+    </PowerLog>
+    <DataLog>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+    </DataLog>
+    <InterruptLog>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+        <SumSortOrder>0</SumSortOrder>
+    </InterruptLog>
+    <EventLog>
+        <Title_0>Ch3</Title_0>
+        <Symbol_0>0 0 1</Symbol_0>
+        <Title_1>Ch2</Title_1>
+        <Symbol_1>0 0 1</Symbol_1>
+        <Title_2>Ch1</Title_2>
+        <Symbol_2>0 0 1</Symbol_2>
+        <Title_3>Ch0</Title_3>
+        <Symbol_3>0 0 1</Symbol_3>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+        <SumSortOrder>0</SumSortOrder>
+    </EventLog>
+    <DisassembleMode>
+        <mode>0</mode>
+    </DisassembleMode>
+    <Breakpoints2>
+        <Count>0</Count>
+    </Breakpoints2>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
+    <LogFile>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+        <Category>_ 0</Category>
+    </LogFile>
+    <Aliases>
+        <A0>_ "D:\1encoder\FCT\EncoderTest_V1.6\BSP\src\TamagawaEncoder.c" ""</A0>
+        <A1>_ "D:\1encoder\FCT\EncoderTest_V1.6\Drivers\KV30_HAL_Driver\inc\fsl_edma.h" ""</A1>
+        <A2>_ "D:\1encoder\FCT\EncoderTest_V1.6\Drivers\KV30_HAL_Driver\inc\fsl_pit.h" ""</A2>
+        <A3>_ "D:\1encoder\FCT\EncoderTest_V1.6\Drivers\KV30_HAL_Driver\inc\fsl_port.h" ""</A3>
+        <A4>_ "D:\1encoder\FCT\EncoderTest_V1.6\Drivers\KV30_HAL_Driver\inc\fsl_uart.h" ""</A4>
+        <A5>_ "D:\1encoder\FCT\EncoderTest_V1.6\Project\src\main.c" ""</A5>
+        <A6>_ "D:\1encoder\FCT\Program\EncoderTest_V1.6\BSP\src\Function.c" ""</A6>
+        <A7>_ "D:\1encoder\FCT\Program\EncoderTest_V1.6\BSP\src\TamagawaEncoder.c" ""</A7>
+        <A8>_ "D:\1encoder\FCT\Program\EncoderTest_V1.6\Drivers\KV30_HAL_Driver\inc\fsl_edma.h" ""</A8>
+        <A9>_ "D:\1encoder\FCT\Program\EncoderTest_V1.6\Drivers\KV30_HAL_Driver\inc\fsl_pit.h" ""</A9>
+        <A10>_ "D:\1encoder\FCT\Program\EncoderTest_V1.6\Drivers\KV30_HAL_Driver\inc\fsl_port.h" ""</A10>
+        <A11>_ "D:\1encoder\FCT\Program\EncoderTest_V1.6\Drivers\KV30_HAL_Driver\inc\fsl_uart.h" ""</A11>
+        <A12>_ "D:\1encoder\FCT\Program\EncoderTest_V1.6\Project\src\main.c" ""</A12>
+        <Count>13</Count>
+        <SuppressDialog>0</SuppressDialog>
+    </Aliases>
+    <DriverProfiling>
+        <Enabled>0</Enabled>
+        <Mode>1</Mode>
+        <Graph>0</Graph>
+        <Symbiont>0</Symbiont>
+        <Exclusions />
+    </DriverProfiling>
+    <CallStackLog>
+        <Enabled>0</Enabled>
+    </CallStackLog>
+    <CallStackStripe>
+        <ShowTiming>1</ShowTiming>
+    </CallStackStripe>
+    <PowerProbe>
+        <Frequency>10000</Frequency>
+        <Probe0>I0</Probe0>
+        <ProbeSetup0>2 1 1 2 0 0</ProbeSetup0>
+    </PowerProbe>
+</settings>

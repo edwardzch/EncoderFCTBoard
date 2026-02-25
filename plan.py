@@ -1,268 +1,457 @@
-ºÜºÃµÄ¼ò»¯£¡¼ÈÈ»Ö»ĞèÒª±£´æ `PA` ²ÎÊı£¨ÓÃ»§ÉèÖÃ£©£¬`DP`£¨ÏÔÊ¾²ÎÊı£©²»ĞèÒª±£´æ£¬ÄÇÃ´·½°¸»á±äµÃ¸ü¼Ó¸ßĞ§ºÍÇáÁ¿¡£
+å¾ˆå¥½çš„ç®€åŒ–ï¼æ—¢ç„¶åªéœ€è¦ä¿å­˜
+`PA`
+å‚æ•°ï¼ˆç”¨æˆ·è®¾ç½®ï¼‰ï¼Œ`DP`ï¼ˆæ˜¾ç¤ºå‚æ•°ï¼‰ä¸éœ€è¦ä¿å­˜ï¼Œé‚£ä¹ˆæ–¹æ¡ˆä¼šå˜å¾—æ›´åŠ é«˜æ•ˆå’Œè½»é‡ã€‚
 
-ÕâÊÇÎªÄú¶¨ÖÆµÄ **STM32G4 Flash ¾ùºâÄ¥Ëğ´æ´¢·½°¸ (PA²ÎÊı×¨ÓÃ°æ)**¡£
-
----
-
-### Ò»¡¢ ÊµÊ©¼Æ»® (The Plan)
-
-ÎÒÃÇ½«ÀûÓÃ **Flash µÄ×îºóÁ½Ò³**£¨Page 126 ºÍ Page 127£©×÷Îª´æ´¢Çø£¬²ÉÓÃ **Æ¹ÅÒ£¨Ping-Pong£©»úÖÆ** À´ÊµÏÖ×·¼ÓĞ´ÈëºÍÄ¥Ëğ¾ùºâ¡£
-
-#### 1. ÎïÀí²¼¾Ö (Memory Map)
-
-* **MCU**: STM32G491CCU3 (256KB Flash)
-* **Page A (Ö÷´æ´¢Çø)**: `0x0803 F000` (µ¹ÊıµÚ2Ò³)
-* **Page B (±¸·İ/°áÔËÇø)**: `0x0803 F800` (µ¹ÊıµÚ1Ò³)
-* **¼ÇÂ¼¸ñÊ½**: Ã¿Ìõ¼ÇÂ¼Õ¼ÓÃ **8×Ö½Ú (64bit)**£¬ÕıºÃ·ûºÏ STM32G4 µÄĞ´ÈëÎ»¿í¡£
-* `[ ²ÎÊıID (2byte) | ²ÎÊıÖµ (4byte) | Ğ£ÑéÂë (2byte) ]`
-
-
-
-#### 2. ÔËĞĞ»úÖÆ (Workflow)
-
-* **ÉÏµç¼ÓÔØ (Load)**:
-1. É¨Ãè Page A ºÍ Page B£¬ÅĞ¶ÏÄÄ¸öÊÇ¡°µ±Ç°ÓĞĞ§Ò³¡±£¨·Ç¿ÕµÄÄÇ¸ö£©¡£
-2. ´ÓÍ·µ½Î²¶ÁÈ¡¸ÃÒ³µÄËùÓĞ¼ÇÂ¼¡£
-3. Ã¿¶Áµ½Ò»Ìõ `PA_xx`£¬¾Í¸üĞÂ RAM ÖĞµÄ `PA_Buffer`¡£
-4. *½á¹û*£ºRAM Àï±£ÁôµÄÊÇ Flash ÖĞ×îºóÒ»´ÎĞ´ÈëµÄ×îĞÂÖµ¡£
-
-
-* **ĞŞ¸Ä²ÎÊı (Append Write)**:
-1. µ±³¤°´ Key 4 ±£´æÊ±£¬²éÕÒµ±Ç°Ò³µÄ**ÏÂÒ»¸ö¿Õ°×Î»ÖÃ (0xFF...)**¡£
-2. Ğ´ÈëÒ»ÌõĞÂ¼ÇÂ¼£º`ID=µ±Ç°²ÎÊıºÅ, Value=ĞÂÖµ`¡£
-3. *ÓÅÊÆ*£º²»²Á³ı£¬ËÙ¶È¼«¿ì£¨Î¢Ãë¼¶£©¡£
-
-
-* **Ò³ÃæĞ´Âú (Garbage Collection / Swap)**:
-1. µ±µ±Ç°Ò³£¨±ÈÈç Page A£©Ğ´ÂúÁË£¨´æÁË 256 ´ÎĞŞ¸Ä£©¡£
-2. ²Á³ı Page B¡£
-3. °Ñ RAM ÖĞµ±Ç° **ËùÓĞ 50 ¸ö PA ²ÎÊı** µÄ×îĞÂÖµ£¬ÕûÆëµØĞ´µ½ Page B µÄ¿ªÍ·¡£
-4. ²Á³ı Page A¡£
-5. ±ê¼Ç Page B Îªµ±Ç°Ò³¡£
-6. *ÓÅÊÆ*£ºÇåÀíÁËÀúÊ·ÈßÓàÊı¾İ£¬Flash »ÀÈ»Ò»ĞÂ¡£
-
-
+è¿™æ˜¯ä¸ºæ‚¨å®šåˆ¶çš„ ** STM32G4
+Flash
+å‡è¡¡ç£¨æŸå­˜å‚¨æ–¹æ¡ˆ(PAå‚æ•°ä¸“ç”¨ç‰ˆ) **ã€‚
 
 ---
 
-### ¶ş¡¢ ÍêÕû´úÂëÊµÏÖ
+### ä¸€ã€ å®æ–½è®¡åˆ’ (The Plan)
 
-Çë½«ÒÔÏÂ´úÂë¸´ÖÆµ½ `DigitalTube_Control.c` µÄ **Ä©Î²**¡£Í¬Ê±È·±£ÔÚ `main.c` ³õÊ¼»¯Ê±µ÷ÓÃ `Load_PA_From_Flash()`¡£
+æˆ‘ä»¬å°†åˆ©ç”¨ ** Flash
+çš„æœ€åä¸¤é¡µ **ï¼ˆPage
+126
+å’Œ
+Page
+127ï¼‰ä½œä¸ºå­˜å‚¨åŒºï¼Œé‡‡ç”¨ ** ä¹’ä¹“ï¼ˆPing - Pongï¼‰æœºåˆ¶ ** æ¥å®ç°è¿½åŠ å†™å…¥å’Œç£¨æŸå‡è¡¡ã€‚
+
+#### 1. ç‰©ç†å¸ƒå±€ (Memory Map)
+
+* ** MCU **: STM32G491CCU3(256
+KB
+Flash)
+* ** Page
+A(ä¸»å­˜å‚¨åŒº) **: `0x0803
+F000
+` (å€’æ•°ç¬¬2é¡µ)
+* ** Page
+B(å¤‡ä»½ / æ¬è¿åŒº) **: `0x0803
+F800
+` (å€’æ•°ç¬¬1é¡µ)
+* ** è®°å½•æ ¼å¼ **: æ¯æ¡è®°å½•å ç”¨ ** 8
+å­—èŠ‚(64
+bit) ** ï¼Œæ­£å¥½ç¬¦åˆ
+STM32G4
+çš„å†™å…¥ä½å®½ã€‚
+*`[å‚æ•°ID(2byte) | å‚æ•°å€¼(4
+byte) | æ ¡éªŒç (2
+byte)]`
+
+#### 2. è¿è¡Œæœºåˆ¶ (Workflow)
+
+* ** ä¸Šç”µåŠ è½½(Load) **:
+1.
+æ‰«æ
+Page
+A
+å’Œ
+Page
+Bï¼Œåˆ¤æ–­å“ªä¸ªæ˜¯â€œå½“å‰æœ‰æ•ˆé¡µâ€ï¼ˆéç©ºçš„é‚£ä¸ªï¼‰ã€‚
+2.
+ä»å¤´åˆ°å°¾è¯»å–è¯¥é¡µçš„æ‰€æœ‰è®°å½•ã€‚
+3.
+æ¯è¯»åˆ°ä¸€æ¡
+`PA_xx`ï¼Œå°±æ›´æ–°
+RAM
+ä¸­çš„
+`PA_Buffer`ã€‚
+4. * ç»“æœ *ï¼šRAM
+é‡Œä¿ç•™çš„æ˜¯
+Flash
+ä¸­æœ€åä¸€æ¬¡å†™å…¥çš„æœ€æ–°å€¼ã€‚
+
+* ** ä¿®æ”¹å‚æ•°(Append
+Write) **:
+1.
+å½“é•¿æŒ‰
+Key
+4
+ä¿å­˜æ—¶ï¼ŒæŸ¥æ‰¾å½“å‰é¡µçš„ ** ä¸‹ä¸€ä¸ªç©ºç™½ä½ç½®(0xFF...) **ã€‚
+2.
+å†™å…¥ä¸€æ¡æ–°è®°å½•ï¼š`ID = å½“å‰å‚æ•°å·, Value = æ–°å€¼
+`ã€‚
+3. * ä¼˜åŠ¿ *ï¼šä¸æ“¦é™¤ï¼Œé€Ÿåº¦æå¿«ï¼ˆå¾®ç§’çº§ï¼‰ã€‚
+
+* ** é¡µé¢å†™æ»¡(Garbage
+Collection / Swap) **:
+1.
+å½“å½“å‰é¡µï¼ˆæ¯”å¦‚
+Page
+Aï¼‰å†™æ»¡äº†ï¼ˆå­˜äº†
+256
+æ¬¡ä¿®æ”¹ï¼‰ã€‚
+2.
+æ“¦é™¤
+Page
+Bã€‚
+3.
+æŠŠ
+RAM
+ä¸­å½“å‰ ** æ‰€æœ‰
+50
+ä¸ª
+PA
+å‚æ•° ** çš„æœ€æ–°å€¼ï¼Œæ•´é½åœ°å†™åˆ°
+Page
+B
+çš„å¼€å¤´ã€‚
+4.
+æ“¦é™¤
+Page
+Aã€‚
+5.
+æ ‡è®°
+Page
+B
+ä¸ºå½“å‰é¡µã€‚
+6. * ä¼˜åŠ¿ *ï¼šæ¸…ç†äº†å†å²å†—ä½™æ•°æ®ï¼ŒFlash
+ç„•ç„¶ä¸€æ–°ã€‚
+
+
+
+---
+
+### äºŒã€ å®Œæ•´ä»£ç å®ç°
+
+è¯·å°†ä»¥ä¸‹ä»£ç å¤åˆ¶åˆ°
+`DigitalTube_Control.c`
+çš„ ** æœ«å°¾ **ã€‚åŒæ—¶ç¡®ä¿åœ¨
+`main.c`
+åˆå§‹åŒ–æ—¶è°ƒç”¨
+`Load_PA_From_Flash()`ã€‚
 
 ```c
-// ========================================================================================
-//                             Flash ¾ùºâÄ¥Ëğ´æ´¢ÏµÍ³ (PA×¨ÓÃ°æ)
-// ========================================================================================
+// == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == ==
+// Flash
+å‡è¡¡ç£¨æŸå­˜å‚¨ç³»ç»Ÿ(PAä¸“ç”¨ç‰ˆ)
+// == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == ==
 
-// ---------------- ÅäÖÃÇøÓò ----------------
-// STM32G491CC (256KB) ×îºóÒ»Ò³µØÖ· = 0x08040000 - 2KB
-#define FLASH_PAGE_SIZE     2048
-#define FLASH_PAGE_A_ADDR   0x0803F000  // µ¹ÊıµÚ¶şÒ³
-#define FLASH_PAGE_B_ADDR   0x0803F800  // µ¹ÊıµÚÒ»Ò³
+// ---------------- é…ç½®åŒºåŸŸ - ---------------
+// STM32G491CC(256
+KB) æœ€åä¸€é¡µåœ°å€ = 0x08040000 - 2
+KB
+# define FLASH_PAGE_SIZE     2048
+# define FLASH_PAGE_A_ADDR   0x0803F000  // å€’æ•°ç¬¬äºŒé¡µ
+# define FLASH_PAGE_B_ADDR   0x0803F800  // å€’æ•°ç¬¬ä¸€é¡µ
 
-// ¼ÇÂ¼½á¹¹Ìå (ÑÏ¸ñ¶ÔÆë 8×Ö½Ú/64bit)
-// [ ID(2) | Value(4) | Magic(2) ]
-typedef struct {
-    uint16_t ParamID;  // PA²ÎÊı±àºÅ (0 ~ PA_SIZE-1)
-    int32_t  Value;    // ²ÎÊıÖµ
-    uint16_t Magic;    // ¹Ì¶¨Îª 0xA55A
+// è®°å½•ç»“æ„ä½“(ä¸¥æ ¼å¯¹é½
+8
+å­—èŠ‚ / 64
+bit)
+// [ID(2) | Value(4) | Magic(2)]
+typedef
+struct
+{
+    uint16_t
+ParamID; // PAå‚æ•°ç¼–å·(0
+~ PA_SIZE - 1)
+int32_t
+Value; // å‚æ•°å€¼
+uint16_t
+Magic; // å›ºå®šä¸º
+0xA55A
 } Flash_Record_t;
 
-#define RECORD_MAGIC  0xA55A
+# define RECORD_MAGIC  0xA55A
 
-// ---------------- ÄÚ²¿×´Ì¬±äÁ¿ ----------------
-static uint32_t g_ActivePageAddr = FLASH_PAGE_A_ADDR; // µ±Ç°ÕıÔÚÊ¹ÓÃµÄÒ³
+// ---------------- å†…éƒ¨çŠ¶æ€å˜é‡ - ---------------
+static
+uint32_t
+g_ActivePageAddr = FLASH_PAGE_A_ADDR; // å½“å‰æ­£åœ¨ä½¿ç”¨çš„é¡µ
 
-// ---------------- ÄÚ²¿º¯ÊıÉùÃ÷ ----------------
-static void Flash_Erase_Page(uint32_t page_addr);
-static void Flash_Write_Record(uint32_t addr, uint16_t id, int32_t val);
+// ---------------- å†…éƒ¨å‡½æ•°å£°æ˜ - ---------------
+static
+void
+Flash_Erase_Page(uint32_t
+page_addr);
+static
+void
+Flash_Write_Record(uint32_t
+addr, uint16_t
+id, int32_t
+val);
 
-/****************************************************************************************
-* º¯ÊıÃû³Æ£ºFlash_Find_Active_Page
-* º¯Êı¹¦ÄÜ£ºÉÏµçÊ±ÅĞ¶ÏÄÄÒ»Ò³ÊÇÓĞĞ§Ò³
-****************************************************************************************/
-static void Flash_Find_Active_Page(void)
+/ ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **
+*å‡½æ•°åç§°ï¼šFlash_Find_Active_Page
+*å‡½æ•°åŠŸèƒ½ï¼šä¸Šç”µæ—¶åˆ¤æ–­å“ªä¸€é¡µæ˜¯æœ‰æ•ˆé¡µ
+** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** /
+static
+void
+Flash_Find_Active_Page(void)
 {
-    // ¶ÁÈ¡Á½Ò³µÄµÚÒ»¸ö×Ö
-    uint32_t headerA = *(__IO uint32_t*)FLASH_PAGE_A_ADDR;
-    uint32_t headerB = *(__IO uint32_t*)FLASH_PAGE_B_ADDR;
+// è¯»å–ä¸¤é¡µçš„ç¬¬ä¸€ä¸ªå­—
+uint32_t
+headerA = *(__IO uint32_t *)
+FLASH_PAGE_A_ADDR;
+uint32_t
+headerB = *(__IO uint32_t *)
+FLASH_PAGE_B_ADDR;
 
-    // Âß¼­£ºË­ÓĞÊı¾İË­¾ÍÊÇ Active¡£Èç¹û¶¼ÓĞÊı¾İ(Òì³£)»ò¶¼¿Õ£¬Ä¬ÈÏÓÃ A¡£
-    if (headerA != 0xFFFFFFFF && headerB == 0xFFFFFFFF) {
-        g_ActivePageAddr = FLASH_PAGE_A_ADDR;
-    } 
-    else if (headerB != 0xFFFFFFFF && headerA == 0xFFFFFFFF) {
-        g_ActivePageAddr = FLASH_PAGE_B_ADDR;
-    } 
-    else {
-        // È«¿Õ(µÚÒ»´ÎÊ¹ÓÃ) »ò È«Âú(Òì³£)£¬ÖØÖÃÎª A
-        g_ActivePageAddr = FLASH_PAGE_A_ADDR;
-    }
+// é€»è¾‘ï¼šè°æœ‰æ•°æ®è°å°±æ˜¯
+Activeã€‚å¦‚æœéƒ½æœ‰æ•°æ®(å¼‚å¸¸)
+æˆ–éƒ½ç©ºï¼Œé»˜è®¤ç”¨
+Aã€‚
+if (headerA != 0xFFFFFFFF & & headerB == 0xFFFFFFFF) {
+g_ActivePageAddr = FLASH_PAGE_A_ADDR;
+}
+else if (headerB != 0xFFFFFFFF & & headerA == 0xFFFFFFFF) {
+g_ActivePageAddr = FLASH_PAGE_B_ADDR;
+}
+else {
+// å…¨ç©º(ç¬¬ä¸€æ¬¡ä½¿ç”¨) æˆ– å…¨æ»¡(å¼‚å¸¸)ï¼Œé‡ç½®ä¸º A
+g_ActivePageAddr = FLASH_PAGE_A_ADDR;
+}
 }
 
-/****************************************************************************************
-* º¯ÊıÃû³Æ£ºLoad_PA_From_Flash
-* º¯Êı¹¦ÄÜ£º[ºËĞÄ] ÉÏµç¶ÁÈ¡£¬»Ö¸´ PA ²ÎÊı
-* ËµÃ÷£º    ĞèÔÚ main.c ³õÊ¼»¯Ê±µ÷ÓÃ
-****************************************************************************************/
-void Load_PA_From_Flash(void)
+/ ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **
+*å‡½æ•°åç§°ï¼šLoad_PA_From_Flash
+*å‡½æ•°åŠŸèƒ½ï¼š[æ ¸å¿ƒ]
+ä¸Šç”µè¯»å–ï¼Œæ¢å¤
+PA
+å‚æ•°
+*è¯´æ˜ï¼š    éœ€åœ¨
+main.c
+åˆå§‹åŒ–æ—¶è°ƒç”¨
+** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** /
+void
+Load_PA_From_Flash(void)
 {
-    // 1. È·¶¨µ±Ç°Ò³
-    Flash_Find_Active_Page();
-    
-    uint32_t curr_addr = g_ActivePageAddr;
-    uint32_t end_addr = g_ActivePageAddr + FLASH_PAGE_SIZE;
+// 1.
+ç¡®å®šå½“å‰é¡µ
+Flash_Find_Active_Page();
 
-    // 2. É¨ÃèÕûÒ³ÈÕÖ¾
-    while (curr_addr < end_addr) {
-        uint64_t raw_data = *(__IO uint64_t*)curr_addr;
-        
-        // Óöµ½¿Õ°×£¬ËµÃ÷ºóÃæÃ»Êı¾İÁË
-        if (raw_data == 0xFFFFFFFFFFFFFFFF) break;
+uint32_t
+curr_addr = g_ActivePageAddr;
+uint32_t
+end_addr = g_ActivePageAddr + FLASH_PAGE_SIZE;
 
-        Flash_Record_t *rec = (Flash_Record_t*)&raw_data;
+// 2.
+æ‰«ææ•´é¡µæ—¥å¿—
+while (curr_addr < end_addr) {
+uint64_t raw_data = * (__IO uint64_t * )curr_addr;
 
-        // Ğ£ÑéÄ§Êõ×Ö£¬·ÀÖ¹¶ÁÈ¡µ½Ğ´»µµÄÊı¾İ
-        if (rec->Magic == RECORD_MAGIC) {
-            // ºÏ·¨ĞÔ¼ì²é£ºID±ØĞëÔÚ PA_SIZE ·¶Î§ÄÚ
-            if (rec->ParamID < PA_SIZE) {
-                // ¸²¸Ç RAM ÖĞµÄ¾ÉÖµ (ÈÕÖ¾¿¿ºóµÄ²ÅÊÇ×îĞÂµÄ)
-                PA_Buffer[rec->ParamID] = rec->Value;
-            }
-        }
-        
-        curr_addr += 8; // ÏÂÒ»Ìõ
-    }
+// é‡åˆ°ç©ºç™½ï¼Œè¯´æ˜åé¢æ²¡æ•°æ®äº†
+if (raw_data == 0xFFFFFFFFFFFFFFFF)
+break;
+
+Flash_Record_t * rec = (Flash_Record_t *) & raw_data;
+
+// æ ¡éªŒé­”æœ¯å­—ï¼Œé˜²æ­¢è¯»å–åˆ°å†™åçš„æ•°æ®
+if (rec->Magic == RECORD_MAGIC) {
+// åˆæ³•æ€§æ£€æŸ¥ï¼šIDå¿…é¡»åœ¨ PA_SIZE èŒƒå›´å†…
+if (rec->ParamID < PA_SIZE) {
+// è¦†ç›– RAM ä¸­çš„æ—§å€¼ (æ—¥å¿—é åçš„æ‰æ˜¯æœ€æ–°çš„)
+PA_Buffer[rec->ParamID] = rec->Value;
+}
 }
 
-/****************************************************************************************
-* º¯ÊıÃû³Æ£ºDTC_SaveParams_Callback
-* º¯Êı¹¦ÄÜ£º[ºËĞÄ] ±£´æµ¥¸ö²ÎÊı (×·¼ÓĞ´ÈëÄ£Ê½)
-* ËµÃ÷£º    ÓÉ Key 4 ³¤°´´¥·¢¡£Ö»±£´æµ±Ç°ĞŞ¸ÄµÄÄÇ¸ö²ÎÊı£¬ËÙ¶È¼«¿ì¡£
-****************************************************************************************/
-void DTC_SaveParams_Callback(void)
-{
-    // Èç¹ûĞŞ¸ÄµÄÊÇ DP ×é£¬²»±£´æ£¬Ö±½Ó·µ»Ø
-    if (DTC_Dev.GroupIdx != 0) return;
-
-    uint16_t save_id = DTC_Dev.ParamNum;
-    int32_t  save_val = PA_Buffer[save_id]; // ×¢Òâ£º´ËÊ± Buffer ÒÑ±» EditVal ¸üĞÂ
-
-    uint32_t write_addr = g_ActivePageAddr;
-    uint32_t end_addr = g_ActivePageAddr + FLASH_PAGE_SIZE;
-    uint8_t page_is_full = 1;
-
-    // 1. Ñ°ÕÒ¿Õ°×Î»ÖÃ
-    while (write_addr < end_addr) {
-        if (*(__IO uint64_t*)write_addr == 0xFFFFFFFFFFFFFFFF) {
-            page_is_full = 0;
-            break;
-        }
-        write_addr += 8;
-    }
-
-    // 2. Èç¹ûÒ³Ã»Âú£¬Ö±½Ó×·¼ÓĞ´Èë
-    if (!page_is_full) {
-        Flash_Write_Record(write_addr, save_id, save_val);
-    }
-    // 3. Èç¹ûÒ³ÂúÁË£¬Ö´ĞĞ¡°°á¼Ò (Page Swap)¡±
-    else {
-        // È·¶¨°á¼ÒÄ¿±êÒ³
-        uint32_t target_page = (g_ActivePageAddr == FLASH_PAGE_A_ADDR) ? FLASH_PAGE_B_ADDR : FLASH_PAGE_A_ADDR;
-        
-        // A. ²Á³ıÄ¿±êÒ³
-        Flash_Erase_Page(target_page);
-        
-        // B. ½« RAM ÖĞËùÓĞµÄ PA ²ÎÊı¿ìÕÕĞ´ÈëÄ¿±êÒ³ (ÕûÀíËéÆ¬)
-        uint32_t target_write_ptr = target_page;
-        for (int i = 0; i < PA_SIZE; i++) {
-            Flash_Write_Record(target_write_ptr, i, PA_Buffer[i]);
-            target_write_ptr += 8;
-        }
-
-        // C. ²Á³ı¾ÉÒ³ (±ê¼ÇÎªÆúÓÃ)
-        Flash_Erase_Page(g_ActivePageAddr);
-
-        // D. ÇĞ»»µ±Ç°Ò³Ö¸Õë
-        g_ActivePageAddr = target_page;
-    }
+curr_addr += 8; // ä¸‹ä¸€æ¡
+}
 }
 
-// ---------------- µ×²ã Flash ¸¨Öúº¯Êı ----------------
+/ ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **
+*å‡½æ•°åç§°ï¼šDTC_SaveParams_Callback
+          * å‡½æ•°åŠŸèƒ½ï¼š[æ ¸å¿ƒ]
+ä¿å­˜å•ä¸ªå‚æ•°(è¿½åŠ å†™å…¥æ¨¡å¼)
+* è¯´æ˜ï¼š    ç”±
+Key
+4
+é•¿æŒ‰è§¦å‘ã€‚åªä¿å­˜å½“å‰ä¿®æ”¹çš„é‚£ä¸ªå‚æ•°ï¼Œé€Ÿåº¦æå¿«ã€‚
+** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** /
+void
+DTC_SaveParams_Callback(void)
+{
+// å¦‚æœä¿®æ”¹çš„æ˜¯
+DP
+ç»„ï¼Œä¸ä¿å­˜ï¼Œç›´æ¥è¿”å›
+if (DTC_Dev.GroupIdx != 0)
+return;
 
-static void Flash_Erase_Page(uint32_t page_addr)
+uint16_t
+save_id = DTC_Dev.ParamNum;
+int32_t
+save_val = PA_Buffer[save_id]; // æ³¨æ„ï¼šæ­¤æ—¶
+Buffer
+å·²è¢«
+EditVal
+æ›´æ–°
+
+uint32_t
+write_addr = g_ActivePageAddr;
+uint32_t
+end_addr = g_ActivePageAddr + FLASH_PAGE_SIZE;
+uint8_t
+page_is_full = 1;
+
+// 1.
+å¯»æ‰¾ç©ºç™½ä½ç½®
+while (write_addr < end_addr) {
+if ( * (__IO uint64_t * )write_addr == 0xFFFFFFFFFFFFFFFF) {
+page_is_full = 0;
+break;
+}
+write_addr += 8;
+}
+
+// 2.
+å¦‚æœé¡µæ²¡æ»¡ï¼Œç›´æ¥è¿½åŠ å†™å…¥
+if (!page_is_full)
+{
+    Flash_Write_Record(write_addr, save_id, save_val);
+}
+// 3.
+å¦‚æœé¡µæ»¡äº†ï¼Œæ‰§è¡Œâ€œæ¬å®¶(Page
+Swap)â€
+else {
+     // ç¡®å®šæ¬å®¶ç›®æ ‡é¡µ
+uint32_t
+target_page = (g_ActivePageAddr == FLASH_PAGE_A_ADDR) ? FLASH_PAGE_B_ADDR: FLASH_PAGE_A_ADDR;
+
+// A.æ“¦é™¤ç›®æ ‡é¡µ
+Flash_Erase_Page(target_page);
+
+// B.å°†
+RAM
+ä¸­æ‰€æœ‰çš„
+PA
+å‚æ•°å¿«ç…§å†™å…¥ç›®æ ‡é¡µ(æ•´ç†ç¢ç‰‡)
+uint32_t
+target_write_ptr = target_page;
+for (int i = 0; i < PA_SIZE; i++)
+{
+Flash_Write_Record(target_write_ptr, i, PA_Buffer[i]);
+target_write_ptr += 8;
+}
+
+// C.æ“¦é™¤æ—§é¡µ(æ ‡è®°ä¸ºå¼ƒç”¨)
+Flash_Erase_Page(g_ActivePageAddr);
+
+// D.åˆ‡æ¢å½“å‰é¡µæŒ‡é’ˆ
+g_ActivePageAddr = target_page;
+}
+}
+
+// ---------------- åº•å±‚
+Flash
+è¾…åŠ©å‡½æ•° - ---------------
+
+static
+void
+Flash_Erase_Page(uint32_t
+page_addr)
 {
     HAL_FLASH_Unlock();
-    FLASH_EraseInitTypeDef Erase;
-    uint32_t PageError;
-    
-    Erase.TypeErase = FLASH_TYPEERASE_PAGES;
-    Erase.Banks = FLASH_BANK_1;
-    // ¼ÆËãÒ³ºÅ: (Addr - Base) / 2048
-    Erase.Page = (page_addr - 0x08000000) / FLASH_PAGE_SIZE;
-    Erase.NbPages = 1;
-    
-    HAL_FLASHEx_Erase(&Erase, &PageError);
-    HAL_FLASH_Lock();
+FLASH_EraseInitTypeDef
+Erase;
+uint32_t
+PageError;
+
+Erase.TypeErase = FLASH_TYPEERASE_PAGES;
+Erase.Banks = FLASH_BANK_1;
+// è®¡ç®—é¡µå·: (Addr - Base) / 2048
+Erase.Page = (page_addr - 0x08000000) / FLASH_PAGE_SIZE;
+Erase.NbPages = 1;
+
+HAL_FLASHEx_Erase( & Erase, & PageError);
+HAL_FLASH_Lock();
 }
 
-static void Flash_Write_Record(uint32_t addr, uint16_t id, int32_t val)
+static
+void
+Flash_Write_Record(uint32_t
+addr, uint16_t
+id, int32_t
+val)
 {
-    Flash_Record_t rec;
-    rec.ParamID = id;
-    rec.Value = val;
-    rec.Magic = RECORD_MAGIC;
+    Flash_Record_t
+rec;
+rec.ParamID = id;
+rec.Value = val;
+rec.Magic = RECORD_MAGIC;
 
-    HAL_FLASH_Unlock();
-    // STM32G4 ±ØĞë°´ 64Î» (Double Word) Ğ´Èë
-    HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, addr, *(__IO uint64_t*)&rec);
-    HAL_FLASH_Lock();
+HAL_FLASH_Unlock();
+// STM32G4
+å¿…é¡»æŒ‰
+64
+ä½(Double
+Word) å†™å…¥
+HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, addr, *(__IO uint64_t *) & rec);
+HAL_FLASH_Lock();
 }
 
 ```
 
-### Èı¡¢ ±ØÒªµÄÎ¢µ÷ (Checklist)
+### ä¸‰ã€ å¿…è¦çš„å¾®è°ƒ (Checklist)
 
-1. **Í·ÎÄ¼şÉùÃ÷**:
-ÔÚ `DigitalTube_Control.h` ÖĞÌí¼Ó `Load_PA_From_Flash` µÄÉùÃ÷£¬ÒÔ±ã main º¯Êıµ÷ÓÃ¡£
+1. ** å¤´æ–‡ä»¶å£°æ˜ **:
+åœ¨
+`DigitalTube_Control.h`
+ä¸­æ·»åŠ 
+`Load_PA_From_Flash`
+çš„å£°æ˜ï¼Œä»¥ä¾¿
+main
+å‡½æ•°è°ƒç”¨ã€‚
 ```c
-void Load_PA_From_Flash(void); // Ìí¼ÓÕâĞĞ
+void
+Load_PA_From_Flash(void); // æ·»åŠ è¿™è¡Œ
 
 ```
 
 
-2. **Ö÷º¯Êıµ÷ÓÃ**:
-ÔÚ `main.c` µÄ `while(1)` Ö®Ç°£¬ÔÚÍâÉè³õÊ¼»¯Ö®ºó£º
+2. ** ä¸»å‡½æ•°è°ƒç”¨ **:
+åœ¨
+`main.c`
+çš„
+`
+while (1)` ä¹‹å‰ï¼Œåœ¨å¤–è®¾åˆå§‹åŒ–ä¹‹åï¼š
 ```c
-/* USER CODE BEGIN 2 */
+/ *USER
+CODE
+BEGIN
+2 * /
 DTC_Init();
-Load_PA_From_Flash(); // <--- ±ØĞë¼ÓÕâ¾ä£¬ÉÏµç¼ÓÔØ²ÎÊı
-/* USER CODE END 2 */
+Load_PA_From_Flash(); // < --- å¿…é¡»åŠ è¿™å¥ï¼Œä¸Šç”µåŠ è½½å‚æ•°
+/ *USER
+CODE
+END
+2 * /
 
 ```
 
-
-3. **Ä¬ÈÏÖµÂß¼­**:
-Èç¹ûĞ¾Æ¬ÊÇÈ«ĞÂµÄ£¬Flash Ò²ÊÇ¿ÕµÄ£¬`Load_PA_From_Flash` Ê²Ã´¶¼²»»á×ö¡£
-ËùÒÔ£¬ÄãĞèÒªÔÚ `DTC_Init` »òÕß¶¨Òå `PA_Buffer` Êı×éÊ±¸øÒ»¸öÓÉ±àÒëÆ÷Éú³ÉµÄÄ¬ÈÏÖµ¡£
+3. ** é»˜è®¤å€¼é€»è¾‘ **:
+å¦‚æœèŠ¯ç‰‡æ˜¯å…¨æ–°çš„ï¼ŒFlash
+ä¹Ÿæ˜¯ç©ºçš„ï¼Œ`Load_PA_From_Flash`
+ä»€ä¹ˆéƒ½ä¸ä¼šåšã€‚
+æ‰€ä»¥ï¼Œä½ éœ€è¦åœ¨
+`DTC_Init`
+æˆ–è€…å®šä¹‰
+`PA_Buffer`
+æ•°ç»„æ—¶ç»™ä¸€ä¸ªç”±ç¼–è¯‘å™¨ç”Ÿæˆçš„é»˜è®¤å€¼ã€‚
 ```c
-// ÔÚ DigitalTube_Control.c ¶¥²¿
-int32_t PA_Buffer[PA_SIZE] = { 100, 200, 500, ... }; // ÄãµÄ³ö³§Ä¬ÈÏÖµ
+// åœ¨
+DigitalTube_Control.c
+é¡¶éƒ¨
+int32_t
+PA_Buffer[PA_SIZE] = {100, 200, 500, ...}; // ä½ çš„å‡ºå‚é»˜è®¤å€¼
 
 ```
 
+### å››ã€ è¿™ä¸ªæ–¹æ¡ˆçš„ä¼˜åŠ¿
 
-
-### ËÄ¡¢ Õâ¸ö·½°¸µÄÓÅÊÆ
-
-1. **³¬³¤ÊÙÃü**:
-Ò»Ò³¿ÉÒÔ´æ  Ìõ¼ÇÂ¼¡£
-Ã¿Ò³Ğ´Âú²Å²Á³ıÒ»´Î¡£
-ÊÙÃü = ¡£
-ÄÄÅÂÓÃ»§ÊÇ¸ö¡°²ÎÊı¿ñÄ§¡±£¬ÕâÌ¨Éè±¸Ò²ÄÜ´«¼ÒÁË¡£
-2. **µôµç°²È«**:
-ÒòÎªÎÒÃÇÖ»±£´æ `PA`¡£ÔÚ°á¼ÒÊ±£¬ÎÒÃÇÊÇÏÈĞ´ÈëĞÂÒ³£¬ÔÙ²Á³ı¾ÉÒ³¡£
-Èç¹ûÔÚĞ´ÈëĞÂÒ³Ê±¶Ïµç -> ¾ÉÒ³»¹ÔÚ£¬Êı¾İ²»¶ª¡£
-Èç¹ûÔÚ²Á³ı¾ÉÒ³Ê±¶Ïµç -> ĞÂÒ³ÒÑ¾­ºÃÁË£¬Êı¾İ²»¶ª¡£
-3. **¼«ËÙÏìÓ¦**:
-Æ½Ê±±£´æÖ»ĞèÒªĞ´ 8 ¸ö×Ö½Ú£¬ºÄÊ±¼¸Ê®Î¢Ãë£¬ÊıÂë¹ÜÏÔÊ¾ÍêÈ«²»»áÉÁË¸»ò¿¨¶Ù¡£
+1. ** è¶…é•¿å¯¿å‘½ **:
+ä¸€é¡µå¯ä»¥å­˜
+æ¡è®°å½•ã€‚
+æ¯é¡µå†™æ»¡æ‰æ“¦é™¤ä¸€æ¬¡ã€‚
+å¯¿å‘½ = ã€‚
+å“ªæ€•ç”¨æˆ·æ˜¯ä¸ªâ€œå‚æ•°ç‹‚é­”â€ï¼Œè¿™å°è®¾å¤‡ä¹Ÿèƒ½ä¼ å®¶äº†ã€‚
+2. ** æ‰ç”µå®‰å…¨ **:
+å› ä¸ºæˆ‘ä»¬åªä¿å­˜
+`PA`ã€‚åœ¨æ¬å®¶æ—¶ï¼Œæˆ‘ä»¬æ˜¯å…ˆå†™å…¥æ–°é¡µï¼Œå†æ“¦é™¤æ—§é¡µã€‚
+å¦‚æœåœ¨å†™å…¥æ–°é¡µæ—¶æ–­ç”µ -> æ—§é¡µè¿˜åœ¨ï¼Œæ•°æ®ä¸ä¸¢ã€‚
+å¦‚æœåœ¨æ“¦é™¤æ—§é¡µæ—¶æ–­ç”µ -> æ–°é¡µå·²ç»å¥½äº†ï¼Œæ•°æ®ä¸ä¸¢ã€‚
+3. ** æé€Ÿå“åº” **:
+å¹³æ—¶ä¿å­˜åªéœ€è¦å†™
+8
+ä¸ªå­—èŠ‚ï¼Œè€—æ—¶å‡ åå¾®ç§’ï¼Œæ•°ç ç®¡æ˜¾ç¤ºå®Œå…¨ä¸ä¼šé—ªçƒæˆ–å¡é¡¿ã€‚

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<userOverrides>
+    <override>
+        <path>D:\1130220108\1encoder\MagnTAK\17BIT_Magnetic encoder\program\MT6835_MKV30_Programming board_slave\BSP\inc\Rtu.h</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>D:\1130220108\1encoder\MagnTAK\17BIT_Magnetic encoder\program\MT6835_MKV30_Programming board_slave\BSP\src\Rtu.c</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>D:\1130220108\1encoder\MagnTAK\17BIT_Magnetic encoder\program\MT6835_MKV30_Programming board_slave\Project\src\main.c</path>
+        <encoding>System</encoding>
+    </override>
+</userOverrides>

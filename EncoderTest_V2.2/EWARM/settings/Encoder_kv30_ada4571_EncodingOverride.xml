@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<userOverrides>
+    <override>
+        <path>C:\Users\Administrator\Desktop\kv30\ADA4571_Encoder_20191026\source\main.c</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Administrator\Desktop\kv30\ADA4571_Encoder_Dorna\source\main.c</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Administrator\Desktop\kv30\test2\source\main.c</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>D:\Works\ADI\7_AMR\1_software\ADA4571_Encoder_Dorna\ADA4571_Encoder_Dorna\source\main.c</path>
+        <encoding>System</encoding>
+    </override>
+</userOverrides>

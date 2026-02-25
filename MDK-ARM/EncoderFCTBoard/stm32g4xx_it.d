@@ -38,3 +38,5 @@ encoderfctboard\stm32g4xx_it.o: ../Core/Inc/stm32g4xx_it.h
 encoderfctboard\stm32g4xx_it.o: ..\user_config\inc\uart_config.h
 encoderfctboard\stm32g4xx_it.o: ..\user_function\inc\modbus_function.h
 encoderfctboard\stm32g4xx_it.o: ..\user_function\inc\DigitalTube_Control.h
+encoderfctboard\stm32g4xx_it.o: ..\user_function\inc\Parameter_Module.h
+encoderfctboard\stm32g4xx_it.o: ..\user_function\inc\encoder_driver.h

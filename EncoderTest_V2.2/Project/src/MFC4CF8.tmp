@@ -1,0 +1,753 @@
+//------------------------------------------------------------------------------ 
+// INCLUDES
+//------------------------------------------------------------------------------ 
+#include "stdio.h"
+#include "adc.h"
+#include "eeprom.h"
+#include "ftm.h"
+#include "smartabs.h"
+#include "ioport.h"
+#include "clock_config.h"
+
+
+//------------------------------------------------------------------------------ 
+// DEFINES
+//------------------------------------------------------------------------------
+//#define RECORD
+
+//------------------------------------------------------------------------------
+// Variables
+//------------------------------------------------------------------------------
+//int32_t angleTable[] = {92160,54405,28746,14592,7324,3666,1833,917,458,229,115,57,29,14,7,4,2,1}; // degree*4096
+int32_t angleTable[] = {524288, 309505, 163534, 83012, 41667, 20854, 10430, 5215, 2608, 1304, 652, 326, 163, 81, 41, 20, 10, 5};
+/*                              360бу              <=> 4194304 = 2^22
+   Start from arctan(1)       = 45бу               <=> 524288 = 2^16
+              arctan(1/2^1)   = 26.565051177бу     <=> 309505
+              arctan(1/2^2)   = 14.036243468бу     <=> 163534
+              arctan(1/2^3)   = 7.1250163489бу     <=> 83012
+              arctan(1/2^4)   = 3.5763343750бу     <=> 41667
+              arctan(1/2^5)   = 1.7899106082бу     <=> 20854
+              arctan(1/2^6)   = 0.8951737102бу     <=> 10430
+              arctan(1/2^7)   = 0.4476141709бу     <=> 5215
+              arctan(1/2^8)   = 0.2238105004бу     <=> 2608
+              arctan(1/2^9)   = 0.1119056771бу     <=> 1304
+              arctan(1/2^10)  = 0.0559528919бу     <=> 652
+              arctan(1/2^11)  = 0.0279764526бу     <=> 326
+              arctan(1/2^12)  = 0.0139882271бу     <=> 163
+              arctan(1/2^13)  = 0.0069941137бу     <=> 81
+              arctan(1/2^14)  = 0.0034970569бу     <=> 41
+              arctan(1/2^15)  = 0.0017485284бу     <=> 20
+              arctan(1/2^16)  = 0.0008742642бу     <=> 10
+              arctan(1/2^17)  = 0.0004371321бу     <=> 5    */
+//extern const int32_t  MyTable[4798][2];
+extern const int16_t  MyTable[4097];
+volatile int16_t   SinMax = 0x8000;
+volatile int16_t   SinMin = 0x7FFF;
+volatile int16_t   CosMax = 0x8000;
+volatile int16_t   CosMin = 0x7FFF;
+volatile int16_t   ADC0Offset[40] = {0};
+volatile int16_t   ADC1Offset[40] = {0};
+volatile int16_t   SumADC0Offset = 0;
+volatile int16_t   SumADC1Offset = 0;
+volatile int16_t   ADC0OFS = 0;
+volatile int16_t   ADC1OFS = 0;
+volatile uint16_t  ADCCalibrationFlag;
+volatile int16_t   SinData[2] = {0, 0};
+volatile int16_t   CosData[2] = {0, 0};
+volatile int32_t   Angle[2] = {0, 0};
+volatile int32_t   Delta[3] = {0, 0, 0};
+volatile int32_t   DeltaAngle = 0;
+volatile int32_t   OldAngle = 0;
+volatile int32_t   NewAngle = 0;
+volatile int32_t   Hall[2] = {0, 0};
+volatile uint16_t  IntSampleFlag = 0;
+volatile uint16_t  CycleTimer[2] = {0, 0};
+volatile uint16_t  CycleTime = 0;
+volatile uint32_t  SumCycle = 0;
+volatile uint32_t  AveCycle = 0;
+volatile int32_t   PDB0Time = 0;
+volatile uint16_t  InitTimer = 0;
+volatile uint16_t  InitFlag = 0;
+volatile s_Filter  SpeedFilter;
+volatile int32_t   CountError[4] = {0, 0, 0, 0};
+volatile uniWR     WriteFlag = {0}; 
+volatile uint16_t  PowerOnFlag = 0;
+volatile uint8_t   Para[256] = {0};
+volatile uint16_t  ADC0Cnt = 0;
+volatile uint16_t  ADC1Cnt = 0;
+volatile uint16_t  UARTCnt = 0;
+volatile uint16_t  MAINCnt = 0;
+volatile uint16_t  wtPages = 0;
+const uint8_t   MyPara[256] = {0};
+volatile uint16_t  OffsetSetting = 0;
+volatile uint16_t  CaliSetting = 0;
+//------------------------------------------------------------------------------
+//0xE0    SMARTABS.Offset (LSB)
+//0xE1    SMARTABS.Offset
+//0xE2    SMARTABS.Offset (MSB)
+//0xE3    fixed to "0"
+//0xE4    SMARTABS.Multi_turn (LSB)
+//0xE5    SMARTABS.Multi_turn (MSB)
+//0xE6    SMARTABS.EncoderErr (LSB)
+//0xE7    SMARTABS.EncoderErr (MSB)
+//0xE8    ADC0->OFS (LSB)
+//0xE9    ADC0->OFS (MSB)
+//0xEA    ADC1->OFS (LSB)
+//0xEB    ADC1->OFS (MSB)
+
+
+#ifdef COMPENSATION
+extern const int8_t   gaLookUpTableSin[32768];
+int32_t   gnPreAngle[5] = {0,0,0,0,0};
+int32_t   gnPreSpeed[5] = {0,0,0,0,0};
+int32_t   gnGainComp1stOrder = -39;
+int32_t   gnPhaseComp1stOrder = 194;
+int32_t   gnGainComp2ndOrder = -95;
+int32_t   gnPhaseComp2ndOrder = 105715;
+int32_t   gnGainComp4thOrder = -36;
+int32_t   gnPhaseComp4thOrder = -7;
+int32_t   gnGainComp8thOrder = -10;
+int32_t   gnPhaseComp8thOrder = -28;
+int32_t   gnGainComp16thOrder = -6;
+int32_t   gnPhaseComp16thOrder = 12;
+#endif
+
+#ifdef RECORD
+int16_t   COS_Record[500];
+int16_t   SIN_Record[500];
+int32_t   ANGLE_Record[500];
+uint16_t  record_cycle = 0;
+uint16_t  record_index = 0;
+uint16_t  record_start = 0;
+#endif
+
+
+//------------------------------------------------------------------------------ 
+// PROTOTYPES
+//------------------------------------------------------------------------------ 
+__ramfunc void MyPDB0Delay(void);
+__ramfunc int32_t MyAtan2(int x, int y); 
+__ramfunc void MyCalibration(void);
+__ramfunc int32_t MyCompensation(int32_t nAngle); 
+
+volatile int32_t  Compensation;
+volatile int32_t  temp1, temp2;
+volatile uint16_t index;
+//------------------------------------------------------------------------------ 
+// CODE
+//------------------------------------------------------------------------------ 
+//==============================================================================
+// main function
+//==============================================================================
+int main(void)
+{ 
+    BOARD_BootClockRUN();                                                       //Configurate clock
+    Init_GPIO();
+    Init_I2C(); 
+    I2C_RD_AT24LC256((uint8_t *)Para, 0, 256);                                  //Read EEPROM Parameters
+    Init_ADC0_1();
+    Init_PDB0();  
+    Init_FTM0();
+    Init_UART0(); 
+//------------------------------------------------------------------------------
+// Initizal Variables 
+//------------------------------------------------------------------------------
+    SMARTABS.EncoderID = 0x11;                                                  //Encoder ID is fixed to 0x11
+    SMARTABS.Offset = *((int32_t *)&Para[0xE0]);
+    InitFlag = 0;
+    CycleTimer[1] = 0;
+    CycleTimer[0] = 0;
+    SpeedFilter.Tf = 0;
+    SpeedFilter.Ts = 1;
+    FirstOrderFilter(&SpeedFilter);
+    CountError[0] = 0x00004000;
+    CountError[1] = 0x0000C000;
+    CountError[2] = 0x00014000;
+    CountError[3] = 0x0001C000;
+    IntSampleFlag = 0;
+    ADC0Cnt = 0;
+    ADC1Cnt = 0;
+    UARTCnt = 0;
+    MAINCnt = 0;
+//------------------------------------------------------------------------------
+// Make MyTable
+//------------------------------------------------------------------------------
+#if (0)    
+    for(i=0; i<2048; i++){
+        temp = i;
+        j = temp;
+        while(temp>=(MyTable[j][0]>>4)){
+            j++;
+        }
+        if(temp=MyTable[j][0]>>4){
+            Table[i] = (int16_t)MyTable[j][1];
+        }  
+        else{
+            temp1 = MyTable[j][0] - MyTable[j-1][0];
+            temp2 = MyTable[j][0] - temp;
+            temp  = ((MyTable[j][1] - MyTable[j-1][1]) * temp2 * 10) / temp1;
+            if(temp>=0){
+                temp = (temp + 5) / 10;
+            }  
+            else{
+                temp = (temp - 5) / 10;
+            }  
+            Table[i] = MyTable[j][1] - temp;
+        }
+    }  
+#endif    
+    
+//------------------------------------------------------------------------------
+//╓ў╤н╗╖  
+//------------------------------------------------------------------------------
+    while(1){         
+#if (1) //6.5us
+        //----------------------------------------------------------------------
+        //Alarm
+        //----------------------------------------------------------------------
+        if((IntSampleFlag & 0x0004) == 0x0004){
+            Hall[1] = Hall[0];
+            Hall[0] = EX_DI(1);
+//            if(InitFlag==1){
+//                #if (ENCODER==SA)
+//                if(Hall[0]==3 && Angle[0]<0x00002000 && Angle[1]>0x0001E000){
+//                    SMARTABS.Multi_turn++;
+//                    if(SMARTABS.Multi_turn==0){
+//                        SMARTABS.EncoderErr.bit.OF = 1;
+//                    }  
+//                }
+//                else if(Hall[0]==3 && Angle[0]>0x0001E000 && Angle[1]<0x00002000){
+//                    SMARTABS.Multi_turn--;
+//                }
+//                #endif
+//                if((Hall[0]==2 && Hall[1]==3) || (Hall[0]==3 && Hall[1]==2)){
+//                    CountError[0] = Angle[0]; //0x00004000
+//                }
+//                else if((Hall[0]==0 && Hall[1]==2) || (Hall[0]==2 && Hall[1]==0)){
+//                    CountError[1] = Angle[0]; //0x0000C000
+//                }
+//                else if((Hall[0]==1 && Hall[1]==0) || (Hall[0]==0 && Hall[1]==1)){
+//                    CountError[2] = Angle[0]; //0x00014000
+//                }  
+//                else if((Hall[0]==3 && Hall[1]==1) || (Hall[0]==1 && Hall[1]==3)){
+//                    CountError[3] = Angle[0]; //0x0001C000
+//                }
+//                if(((CountError[0]<0x00002000 || CountError[0]>0x00006000) 
+//                ||  (CountError[1]<0x0000A000 || CountError[1]>0x0000E000)   
+//                ||  (CountError[2]<0x00012000 || CountError[2]>0x00016000)   
+//                ||  (CountError[3]<0x0001A000 || CountError[3]>0x0001E000))
+//                &&  SMARTABS.Speed>13){
+//                    SMARTABS.EncoderErr.bit.CE = 1;
+//                }
+//                else{
+//                    SMARTABS.EncoderErr.bit.CE = 0;
+//                }  
+//                #if (0)//(ENCODER==SA)
+//                if(((CountError[0]<0x00003F00 || CountError[0]>0x00004100) 
+//                ||  (CountError[1]<0x0000BF00 || CountError[1]>0x0000C100)   
+//                ||  (CountError[2]<0x00013F00 || CountError[2]>0x00014100)   
+//                ||  (CountError[3]<0x0001BF00 || CountError[3]>0x0001C100))
+//                &&  SMARTABS.Speed<13){
+//                    SMARTABS.EncoderErr.bit.CE = 1;
+//                }
+//                #endif
+//            }
+            #if (ENCODER==SA)
+            //--- Error ---
+            SpeedFilter.InValue = DeltaAngle;
+            SpeedFilter.Tf = 4;
+            SpeedFilter.Ts = 1;
+            FirstOrderFilter(&SpeedFilter);
+            SMARTABS.Speed = SpeedFilter.OutValue;
+
+            if(InitFlag==0 && labs(SMARTABS.Speed)>25){
+                SMARTABS.EncoderErr.bit.FS = 1;
+            }  
+            else{
+                SMARTABS.EncoderErr.bit.FS = 0;
+            }  
+            if(labs(SMARTABS.Speed)>1650){
+                SMARTABS.EncoderErr.bit.OS = 1;
+            }  
+            //--- Status ---
+            if(SMARTABS.EncoderErr.bit.OH || SMARTABS.EncoderErr.bit.ME 
+            || SMARTABS.EncoderErr.bit.BE || SMARTABS.EncoderErr.bit.BA){
+                SMARTABS.Status.bit.ea1 = 1;
+            }  
+            else{
+                SMARTABS.Status.bit.ea1 = 0;
+            }  
+            SMARTABS.Status.bit.ea0 = SMARTABS.EncoderErr.bit.CE;
+            #elif (ENCODER==SI)
+            //--- Error ---
+            if(InitFlag==0 && labs(SMARTABS.Speed)>25){
+                SMARTABS.EncoderErr.bit.FS = 1;
+            }  
+            else{
+                SMARTABS.EncoderErr.bit.FS = 0;
+            }  
+            //--- Status ---
+            SMARTABS.Status.bit.ea1 = SMARTABS.EncoderErr.bit.FS;
+            SMARTABS.Status.bit.ea0 = SMARTABS.EncoderErr.bit.CE;
+            #endif
+            IntSampleFlag &= 0xFFFB;
+        }  
+        //----------------------------------------------------------------------
+        //Claculate Angle
+        //----------------------------------------------------------------------
+        else if((IntSampleFlag & 0x0003) == 0x0003){
+            if(CosData[0] | SinData[0]){
+                Angle[1] = Angle[0];
+                Angle[0] = MyAtan2((int32_t)CosData[0], (int32_t)SinData[0]);   //calculate the new angle
+                //--------------------------------------------------------------
+                //index = (uint16_t)(4095-(Angle[0]>>5));                       //index is from 0 to 4095
+                index = (uint16_t)((Angle[0]>>5));                              //index is from 0 to 4095
+//              temp1 = MyTable[index+1] - MyTable[index];                      //delta_Compensation(+/-)
+//              temp2 = (((uint32_t)index+1)<<5) - Angle[0];                    //delta_Angle(+)
+//              Compensation  = (temp1 * temp2)>>4;                             //Compensation = delta_Compensation(+/-) * delta_Angle(+) / 32
+//              if(Compensation>=0){                       //(+)
+//                  Compensation = (Compensation + 1)>>1;  //Compensation + 0.5
+//              }  
+//              else{                                      //(-)
+//                  Compensation = (Compensation - 1)>>1;  //Compensation - 0.5
+//              }  
+//              Angle[0] = (Angle[0] - Compensation) & 0x0001FFFF;
+                
+                Angle[0] = (Angle[0] + MyTable[index]) & 0x0001FFFF;   
+                //--------------------------------------------------------------
+                if(PowerOnFlag){
+                    DeltaAngle = Angle[0] - Angle[1];
+                }
+                if(DeltaAngle>65535){
+                    DeltaAngle -= 131072;
+                }  
+                else if(DeltaAngle<-65535){
+                    DeltaAngle += 131072;
+                }  
+//              NewAngle = (Angle[0] - (SpeedFilter.OutValue*2)) & 0x0001FFFF;
+                SMARTABS.Absolute = (Angle[0] - SMARTABS.Offset) & 0x0001FFFF;
+                if(labs(DeltaAngle)>13){                                        //More than 100rpm
+                    MyCalibration();
+                }    
+                MAINCnt++;
+            }
+            #ifdef RECORD
+            if(record_start){
+              if(++record_cycle>=10){
+                record_cycle = 0;
+                if(record_index++<500){
+                    COS_Record[record_index]   = CosData[0];
+                    SIN_Record[record_index]   = SinData[0];
+                    ANGLE_Record[record_index] = SMARTABS.Absolute;
+                }
+                else{
+                    record_index = 0;
+                    record_start = 0;
+                }
+              }  
+            }
+            #endif    
+            IntSampleFlag &= 0xFFFC;
+            LED_OFF();
+        }  
+        //----------------------------------------------------------------------
+        //Write EEPROM
+        //----------------------------------------------------------------------
+        else{
+            if(WriteFlag.bit.Offset){
+                *((int32_t *)&Para[0xE0]) = SMARTABS.Offset;
+                if(I2C_WR_AT24LC256((uint8_t *)&Para[0xE0], 0xE0, 0x04)==kStatus_Success){
+                    WriteFlag.bit.Offset = 0;
+                }
+            }  
+            else if(WriteFlag.bit.Para){
+                if(I2C_WR_AT24LC256((uint8_t *)&Para[SMARTABS.Address], SMARTABS.Address, 0x01)==kStatus_Success){
+                    WriteFlag.bit.Para = 0;
+                }    
+            }  
+            else if(WriteFlag.bit.Factory){
+                if(wtPages<8){
+                    if(I2C_WR_AT24LC256((uint8_t *)&MyPara[wtPages*0x20], wtPages*0x20, 0x20)==kStatus_Success){
+                        wtPages++;
+                    }
+                }
+                else{
+                    wtPages = 0;
+                    WriteFlag.bit.Factory = 0;
+                }  
+            }
+        }  
+#endif        
+    }
+}
+
+//==============================================================================
+//UART0 RX Interrupt Handler
+//void UART0_RX_TX_IRQHandler(void)
+//==============================================================================
+__ramfunc void UART0_RX_TX_IRQHandler(void)
+{
+    if(UART0->S1 & kUART_RxDataRegFullFlag){                                    //Read flag and auto clear flag
+        LED_ON();
+        CycleTimer[0] = FTM0->CNT;
+        if(ABS_Encoder()==0){                                                   //Recieve request and transfer data
+            if(SMARTABS.RequstID==0x1A || SMARTABS.RequstID==0x02){
+                MyPDB0Delay();                                                  //Calculate PDB0 Delay Timer
+            } 
+        }
+        CycleTimer[1] = CycleTimer[0];
+        IntSampleFlag |= 4;
+        UARTCnt++;
+    } 
+}
+                             
+//==============================================================================
+//ADC0 Active Interrupt Handler
+//void ADC0_IRQHandler(void)
+//==============================================================================
+__ramfunc void ADC0_IRQHandler(void)
+{          
+    if(ADC0->SC1[0] & kADC16_ActiveFlag){
+        #if (BOARD==REAGLE)
+        SinData[0] = (int16_t)(ADC0->R[0]);    
+        #else
+        CosData[0] = (int16_t)(ADC0->R[0]);
+        #endif
+        IntSampleFlag |= 2;
+        ADC0Cnt++;
+    }
+}
+
+//==============================================================================
+//ADC1 Active Interrupt Handler
+//void ADC1_IRQHandler(void)
+//==============================================================================
+__ramfunc void ADC1_IRQHandler(void)
+{
+    if(ADC1->SC1[0] & kADC16_ActiveFlag){                                       //Read flag and auto clear flag
+        #if (BOARD==REAGLE)
+        CosData[0] = (int16_t)(ADC1->R[0]);
+        #else
+        SinData[0] = (int16_t)(ADC1->R[0]);    
+        #endif
+        IntSampleFlag |= 1;
+        ADC1Cnt++;
+    }
+}
+
+//==============================================================================
+//PDB0 Delay Interrupt Handler
+//void PDB0_IRQHandler(void)
+//==============================================================================
+__ramfunc void PDB0_IRQHandler(void)
+{
+    RS485RE();
+    UART_EnableInterrupts(UART0, kUART_RxDataRegFullInterruptEnable);
+    //EnableIRQ(UART0_RX_TX_IRQn);  
+    PDB0->SC &= ~kPDB_DelayEventFlag;
+}
+
+//==============================================================================
+////Calculate PDB0 Delay Timer
+//void MyPDB0Delay(void)
+//==============================================================================
+__ramfunc void MyPDB0Delay(void)
+{
+    if(InitFlag==0){
+        if(InitTimer++<64){                                                     //62.5us*64=4ms
+            CycleTime = CycleTimer[0] - CycleTimer[1];
+            SumCycle += CycleTime;
+        }
+        else{
+            AveCycle = SumCycle>>6;
+            SumCycle = 0;
+            InitTimer = 0;
+            PDB0Time = AveCycle - (ConverTime * 48);
+            if(PDB0Time>=0){
+                PDB_SetADCPreTriggerDelayValue(PDB0, kPDB_ADCTriggerChannel0, kPDB_ADCPreTrigger0, PDB0Time);
+                PDB_SetADCPreTriggerDelayValue(PDB0, kPDB_ADCTriggerChannel1, kPDB_ADCPreTrigger0, PDB0Time);
+                PDB_DoLoadValues(PDB0);
+            }
+            InitFlag = 1;
+        }  
+        if(InitTimer>10){    
+            PowerOnFlag = 1;
+        }    
+    }    
+}
+ 
+//==============================================================================
+//Calculate PDB0 Delay Timer
+//void MyCalibration(void)
+//==============================================================================
+__ramfunc void MyCalibration(void)
+{
+    static uint16_t i;
+
+    if(SinData[0]>SinMax){
+        SinMax = SinData[0];
+    }  
+    if(SinData[0]<SinMin){
+        SinMin = SinData[0];
+    }  
+    if(CosData[0]>CosMax){
+        CosMax = CosData[0];
+    }  
+    if(CosData[0]<CosMin){
+        CosMin = CosData[0];
+    }  
+    if(ADCCalibrationFlag==0){
+        //if((Hall[0]==1 & Hall[1]==0) | (Hall[0]==0 & Hall[1]==1)){
+        if(((Angle[0]&0xFFFF)<0x100 && (Angle[1]&0xFFFF)>0xFF00) || ((Angle[0]&0xFFFF)>0xFF00 && (Angle[1]&0xFFFF)<0x100)){
+            #if (BOARD==REAGLE)
+            ADC0Offset[i] = (SinMax + SinMin)>>1;
+            ADC1Offset[i] = (CosMax + CosMin)>>1;
+            #else    
+            ADC0Offset[i] = (CosMax + CosMin)>>1;
+            ADC1Offset[i] = (SinMax + SinMin)>>1;
+            #endif
+            i++;
+            SinMax = 0x8000;
+            SinMin = 0x7FFF;
+            CosMax = 0x8000;
+            CosMin = 0x7FFF;
+        }
+        if(i>32){
+            for(i=1; i<=32; i++){
+                SumADC0Offset += ADC0Offset[i];
+                SumADC1Offset += ADC1Offset[i];
+            }  
+            i = 0;
+            ADC0OFS = SumADC0Offset>>5;
+            ADC1OFS = SumADC1Offset>>5;
+            SumADC0Offset = 0;
+            SumADC1Offset = 0;
+            if(OffsetSetting==1){
+                if(ADC0OFS>-511 && ADC0OFS<511){
+                    ADC0->OFS += ADC0OFS;
+                }
+                if(ADC0OFS>-511 && ADC0OFS<511){
+                    ADC1->OFS += ADC1OFS;
+                }
+                OffsetSetting = 0;
+            }
+            //ADCCalibrationFlag = 1;
+        }
+    }
+}
+   
+//==============================================================================
+//Calculate Angle Function
+//int32_t MyAtan2(int32_t x, int32_t y)
+//==============================================================================
+__ramfunc int32_t MyAtan2(int32_t x, int32_t y)
+{
+    int32_t i = 0;
+    int32_t x_new, y_new;
+    int32_t angleSum = 0;
+    int32_t quadrant = 0;
+      
+    //Calculate sections
+    if(x<0 && y>=0){
+        x = -x;                                                                                    
+        quadrant = 2; //secord section
+    }
+    else if(x>=0 && y<0){
+        y = -y;
+        quadrant = 4; //fourth section
+    }
+    else if(x<0 && y<0){
+        x = -x;
+        y = -y;
+        quadrant = 3; //thrid section
+    }
+  
+    //*1024 for more calculation accuracy
+    x *= 1024; 
+    y *= 1024;
+
+    for(i=0; i<18; i++){
+        if(y>=0){
+            x_new = x + (y>>i);              
+            y_new = y - (x>>i);
+            x = x_new;
+            y = y_new;
+            angleSum += angleTable[i];
+        }
+        else{
+            x_new = x - (y>>i);
+            y_new = y + (x>>i);
+            x = x_new;
+            y = y_new;
+            angleSum -= angleTable[i];
+        }
+    }  
+      
+    if(quadrant==2){
+        angleSum = 0x200000 - angleSum; //180-teta
+    }
+    else if(quadrant==3){
+        angleSum = 0x200000 + angleSum; //180+teta
+    }
+    else if(quadrant==4){
+        angleSum = 0x400000 - angleSum; //360-teta
+    }       
+    angleSum = (angleSum+1)>>6;   //range = 0~65535
+   
+    switch(Hall[0]){
+    case 0x00:     
+        if(!(angleSum & 0x8000)){
+            angleSum = angleSum | 0x10000;  
+        }
+        break;      
+    case 0x01: 
+        angleSum = angleSum | 0x10000;        
+        break;  
+    case 0x02: 
+        break;         
+    case 0x03:      
+        if(angleSum & 0x8000){
+            angleSum = angleSum | 0x10000;
+        }       
+        break;
+    default:
+        break;
+    }
+    
+    return angleSum; //MyCompensation(angleSum);
+}
+
+#ifdef COMPENSATION
+//==============================================================================
+//int32_t MyCompensation(int32_t nAngle)  
+//==============================================================================
+__ramfunc int32_t MyCompensation(int32_t nAngle)  
+{
+    int32_t angleSum = nAngle;
+    int32_t angleTemp = nAngle;
+                                                         
+    //Compensation fundamental 
+    angleTemp += gnPhaseComp1stOrder;
+    if(angleTemp<0){
+        angleTemp += 131072;
+    }
+    else if(angleTemp>131071){
+        angleTemp -= 131072;
+    }  
+    angleSum -= gnGainComp1stOrder * gaLookUpTableSin[angleTemp>>2] / 126;
+
+    //Compensation 2nd order harmonic   
+    angleTemp = nAngle<<1; 
+    angleTemp += gnPhaseComp2ndOrder;
+    if(angleTemp<0){
+        angleTemp += 131072;
+    }
+    else if(angleTemp>131071){
+        do{
+            angleTemp -= 131072;
+        }
+        while(angleTemp >131071);
+    }
+    angleSum -= gnGainComp2ndOrder * gaLookUpTableSin[angleTemp>>2] / 126; 
+
+    //Compensation 4th order harmonic   
+    angleTemp = nAngle<<2; 
+    angleTemp += gnPhaseComp4thOrder;
+    if(angleTemp<0){
+        angleTemp += 131072;
+    }
+    else if(angleTemp>131071){
+        do{
+            angleTemp -= 131072;
+        }
+        while(angleTemp >131071);
+    }
+    angleSum -= gnGainComp4thOrder * gaLookUpTableSin[angleTemp>>2] / 126;  
+
+    //Compensation 8th order harmonic   
+    angleTemp = nAngle<<3; 
+    angleTemp += gnPhaseComp8thOrder;
+    if(angleTemp<0){
+        angleTemp += 131072;
+    }
+    else if(angleTemp>131071){
+        do{
+            angleTemp -= 131072;
+        }
+        while(angleTemp >131071);
+    }
+    angleSum -= gnGainComp8thOrder * gaLookUpTableSin[angleTemp>>2] / 126;    
+
+    //Compensation 16th order harmonic   
+    angleTemp = nAngle<<4; 
+    angleTemp += gnPhaseComp16thOrder;
+    if(angleTemp<0){
+        angleTemp += 131072;
+    }
+    else if(angleTemp>131071){
+        do{
+            angleTemp -= 131072;
+        }
+        while(angleTemp >131071);
+    }
+    angleSum -= gnGainComp16thOrder * gaLookUpTableSin[angleTemp>>2] / 126;
+  
+    //Speed compensation
+                     
+    //Final cut 
+    if(angleSum<0){
+        angleSum += 131072;
+    }
+    else if(angleSum>131071){
+        angleSum -= 131072;
+    }             
+  
+    //Speed update  
+    gnPreAngle[4] = gnPreAngle[3]; 
+    gnPreAngle[3] = gnPreAngle[2]; 
+    gnPreAngle[2] = gnPreAngle[1];   
+    gnPreAngle[1] = gnPreAngle[0];   
+    gnPreAngle[0] = (int32_t)angleSum; 
+                   
+    gnPreSpeed[1] = gnPreSpeed[0];  
+    gnPreSpeed[0] = gnPreAngle[0]-gnPreAngle[1];
+    
+    /*
+    if((gnPreSpeed[0]>=0) && (gnPreSpeed[0]<14000)){
+        gnFlagOverSpeed = 0;    
+        gnRotationDirection = 1;
+        angleSum = (angleSum + gnPreAngle[0]) / 2;
+    }
+    else if((gnPreSpeed[0]>=14000) && (gnPreSpeed[0]<=117072)){
+        gnFlagOverSpeed = 1;
+        gnRotationDirection = 2;
+    }
+    else if(gnPreSpeed[0]>117072){
+        gnFlagOverSpeed = 0;      
+        gnRotationDirection = -1; 
+        gnPreSpeed[0] -= 131072; 
+        angleSum = (angleSum + gnPreAngle[0] + 131072) / 2;
+    }
+    else if((gnPreSpeed[0]<0) && (gnPreSpeed[0]<-14000)){
+        gnFlagOverSpeed = 0;    
+        gnRotationDirection = -1;
+        angleSum = (angleSum + gnPreAngle[0])/2;
+    }  
+    else if((gnPreSpeed[0]<=-14000) && (gnPreSpeed[0]>=-117072)){
+        gnFlagOverSpeed = 1;    
+        gnRotationDirection = 2;
+    }
+    else{
+        gnFlagOverSpeed = 0;    
+        gnRotationDirection = 1; 
+        gnPreSpeed[0] += 131072;  
+        angleSum = (angleSum + gnPreAngle[0] + 131072) / 2;
+    }
+    */      
+  
+    return angleSum;  
+}
+#endif
+
+
+//---end---

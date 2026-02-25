@@ -1,0 +1,1082 @@
+###############################################################################
+#
+# IAR ELF Linker V8.32.1.169/W32 for ARM                  28/Jan/2026  15:33:59
+# Copyright 2007-2018 IAR Systems AB.
+#
+#    Output file  =  
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Exe\Encoder_kv30_ada4571.out
+#    Map file     =  
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\List\Encoder_kv30_ada4571.map
+#    Command line =  
+#        -f C:\Users\ZHANGC~1\AppData\Local\Temp\EWA546.tmp
+#        (C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\clock_config.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_adc16.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_clock.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_dmamux.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_dspi.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_edma.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_ftm.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_gpio.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_i2c.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_pdb.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_pit.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_smc.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_uart.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\fsl_uart_edma.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\Function.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\gpio_config.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\iap_function.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\main.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\MGTMagneticEncoder.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\ModBus.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\MultiturnMagneticEncoder.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\MultiturnOpticalEncoder.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\NXPMagneticEncoder.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\pit_congfig.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\SensAREncoder.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\startup_MKV30F12810.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\system_MKV30F12810.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\TamagawaEncoder.o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj\uart_config.o
+#        --no_out_extension -o
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Exe\Encoder_kv30_ada4571.out
+#        --map
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\List\Encoder_kv30_ada4571.map
+#        --config
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.1\EWARM\MKV30F128_APP.icf
+#        --semihosting
+#        C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\..\BSP\src\MT6835_NLC.lib
+#        --entry __iar_program_start --vfe --text_out locale)
+#
+###############################################################################
+
+*******************************************************************************
+*** RUNTIME MODEL ATTRIBUTES
+***
+
+CppFlavor       = *
+__SystemLibrary = DLib
+__dlib_version  = 6
+
+
+*******************************************************************************
+*** HEAP SELECTION
+***
+
+The basic heap was selected because no calls to memory allocation
+functions were found in the application outside of system library
+functions, and there are calls to deallocation functions in the
+application.
+
+
+*******************************************************************************
+*** PLACEMENT SUMMARY
+***
+
+"A0":  place at 0x5000 { ro section .intvec };
+"P1":  place in [from 0x5000 to 0x1'ffff] { ro };
+define block CSTACK with size = 1K, alignment = 8 { };
+define block HEAP with size = 2K, alignment = 8 { };
+"P2":  place in [from 0x1fff'e000 to 0x1fff'ffff repeat 2] {
+          rw, block CSTACK, block HEAP };
+initialize by copy { rw };
+
+  Section            Kind         Address    Size  Object
+  -------            ----         -------    ----  ------
+"A0":                                       0x400
+  .intvec            ro code       0x5000   0x400  startup_MKV30F12810.o [1]
+                                 - 0x5400   0x400
+
+"P1":                                      0xd915
+  Veneer             ro code       0x5400     0x8  - Linker created -
+  Veneer             ro code       0x5408     0x8  - Linker created -
+  .text              ro code       0x5410  0x26c8  ModBus.o [1]
+  .text              ro code       0x7ad8    0x24  ABIassert.o [5]
+  .text              ro code       0x7afc    0x66  ABImemset.o [4]
+  .text              ro code       0x7b62    0x3a  zero_init3.o [4]
+  .text              ro code       0x7b9c    0x3c  vsnprint.o [2]
+  .text              ro code       0x7bd8    0x12  strcmp.o [4]
+  .text              ro code       0x7bea    0x28  strncmp.o [2]
+  .text              ro code       0x7c12    0x1a  xsnprout.o [2]
+  .text              ro code       0x7c2c    0x4c  iap_function.o [1]
+  .text              ro code       0x7c78   0x444  uart_config.o [1]
+  .text              ro code       0x80bc    0x48  FltToDbl.o [3]
+  .text              ro code       0x8104     0x8  abs.o [2]
+  .text              ro code       0x810c   0xa84  SensAREncoder.o [1]
+  .text              ro code       0x8b90     0x6  abort.o [2]
+  .rodata            const         0x8b96     0x2  gpio_config.o [1]
+  .text              ro code       0x8b98   0xdf2  xprintffull_nomb.o [2]
+  .rodata            const         0x998a     0x2  gpio_config.o [1]
+  .text              ro code       0x998c   0x540  fsl_clock.o [1]
+  .text              ro code       0x9ecc   0x2a8  fsl_uart.o [1]
+  .text              ro code       0xa174   0x20c  fsl_edma.o [1]
+  .text              ro code       0xa380   0x338  Function.o [1]
+  .text              ro code       0xa6b8    0x36  strlen.o [4]
+  .rodata            const         0xa6ee     0x2  gpio_config.o [1]
+  .text              ro code       0xa6f0    0x14  exit.o [5]
+  .text              ro code       0xa704    0x16  strchr.o [4]
+  .text              ro code       0xa71a     0x2  startup_MKV30F12810.o [1]
+  .text              ro code       0xa71c    0x40  xfail_s.o [2]
+  .text              ro code       0xa75c    0x58  memchr.o [4]
+  .text              ro code       0xa7b4   0x230  I64DivMod.o [4]
+  .text              ro code       0xa9e4   0x1a2  DblMul.o [3]
+  .text              ro code       0xab86     0x2  startup_MKV30F12810.o [1]
+  .text              ro code       0xab88    0xa6  ABImemcpy.o [4]
+  .text              ro code       0xac2e     0x2  startup_MKV30F12810.o [1]
+  .text              ro code       0xac30    0x70  frexp.o [3]
+  .text              ro code       0xaca0    0x2e  DblCmpLe.o [3]
+  .text              ro code       0xacce     0x2  startup_MKV30F12810.o [1]
+  .text              ro code       0xacd0    0x2e  DblCmpGe.o [3]
+  .text              ro code       0xacfe     0x2  startup_MKV30F12810.o [1]
+  .text              ro code       0xad00   0x13a  ldexp.o [3]
+  .text              ro code       0xae3a     0x2  startup_MKV30F12810.o [1]
+  .text              ro code       0xae3c    0x3a  DblToS32.o [3]
+  .text              ro code       0xae76     0x2  startup_MKV30F12810.o [1]
+  .text              ro code       0xae78    0x22  S32ToDbl.o [3]
+  .text              ro code       0xae9a     0x2  startup_MKV30F12810.o [1]
+  .text              ro code       0xae9c    0xe2  DblSub.o [3]
+  .text              ro code       0xaf7e     0x2  startup_MKV30F12810.o [1]
+  .text              ro code       0xaf80   0x246  DblDiv.o [3]
+  .text              ro code       0xb1c8    0x28  DblToU32.o [3]
+  .text              ro code       0xb1f0    0x1a  U32ToDbl.o [3]
+  .text              ro code       0xb20c     0x2  I64DivZer.o [4]
+  .text              ro code       0xb210   0x16a  DblAdd.o [3]
+  Veneer             ro code       0xb37c     0x8  - Linker created -
+  Veneer             ro code       0xb384     0x8  - Linker created -
+  .text              ro code       0xb38c  0x16c0  MultiturnMagneticEncoder.o [1]
+  Veneer             ro code       0xca4c     0x8  - Linker created -
+  .text              ro code       0xca54  0x11dc  MultiturnOpticalEncoder.o [1]
+  .text              ro code       0xdc30   0xf40  MGTMagneticEncoder.o [1]
+  .text              ro code       0xeb70   0xb70  TamagawaEncoder.o [1]
+  .text              ro code       0xf6e0   0xa70  main.o [1]
+  .text              ro code     0x1'0150    0x88  clock_config.o [1]
+  .text              ro code     0x1'01d8   0x370  gpio_config.o [1]
+  .text              ro code     0x1'0548   0x148  pit_congfig.o [1]
+  .text              ro code     0x1'0690    0x12  fsl_smc.o [1]
+  .text              ro code     0x1'06a4    0x64  fsl_gpio.o [1]
+  .text              ro code     0x1'0708    0xcc  fsl_pit.o [1]
+  .text              ro code     0x1'07d4   0x690  NXPMagneticEncoder.o [1]
+  .text              ro code     0x1'0e64   0x1f6  lz77_init.o [4]
+  .rodata            const       0x1'105c    0x90  fsl_uart.o [1]
+  .rodata            const       0x1'10ec    0x90  fsl_uart.o [1]
+  .text              ro code     0x1'117c    0x7c  fsl_dspi.o [1]
+  .rodata            const       0x1'11f8    0x68  gpio_config.o [1]
+  .rodata            const       0x1'1260    0x68  ModBus.o [1]
+  .rodata            const       0x1'12c8    0x68  pit_congfig.o [1]
+  .rodata            const       0x1'1330    0x60  fsl_clock.o [1]
+  .rodata            const       0x1'1390    0x60  fsl_dspi.o [1]
+  .rodata            const       0x1'13f0    0x60  fsl_edma.o [1]
+  .rodata            const       0x1'1450    0x60  fsl_gpio.o [1]
+  .rodata            const       0x1'14b0    0x60  fsl_pit.o [1]
+  .rodata            const       0x1'1510    0x60  fsl_uart.o [1]
+  .rodata            const       0x1'1570    0x60  main.o [1]
+  .rodata            const       0x1'15d0    0x60  ModBus.o [1]
+  .text              ro code     0x1'1630    0x58  fsl_i2c.o [1]
+  .rodata            const       0x1'1688    0x3c  fsl_pit.o [1]
+  .text              ro code     0x1'16c4    0x36  system_MKV30F12810.o [1]
+  .text              ro code     0x1'16fc    0x28  startup_MKV30F12810.o [1]
+  .text              ro code     0x1'1724    0x28  data_init.o [4]
+  .text              ro code     0x1'174c    0x22  fpinit_M.o [3]
+  .iar.init_table    const       0x1'1770    0x3c  - Linker created -
+  .text              ro code     0x1'17ac    0x1e  cmain.o [4]
+  .text              ro code     0x1'17ca     0x4  low_level_init.o [2]
+  .text              ro code     0x1'17ce     0x4  exit.o [2]
+  .text              ro code     0x1'17d4     0xa  cexit.o [4]
+  .rodata            const       0x1'17e0    0x1c  fsl_uart.o [1]
+  .rodata            const       0x1'17fc    0x1c  fsl_uart.o [1]
+  .rodata            const       0x1'1818    0x18  fsl_dspi.o [1]
+  .rodata            const       0x1'1830    0x18  fsl_edma.o [1]
+  .rodata            const       0x1'1848    0x18  main.o [1]
+  .rodata            const       0x1'1860    0x18  ModBus.o [1]
+  .rodata            const       0x1'1878    0x18  ModBus.o [1]
+  .rodata            const       0x1'1890    0x18  ModBus.o [1]
+  .rodata            const       0x1'18a8    0x14  fsl_clock.o [1]
+  .rodata            const       0x1'18bc    0x14  fsl_clock.o [1]
+  .rodata            const       0x1'18d0    0x14  ModBus.o [1]
+  .rodata            const       0x1'18e4    0x14  ModBus.o [1]
+  .rodata            const       0x1'18f8    0x14  ModBus.o [1]
+  .rodata            const       0x1'190c    0x14  ModBus.o [1]
+  .rodata            const       0x1'1920    0x14  ModBus.o [1]
+  .rodata            const       0x1'1934    0x14  ModBus.o [1]
+  .rodata            const       0x1'1948    0x14  ModBus.o [1]
+  .rodata            const       0x1'195c    0x14  ModBus.o [1]
+  .rodata            const       0x1'1970    0x10  fsl_clock.o [1]
+  .rodata            const       0x1'1980    0x10  ModBus.o [1]
+  .rodata            const       0x1'1990    0x10  ModBus.o [1]
+  .rodata            const       0x1'19a0    0x10  ModBus.o [1]
+  .rodata            const       0x1'19b0    0x10  ModBus.o [1]
+  .rodata            const       0x1'19c0    0x10  ModBus.o [1]
+  .rodata            const       0x1'19d0    0x10  ModBus.o [1]
+  .rodata            const       0x1'19e0    0x10  ModBus.o [1]
+  .rodata            const       0x1'19f0    0x10  ModBus.o [1]
+  .rodata            const       0x1'1a00    0x10  ModBus.o [1]
+  .rodata            const       0x1'1a10    0x10  ModBus.o [1]
+  .rodata            const       0x1'1a20    0x10  ModBus.o [1]
+  .rodata            const       0x1'1a30    0x10  ModBus.o [1]
+  .rodata            const       0x1'1a40    0x10  SensAREncoder.o [1]
+  .rodata            const       0x1'1a50    0x10  SensAREncoder.o [1]
+  .rodata            const       0x1'1a60    0x10  SensAREncoder.o [1]
+  .rodata            const       0x1'1a70    0x10  SensAREncoder.o [1]
+  .rodata            const       0x1'1a80    0x10  SensAREncoder.o [1]
+  .rodata            const       0x1'1a90    0x10  SensAREncoder.o [1]
+  .rodata            const       0x1'1aa0    0x10  SensAREncoder.o [1]
+  .rodata            const       0x1'1ab0    0x10  SensAREncoder.o [1]
+  FlashConfig        ro code     0x1'1ac0    0x10  startup_MKV30F12810.o [1]
+  .rodata            const       0x1'1ad0     0xc  fsl_clock.o [1]
+  .rodata            const       0x1'1adc     0xc  fsl_edma.o [1]
+  .rodata            const       0x1'1ae8     0xc  fsl_gpio.o [1]
+  .rodata            const       0x1'1af4     0xc  fsl_pit.o [1]
+  .rodata            const       0x1'1b00     0xc  fsl_uart.o [1]
+  .rodata            const       0x1'1b0c     0xc  ModBus.o [1]
+  .rodata            const       0x1'1b18     0xc  ModBus.o [1]
+  .rodata            const       0x1'1b24     0xc  ModBus.o [1]
+  .rodata            const       0x1'1b30     0xc  ModBus.o [1]
+  .rodata            const       0x1'1b3c     0xc  ModBus.o [1]
+  .rodata            const       0x1'1b48     0xc  pit_congfig.o [1]
+  .rodata            const       0x1'1b54     0xc  pit_congfig.o [1]
+  .rodata            const       0x1'1b60     0xc  SensAREncoder.o [1]
+  .text              ro code     0x1'1b6c     0xc  cstartup_M.o [4]
+  .rodata            const       0x1'1b78     0x8  clock_config.o [1]
+  .rodata            const       0x1'1b80     0x8  clock_config.o [1]
+  .rodata            const       0x1'1b88     0x8  fsl_uart.o [1]
+  .rodata            const       0x1'1b90     0x8  fsl_uart.o [1]
+  .rodata            const       0x1'1b98     0x8  gpio_config.o [1]
+  .rodata            const       0x1'1ba0     0x8  ModBus.o [1]
+  .text              ro code     0x1'1ba8     0x8  startup_MKV30F12810.o [1]
+  .text              ro code     0x1'1bb0     0x8  startup_MKV30F12810.o [1]
+  .text              ro code     0x1'1bb8     0x8  startup_MKV30F12810.o [1]
+  .text              ro code     0x1'1bc0     0x8  startup_MKV30F12810.o [1]
+  .text              ro code     0x1'1bc8     0x8  startup_MKV30F12810.o [1]
+  .text              ro code     0x1'1bd0     0x8  startup_MKV30F12810.o [1]
+  .text              ro code     0x1'1bd8     0x8  startup_MKV30F12810.o [1]
+  .rodata            const       0x1'1be0     0x4  fsl_pit.o [1]
+  .rodata            const       0x1'1be4     0x4  fsl_pit.o [1]
+  .rodata            const       0x1'1be8     0x4  MultiturnOpticalEncoder.o [1]
+  .rodata            const       0x1'1bec     0x4  MultiturnOpticalEncoder.o [1]
+  .text              ro code     0x1'1bf0     0x4  startup_MKV30F12810.o [1]
+  .rodata            const       0x1'1bf4     0x0  zero_init3.o [4]
+  .rodata            const       0x1'1bf4     0x0  lz77_init.o [4]
+  Initializer bytes  const       0x1'1bf4  0x1121  <for P2 s0>
+                               - 0x1'2d15  0xd915
+
+"P2", part 1 of 5:                         0x16bc
+  P2 s0                       0x1fff'e000  0x16bc  <Init block>
+    Veneer           inited   0x1fff'e000     0x8  - Linker created -
+    Veneer           inited   0x1fff'e008     0x8  - Linker created -
+    Veneer           inited   0x1fff'e010     0x8  - Linker created -
+    Veneer           inited   0x1fff'e018     0x8  - Linker created -
+    Veneer           inited   0x1fff'e020     0x8  - Linker created -
+    Veneer           inited   0x1fff'e028     0x8  - Linker created -
+    Veneer           inited   0x1fff'e030     0x8  - Linker created -
+    Veneer           inited   0x1fff'e038     0x8  - Linker created -
+    Veneer           inited   0x1fff'e040     0x8  - Linker created -
+    Veneer           inited   0x1fff'e048     0x8  - Linker created -
+    Veneer           inited   0x1fff'e050     0x8  - Linker created -
+    Veneer           inited   0x1fff'e058     0x8  - Linker created -
+    Veneer           inited   0x1fff'e060     0x8  - Linker created -
+    Veneer           inited   0x1fff'e068     0x8  - Linker created -
+    Veneer           inited   0x1fff'e070     0x8  - Linker created -
+    Veneer           inited   0x1fff'e078     0x8  - Linker created -
+    Veneer           inited   0x1fff'e080     0x8  - Linker created -
+    Veneer           inited   0x1fff'e088     0x8  - Linker created -
+    Veneer           inited   0x1fff'e090     0x8  - Linker created -
+    Veneer           inited   0x1fff'e098     0x8  - Linker created -
+    Veneer           inited   0x1fff'e0a0     0x8  - Linker created -
+    Veneer           inited   0x1fff'e0a8     0x8  - Linker created -
+    Veneer           inited   0x1fff'e0b0     0x8  - Linker created -
+    Veneer           inited   0x1fff'e0b8     0x8  - Linker created -
+    Veneer           inited   0x1fff'e0c0     0x8  - Linker created -
+    Veneer           inited   0x1fff'e0c8     0x8  - Linker created -
+    Veneer           inited   0x1fff'e0d0     0x8  - Linker created -
+    .textrw          inited   0x1fff'e0d8  0x10b4  MultiturnOpticalEncoder.o [1]
+    .textrw          inited   0x1fff'f18c    0x56  Function.o [1]
+    .data            inited   0x1fff'f1e2     0x1  MultiturnOpticalEncoder.o [1]
+    .data            inited   0x1fff'f1e3     0x1  MultiturnOpticalEncoder.o [1]
+    Veneer           inited   0x1fff'f1e4     0x8  - Linker created -
+    Veneer           inited   0x1fff'f1ec     0x8  - Linker created -
+    Veneer           inited   0x1fff'f1f4     0x8  - Linker created -
+    Veneer           inited   0x1fff'f1fc     0x8  - Linker created -
+    Veneer           inited   0x1fff'f204     0x8  - Linker created -
+    Veneer           inited   0x1fff'f20c     0x8  - Linker created -
+    .textrw          inited   0x1fff'f214   0x240  ModBus.o [1]
+    Veneer           inited   0x1fff'f454     0x8  - Linker created -
+    Veneer           inited   0x1fff'f45c     0x8  - Linker created -
+    Veneer           inited   0x1fff'f464     0x8  - Linker created -
+    Veneer           inited   0x1fff'f46c     0x8  - Linker created -
+    Veneer           inited   0x1fff'f474     0x8  - Linker created -
+    Veneer           inited   0x1fff'f47c     0x8  - Linker created -
+    Veneer           inited   0x1fff'f484     0x8  - Linker created -
+    Veneer           inited   0x1fff'f48c     0x8  - Linker created -
+    Veneer           inited   0x1fff'f494     0x8  - Linker created -
+    Veneer           inited   0x1fff'f49c     0x8  - Linker created -
+    Veneer           inited   0x1fff'f4a4     0x8  - Linker created -
+    Veneer           inited   0x1fff'f4ac     0x8  - Linker created -
+    Veneer           inited   0x1fff'f4b4     0x8  - Linker created -
+    Veneer           inited   0x1fff'f4bc     0x8  - Linker created -
+    .textrw          inited   0x1fff'f4c4   0x114  MGTMagneticEncoder.o [1]
+    Veneer           inited   0x1fff'f5d8     0x8  - Linker created -
+    Veneer           inited   0x1fff'f5e0     0x8  - Linker created -
+    Veneer           inited   0x1fff'f5e8     0x8  - Linker created -
+    Veneer           inited   0x1fff'f5f0     0x8  - Linker created -
+    .textrw          inited   0x1fff'f5f8    0x4c  NXPMagneticEncoder.o [1]
+    Veneer           inited   0x1fff'f644     0x8  - Linker created -
+    Veneer           inited   0x1fff'f64c     0x8  - Linker created -
+    Veneer           inited   0x1fff'f654     0x8  - Linker created -
+    Veneer           inited   0x1fff'f65c     0x8  - Linker created -
+    Veneer           inited   0x1fff'f664     0x8  - Linker created -
+    .textrw          inited   0x1fff'f66c    0x42  TamagawaEncoder.o [1]
+    .data            inited   0x1fff'f6ae     0x1  MultiturnOpticalEncoder.o [1]
+    .data            inited   0x1fff'f6af     0x1  MultiturnOpticalEncoder.o [1]
+    .data            inited   0x1fff'f6b0     0x4  fsl_clock.o [1]
+    .data            inited   0x1fff'f6b4     0x4  fsl_clock.o [1]
+    .data            inited   0x1fff'f6b8     0x4  system_MKV30F12810.o [1]
+                            - 0x1fff'f6bc  0x16bc
+
+"P2", part 2 of 5:                          0x184
+  .bss               zero     0x1fff'f6bc    0x80  uart_config.o [1]
+  .bss               zero     0x1fff'f73c    0x50  Function.o [1]
+  .bss               zero     0x1fff'f78c    0x44  Function.o [1]
+  .bss               zero     0x1fff'f7d0    0x10  fsl_edma.o [1]
+  .bss               zero     0x1fff'f7e0     0xc  Function.o [1]
+  .bss               zero     0x1fff'f7ec     0x8  Function.o [1]
+  .bss               zero     0x1fff'f7f4     0x8  Function.o [1]
+  .bss               zero     0x1fff'f7fc     0x8  ModBus.o [1]
+  .bss               zero     0x1fff'f804     0x4  fsl_clock.o [1]
+  .bss               zero     0x1fff'f808     0x4  fsl_clock.o [1]
+  .bss               zero     0x1fff'f80c     0x4  fsl_dspi.o [1]
+  .bss               zero     0x1fff'f810     0x4  fsl_dspi.o [1]
+  .bss               zero     0x1fff'f814     0x4  fsl_dspi.o [1]
+  .bss               zero     0x1fff'f818     0x4  fsl_i2c.o [1]
+  .bss               zero     0x1fff'f81c     0x4  fsl_i2c.o [1]
+  .bss               zero     0x1fff'f820     0x4  fsl_i2c.o [1]
+  .bss               zero     0x1fff'f824     0x4  main.o [1]
+  .bss               zero     0x1fff'f828     0x4  main.o [1]
+  .bss               zero     0x1fff'f82c     0x4  xfail_s.o [2]
+  .bss               zero     0x1fff'f830     0x1  Function.o [1]
+  .bss               zero     0x1fff'f831     0x1  main.o [1]
+  .bss               zero     0x1fff'f832     0x1  main.o [1]
+  .bss               zero     0x1fff'f833     0x1  MultiturnMagneticEncoder.o [1]
+  .bss               zero     0x1fff'f834     0x1  MultiturnMagneticEncoder.o [1]
+  .bss               zero     0x1fff'f835     0x1  MultiturnMagneticEncoder.o [1]
+  .bss               zero     0x1fff'f836     0x1  MultiturnMagneticEncoder.o [1]
+  .bss               zero     0x1fff'f837     0x1  MultiturnOpticalEncoder.o [1]
+  .bss               zero     0x1fff'f838     0x1  MultiturnOpticalEncoder.o [1]
+  .bss               zero     0x1fff'f839     0x1  MultiturnOpticalEncoder.o [1]
+  .bss               zero     0x1fff'f83a     0x1  MultiturnOpticalEncoder.o [1]
+  .bss               zero     0x1fff'f83b     0x1  MultiturnOpticalEncoder.o [1]
+  .bss               zero     0x1fff'f83c     0x1  MultiturnOpticalEncoder.o [1]
+  .bss               zero     0x1fff'f83d     0x1  TamagawaEncoder.o [1]
+                            - 0x1fff'f83e   0x182
+
+"P2", part 3 of 5:                          0x404
+  P2 s0                       0x2000'0000   0x404  <Init block>
+    Veneer           inited   0x2000'0000     0x8  - Linker created -
+    Veneer           inited   0x2000'0008     0x8  - Linker created -
+    Veneer           inited   0x2000'0010     0x8  - Linker created -
+    Veneer           inited   0x2000'0018     0x8  - Linker created -
+    Veneer           inited   0x2000'0020     0x8  - Linker created -
+    Veneer           inited   0x2000'0028     0x8  - Linker created -
+    Veneer           inited   0x2000'0030     0x8  - Linker created -
+    Veneer           inited   0x2000'0038     0x8  - Linker created -
+    Veneer           inited   0x2000'0040     0x8  - Linker created -
+    Veneer           inited   0x2000'0048     0x8  - Linker created -
+    Veneer           inited   0x2000'0050     0x8  - Linker created -
+    Veneer           inited   0x2000'0058     0x8  - Linker created -
+    Veneer           inited   0x2000'0060     0x8  - Linker created -
+    .textrw          inited   0x2000'0068   0x270  main.o [1]
+    Veneer           inited   0x2000'02d8     0x8  - Linker created -
+    Veneer           inited   0x2000'02e0     0x8  - Linker created -
+    Veneer           inited   0x2000'02e8     0x8  - Linker created -
+    Veneer           inited   0x2000'02f0     0x8  - Linker created -
+    Veneer           inited   0x2000'02f8     0x8  - Linker created -
+    Veneer           inited   0x2000'0300     0x8  - Linker created -
+    Veneer           inited   0x2000'0308     0x8  - Linker created -
+    Veneer           inited   0x2000'0310     0x8  - Linker created -
+    Veneer           inited   0x2000'0318     0x8  - Linker created -
+    Veneer           inited   0x2000'0320     0x8  - Linker created -
+    Veneer           inited   0x2000'0328     0x8  - Linker created -
+    Veneer           inited   0x2000'0330     0x8  - Linker created -
+    Veneer           inited   0x2000'0338     0x8  - Linker created -
+    Veneer           inited   0x2000'0340     0x8  - Linker created -
+    Veneer           inited   0x2000'0348     0x8  - Linker created -
+    .textrw          inited   0x2000'0350    0xb4  MultiturnMagneticEncoder.o [1]
+                            - 0x2000'0404   0x404
+
+"P2", part 4 of 5:                         0x1388
+  .bss               zero     0x2000'0404   0x350  TamagawaEncoder.o [1]
+  .bss               zero     0x2000'0754   0x348  MGTMagneticEncoder.o [1]
+  .bss               zero     0x2000'0a9c   0x2ec  MultiturnOpticalEncoder.o [1]
+  .bss               zero     0x2000'0d88   0x2d4  MultiturnMagneticEncoder.o [1]
+  .bss               zero     0x2000'105c   0x294  SensAREncoder.o [1]
+  .bss               zero     0x2000'12f0   0x11c  MultiturnOpticalEncoder.o [1]
+  .bss               zero     0x2000'140c    0xc8  Function.o [1]
+  .bss               zero     0x2000'14d4    0xc8  ModBus.o [1]
+  .bss               zero     0x2000'159c    0xc0  NXPMagneticEncoder.o [1]
+  .bss               zero     0x2000'165c    0x9c  TamagawaEncoder.o [1]
+  .bss               zero     0x2000'16f8    0x94  ModBus.o [1]
+                            - 0x2000'178c  0x1388
+
+"P2", part 5 of 5:                          0x400
+  CSTACK                      0x2000'1790   0x400  <Block>
+    CSTACK           uninit   0x2000'1790   0x400  <Block tail>
+                            - 0x2000'1b90   0x400
+
+Unused ranges:
+
+         From           To    Size
+         ----           --    ----
+     0x1'2d15     0x1'ffff  0xd2eb
+  0x1fff'f840  0x1fff'ffff   0x7c0
+  0x2000'178c  0x2000'178f     0x4
+  0x2000'1b90  0x2000'1fff   0x470
+
+
+*******************************************************************************
+*** INIT TABLE
+***
+
+          Address      Size
+          -------      ----
+Zero (__iar_zero_init3)
+    2 destination ranges, total size 0x150a:
+          0x1fff'f6bc   0x182
+          0x2000'0404  0x1388
+
+Copy/lz77 (__iar_lz77_init3)
+    1 source range, total size 0x1121 (64% of destination):
+             0x1'1bf4  0x1121
+    2 destination ranges, total size 0x1ac0:
+          0x1fff'e000  0x16bc
+          0x2000'0000   0x404
+
+
+
+*******************************************************************************
+*** MODULE SUMMARY
+***
+
+    Module                      ro code  rw code  ro data  rw data
+    ------                      -------  -------  -------  -------
+command line/config:
+    --------------------------------------------------------------
+    Total:
+
+C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj: [1]
+    Function.o                      824       86       55      377
+    MGTMagneticEncoder.o          3 904      276      176      840
+    ModBus.o                      9 928      576    1 061      356
+    MultiturnMagneticEncoder.o    5 824      180      115      728
+    MultiturnOpticalEncoder.o     4 572    4 276    2 749    1 042
+    NXPMagneticEncoder.o          1 680       76       48      192
+    SensAREncoder.o               2 692               140      660
+    TamagawaEncoder.o             2 928       66       42    1 005
+    clock_config.o                  136                16
+    fsl_clock.o                   1 344               169       16
+    fsl_dspi.o                      124               120       12
+    fsl_edma.o                      524               132       16
+    fsl_gpio.o                      100               108
+    fsl_i2c.o                        88                         12
+    fsl_pit.o                       204               176
+    fsl_smc.o                        18
+    fsl_uart.o                      680               468
+    gpio_config.o                   880               118
+    iap_function.o                   76
+    main.o                        2 672      624      520       10
+    pit_congfig.o                   328               128
+    startup_MKV30F12810.o         1 158
+    system_MKV30F12810.o             54                 2        4
+    uart_config.o                 1 092                        128
+    --------------------------------------------------------------
+    Total:                       41 830    6 160    6 343    5 398
+
+dl7M_tln.a: [2]
+    abort.o                           6
+    abs.o                             8
+    exit.o                            4
+    low_level_init.o                  4
+    strncmp.o                        40
+    vsnprint.o                       60
+    xfail_s.o                        64                          4
+    xprintffull_nomb.o            3 570
+    xsnprout.o                       26
+    --------------------------------------------------------------
+    Total:                        3 782                          4
+
+m7M_tls.a: [3]
+    DblAdd.o                        362
+    DblCmpGe.o                       46
+    DblCmpLe.o                       46
+    DblDiv.o                        582
+    DblMul.o                        418
+    DblSub.o                        226
+    DblToS32.o                       58
+    DblToU32.o                       40
+    FltToDbl.o                       72
+    S32ToDbl.o                       34
+    U32ToDbl.o                       26
+    fpinit_M.o                       34
+    frexp.o                         112
+    ldexp.o                         314
+    --------------------------------------------------------------
+    Total:                        2 370
+
+rt7M_tl.a: [4]
+    ABImemcpy.o                     166
+    ABImemset.o                     102
+    I64DivMod.o                     560
+    I64DivZer.o                       2
+    cexit.o                          10
+    cmain.o                          30
+    cstartup_M.o                     12
+    data_init.o                      40
+    lz77_init.o                     502
+    memchr.o                         88
+    strchr.o                         22
+    strcmp.o                         18
+    strlen.o                         54
+    zero_init3.o                     58
+    --------------------------------------------------------------
+    Total:                        1 664
+
+shb_l.a: [5]
+    ABIassert.o                      36
+    exit.o                           20
+    --------------------------------------------------------------
+    Total:                           56
+
+    Gaps                             14                 6
+    Linker created                   40      672      492    1 024
+------------------------------------------------------------------
+    Grand Total:                 49 756    6 832    6 841    6 426
+
+
+*******************************************************************************
+*** ENTRY LIST
+***
+
+Entry                       Address   Size  Type      Object
+-----                       -------   ----  ----      ------
+.iar.init_table$$Base      0x1'1770          --   Gb  - Linker created -
+.iar.init_table$$Limit     0x1'17ac          --   Gb  - Linker created -
+?main                      0x1'17ad         Code  Gb  cmain.o [4]
+BOARD_BootClockRUN         0x1'0173   0x44  Code  Gb  clock_config.o [1]
+BasicReadings                0x5a8b   0x4c  Code  Gb  ModBus.o [1]
+BasicSettings                0x5c71  0x430  Code  Gb  ModBus.o [1]
+Bubble_Sort                  0xa603   0x4e  Code  Gb  Function.o [1]
+CLOCK_BootToFeiMode          0x9e71   0x18  Code  Gb  fsl_clock.o [1]
+CLOCK_CONFIG_FllStableDelay
+                           0x1'0161   0x12  Code  Lc  clock_config.o [1]
+CLOCK_EnableClock          0x1'0709   0x12  Code  Lc  fsl_pit.o [1]
+CLOCK_EnableClock            0x9ecd   0x14  Code  Lc  fsl_uart.o [1]
+CLOCK_EnableClock          0x1'0223   0x12  Code  Lc  gpio_config.o [1]
+CLOCK_EnableClock          0x1'0593   0x12  Code  Lc  pit_congfig.o [1]
+CLOCK_EnableClock            0x7cc5   0x12  Code  Lc  uart_config.o [1]
+CLOCK_GetEr32kClkFreq        0x9b37   0x36  Code  Gb  fsl_clock.o [1]
+CLOCK_GetFixedFreqClkFreq
+                             0x9cf7   0x1e  Code  Gb  fsl_clock.o [1]
+CLOCK_GetFllExtRefClkFreq
+                             0x9a0d   0x6c  Code  Lc  fsl_clock.o [1]
+CLOCK_GetFllFreq             0x9c97   0x4a  Code  Gb  fsl_clock.o [1]
+CLOCK_GetFllFreq::fllFactorTable
+                           0x1'1970   0x10  Data  Lc  fsl_clock.o [1]
+CLOCK_GetFllRefClkFreq       0x9a9f   0x20  Code  Lc  fsl_clock.o [1]
+CLOCK_GetFreq                0x9b95   0xb8  Code  Gb  fsl_clock.o [1]
+CLOCK_GetInternalRefClkFreq
+                             0x9ce1   0x16  Code  Gb  fsl_clock.o [1]
+CLOCK_GetInternalRefClkSelectFreq
+                             0x9a79   0x26  Code  Lc  fsl_clock.o [1]
+CLOCK_GetMcgExtClkFreq       0x99a9   0x64  Code  Lc  fsl_clock.o [1]
+CLOCK_GetOsc0ErClkDivFreq
+                             0x9af1   0x46  Code  Gb  fsl_clock.o [1]
+CLOCK_GetOsc0ErClkUndivFreq
+                             0x9abf   0x32  Code  Gb  fsl_clock.o [1]
+CLOCK_GetOutClkFreq          0x9c67   0x30  Code  Gb  fsl_clock.o [1]
+CLOCK_GetPllFllSelClkFreq
+                             0x9b6d   0x28  Code  Gb  fsl_clock.o [1]
+CLOCK_SetEr32kClock          0x998d    0xe  Code  Lc  fsl_clock.o [1]
+CLOCK_SetFeiMode             0x9ddb   0x7e  Code  Gb  fsl_clock.o [1]
+CLOCK_SetInternalRefClkConfig
+                             0x9d15   0xc6  Code  Gb  fsl_clock.o [1]
+CLOCK_SetPllFllSelClock
+                             0x999b    0xe  Code  Lc  fsl_clock.o [1]
+CLOCK_SetSimConfig           0x9c4d   0x1a  Code  Gb  fsl_clock.o [1]
+CLOCK_SetSimSafeDivs       0x1'0151    0x8  Code  Lc  clock_config.o [1]
+CRC8_Check              0x1fff'f1c9   0x1a  Code  Gb  Function.o [1]
+CSTACK$$Base            0x2000'1790          --   Gb  - Linker created -
+CSTACK$$Limit           0x2000'1b90          --   Gb  - Linker created -
+ClientEncoderTypeSet         0x5a35   0x56  Code  Gb  ModBus.o [1]
+Communication_Address_Error
+                             0x7915   0x68  Code  Gb  ModBus.o [1]
+ConvertHexadecimalToDecimal
+                           0x1'00d1   0x30  Code  Gb  main.o [1]
+DMA0_IRQHandler         0x2000'0113   0x40  Code  Gb  main.o [1]
+DMA1_IRQHandler         0x2000'0153   0x64  Code  Gb  main.o [1]
+DMA2_DriverIRQHandler        0xa351   0x10  Code  Gb  fsl_edma.o [1]
+DMA3_DriverIRQHandler        0xa361   0x10  Code  Gb  fsl_edma.o [1]
+DSPI_CommonIRQHandler      0x1'118f   0x2c  Code  Lc  fsl_dspi.o [1]
+DSPI_IsMaster              0x1'117d   0x12  Code  Lc  fsl_dspi.o [1]
+Display                 0x1fff'f7ec    0x8  Data  Gb  Function.o [1]
+DisplayDate                0x1'0115   0x12  Code  Gb  main.o [1]
+DisplayFirmwareVersion     0x1'0127   0x2a  Code  Gb  main.o [1]
+DornaEncoderReadMTPDefine
+                             0xf145  0x330  Code  Gb  TamagawaEncoder.o [1]
+DornaEncoderReadMTPDefine::i
+                        0x1fff'f83d    0x1  Data  Lc  TamagawaEncoder.o [1]
+EDMA_ClearChannelStatusFlags
+                             0xa1d5   0x30  Code  Gb  fsl_edma.o [1]
+EDMA_DisableChannelRequest
+                             0xf703   0x26  Code  Lc  main.o [1]
+EDMA_EnableChannelInterrupts
+                             0xa175   0x60  Code  Gb  fsl_edma.o [1]
+EDMA_EnableChannelRequest
+                             0x54db   0x26  Code  Lc  ModBus.o [1]
+EDMA_HandleIRQ               0xa20d  0x144  Code  Gb  fsl_edma.o [1]
+EnableIRQ                  0x1'0235   0x24  Code  Lc  gpio_config.o [1]
+EnableIRQ                    0x5431   0x24  Code  Lc  ModBus.o [1]
+EnableIRQ                  0x1'05a5   0x24  Code  Lc  pit_congfig.o [1]
+EnableIRQ                    0x7cd7   0x24  Code  Lc  uart_config.o [1]
+EncTxData               0x1fff'f6bc   0x80  Data  Gb  uart_config.o [1]
+EncoderPrintf                0xa381   0x40  Code  Gb  Function.o [1]
+EncoderPrintf::EncoderSendBuff
+                        0x2000'140c   0xc8  Data  Lc  Function.o [1]
+EncoderTXRegister            0xc1c9   0xd4  Code  Gb  MultiturnMagneticEncoder.o [1]
+EncoderTypeSet               0x59ed   0x48  Code  Gb  ModBus.o [1]
+Encoder_CrcError             0x78ad   0x68  Code  Gb  ModBus.o [1]
+Encoder_Timeout              0x783d   0x68  Code  Gb  ModBus.o [1]
+GPIO_PinInit               0x1'06bd   0x42  Code  Gb  fsl_gpio.o [1]
+GPIO_PinWrite              0x1'06a5   0x18  Code  Lc  fsl_gpio.o [1]
+GetPrdInfoDataMrging         0x8373   0x28  Code  Gb  SensAREncoder.o [1]
+GetVERMrging                 0x839b   0x28  Code  Gb  SensAREncoder.o [1]
+HALL_Map                   0x1'1bec    0x4  Data  Lc  MultiturnOpticalEncoder.o [1]
+HallValueCalculate           0x8735   0xf0  Code  Gb  SensAREncoder.o [1]
+I2C0_DriverIRQHandler      0x1'1671    0xe  Code  Gb  fsl_i2c.o [1]
+I2C_TransferCommonIRQHandler
+                           0x1'1631   0x36  Code  Lc  fsl_i2c.o [1]
+IAP_RequestUpdate            0x7c55   0x16  Code  Gb  iap_function.o [1]
+IAP_SetFlag                  0x7c4b    0xa  Code  Lc  iap_function.o [1]
+InStream_Read              0x1'0e79   0x28  Code  Lc  lz77_init.o [4]
+InStream_StepRegion        0x1'0e65   0x14  Code  Lc  lz77_init.o [4]
+Init_GPIO                  0x1'02bb  0x230  Code  Gb  gpio_config.o [1]
+Init_PIT                   0x1'062f   0x3e  Code  Gb  pit_congfig.o [1]
+Init_UART0                   0x7d45  0x15a  Code  Gb  uart_config.o [1]
+Init_UART1                   0x7e9f  0x152  Code  Gb  uart_config.o [1]
+Lights_Cycle_On              0xfaed  0x5e0  Code  Gb  main.o [1]
+Lights_Cycle_On::LightsTime
+                        0x1fff'f828    0x4  Data  Lc  main.o [1]
+Lights_TwoDigits             0xf7d7  0x17c  Code  Gb  main.o [1]
+Lights_TwoDigitsTenthDot
+                             0xf959  0x174  Code  Gb  main.o [1]
+LoadInt                      0x8d47   0x7a  Code  Lc  xprintffull_nomb.o [2]
+MNS_SinCos_MaxMin            0xcb57   0xf6  Code  Gb  MultiturnOpticalEncoder.o [1]
+MT6835Addr              0x1fff'f7e0    0xc  Data  Gb  Function.o [1]
+MTAB_Map                   0x1'1be8    0x4  Data  Lc  MultiturnOpticalEncoder.o [1]
+MTP                     0x2000'165c   0x9c  Data  Gb  TamagawaEncoder.o [1]
+MgtMagneticEncoder      0x2000'0754  0x348  Data  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderCommand0x32
+                             0xe889   0x38  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderCommand0x7A
+                             0xe8c1   0x36  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderInitialize
+                             0xe801   0x2c  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderOpenInternalProtocol
+                             0xe85f   0x2a  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderRX         0xdc4d  0x678  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderReadAllEeprom
+                             0xe701   0x2c  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderReadHWRev
+                             0xea89   0xa8  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderReadOnePage
+                             0xe673   0x8e  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderReadResolution
+                             0xe955   0x14  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderSetResolution
+                             0xe941   0x14  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderSpeed
+                             0xe82d   0x32  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderTX         0xe2c5  0x3ae  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderTest  0x1fff'f4c5  0x114  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderTimeOut
+                             0xeb31   0x30  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderWriteAllEeprom
+                             0xe7e5   0x1c  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderWriteDate
+                             0xe8fd   0x40  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderWriteHWRev
+                             0xe97d  0x10c  Code  Gb  MGTMagneticEncoder.o [1]
+MgtMagneticEncoderWriteOnePage
+                             0xe72d   0xb8  Code  Gb  MGTMagneticEncoder.o [1]
+ModBus                  0x2000'16f8   0x94  Data  Gb  ModBus.o [1]
+ModBusProtocol_ASCII_Rx
+                             0x55a9  0x120  Code  Gb  ModBus.o [1]
+ModBus_Crc_Error             0x7981   0x68  Code  Gb  ModBus.o [1]
+ModBus_RTU              0x1fff'f283  0x1ac  Code  Gb  ModBus.o [1]
+ModBus_Return32bitTx03       0x575d   0x96  Code  Gb  ModBus.o [1]
+ModBus_ReturnEeprom          0x594b   0x36  Code  Gb  ModBus.o [1]
+ModBus_ReturnEepromPage0
+                             0x5981   0x36  Code  Gb  ModBus.o [1]
+ModBus_ReturnEepromPage2
+                             0x59b7   0x36  Code  Gb  ModBus.o [1]
+ModBus_ReturnTx03            0x56cd   0x90  Code  Gb  ModBus.o [1]
+ModBus_ReturnTx06            0x57f3   0x7e  Code  Gb  ModBus.o [1]
+ModBus_Rx03                  0x6121  0xa5c  Code  Gb  ModBus.o [1]
+ModBus_Rx03DataCollation
+                             0x5871   0x72  Code  Gb  ModBus.o [1]
+ModBus_Rx06                  0x6ba9  0xc88  Code  Gb  ModBus.o [1]
+ModBus_Rx06DataCollation
+                             0x58e3   0x68  Code  Gb  ModBus.o [1]
+Motor                   0x1fff'f73c   0x50  Data  Gb  Function.o [1]
+MotorEncoder            0x1fff'f78c   0x44  Data  Gb  Function.o [1]
+Motor_SpeedTest              0xa4c9  0x13a  Code  Gb  Function.o [1]
+MultiturnMagneticEncoder
+                        0x2000'0d88  0x2d4  Data  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderGetAllData
+                             0xc747   0x30  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderGetAllData::i
+                        0x1fff'f834    0x1  Data  Lc  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderHallCCWCheck
+                             0xc373  0x128  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderHallCWCheck
+                             0xc49b  0x128  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderHallCheck
+                             0xc5c3   0x90  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderHallRead
+                             0xc653   0x36  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderInitialize
+                             0xc717   0x30  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderMultiturnReset
+                             0xc2a1   0x34  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderOpenInternalProtocol
+                             0xc78b   0x30  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderRX
+                             0xb3f3  0xa28  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderReadAllEeprom
+                             0xc689   0x4a  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderReadFWRev
+                             0xc323   0x50  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderReadHWRev
+                             0xc2d5   0x4e  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderReadRegister
+                             0xc98f   0x90  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderReadRegister::i
+                        0x1fff'f836    0x1  Data  Lc  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderReadResolution
+                             0xc857   0x14  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderSetResolution
+                             0xc843   0x14  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderTB
+                             0xc777   0x14  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderTX
+                             0xbe2d  0x38a  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderTX::j
+                        0x1fff'f833    0x1  Data  Lc  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderTXOneByte
+                             0xb3a9   0x4a  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderTest
+                        0x2000'0351   0xb4  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderWriteDate
+                             0xc7bb   0x88  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderWriteHWRev
+                             0xc871   0x88  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderWriteRegister
+                             0xc8f9   0x96  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderWriteRegister::i
+                        0x1fff'f835    0x1  Data  Lc  MultiturnMagneticEncoder.o [1]
+MultiturnMagneticEncoderWriteResult
+                             0xc6d3   0x44  Code  Gb  MultiturnMagneticEncoder.o [1]
+MultiturnOpticalAnalogReset
+                             0xd03b   0x2a  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoder
+                        0x2000'0a9c  0x2ec  Data  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderDAC
+                             0xcfaf   0x34  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderDACAdjustment
+                             0xd1eb   0x92  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderGetAllData
+                             0xcf77   0x1c  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderHallCheck
+                             0xd45f   0xb8  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderHallContinuousCheck
+                             0xd9ef  0x12c  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderHallContinuousCheck::change_cnt
+                        0x1fff'f83b    0x1  Data  Lc  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderHallContinuousCheck::circle_done
+                        0x1fff'f83c    0x1  Data  Lc  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderHallContinuousCheck::prev_logic
+                        0x1fff'f6ae    0x1  Data  Lc  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderHallContinuousCheck::start_logic
+                        0x1fff'f6af    0x1  Data  Lc  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderInitialize
+                             0xcef1   0x3a  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderLedDac
+                             0xcc4d   0x8a  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderLightIntensity
+                             0xcfe3   0x58  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMNSAnalogMaxCheck
+                             0xd065  0x186  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMNSAnalogMaxSampling
+                             0xcabf   0x98  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMNSSpeedCheck
+                             0xd5dd  0x1e6  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMPositionMark
+                             0xd7cd   0x88  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMPositionMark1
+                             0xd859   0x60  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMPositionMark1::i
+                        0x1fff'f838    0x1  Data  Lc  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMTABCheck
+                             0xd517   0xb8  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMTABContinuousCheck
+                             0xd8b9  0x136  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMTABContinuousCheck::change_cnt
+                        0x1fff'f839    0x1  Data  Lc  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMTABContinuousCheck::circle_done
+                        0x1fff'f83a    0x1  Data  Lc  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMTABContinuousCheck::prev_logic
+                        0x1fff'f1e2    0x1  Data  Lc  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMTABContinuousCheck::start_logic
+                        0x1fff'f1e3    0x1  Data  Lc  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderMultiturnReset
+                             0xce7d   0x3a  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderOpenInternalProtocol
+                             0xceb7   0x3a  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderRX
+                        0x1fff'e0d9  0xacc  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderReadAllEeprom
+                             0xce35   0x48  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderReadFWRev
+                             0xcddf   0x56  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderReadHWRev
+                             0xcd8b   0x54  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderSectorCollect
+                             0xccd7   0xb4  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderTB
+                             0xcf93   0x1c  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderTX
+                        0x1fff'ebb9  0x44e  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderTX::j
+                        0x1fff'f837    0x1  Data  Lc  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderTXOneByte
+                             0xca71   0x4e  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderTest
+                        0x1fff'f011  0x15e  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderWriteDate
+                             0xd27d   0x92  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderWriteHWRev
+                             0xd3cf   0x90  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderWriteRMRNRS
+                             0xd30f   0xc0  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalEncoderWriteResult
+                             0xcf2b   0x4c  Code  Gb  MultiturnOpticalEncoder.o [1]
+MultiturnOpticalMNSAnalogSynCheckResult
+                             0xdb21   0xd4  Code  Gb  MultiturnOpticalEncoder.o [1]
+NotSetEncoderType            0x79e9   0x68  Code  Gb  ModBus.o [1]
+NxpMagneticEncoder      0x2000'159c   0xc0  Data  Gb  NXPMagneticEncoder.o [1]
+NxpMagneticEncoderInitialize
+                           0x1'0de5   0x2a  Code  Gb  NXPMagneticEncoder.o [1]
+NxpMagneticEncoderRX       0x1'07f1  0x386  Code  Gb  NXPMagneticEncoder.o [1]
+NxpMagneticEncoderReadOnePage
+                           0x1'0db7   0x2e  Code  Gb  NXPMagneticEncoder.o [1]
+NxpMagneticEncoderSpeed
+                           0x1'0e0f   0x32  Code  Gb  NXPMagneticEncoder.o [1]
+NxpMagneticEncoderTX       0x1'0b77  0x240  Code  Gb  NXPMagneticEncoder.o [1]
+NxpMagneticEncoderTest  0x1fff'f5f9   0x4c  Code  Gb  NXPMagneticEncoder.o [1]
+OutStream_Write            0x1'0ea1   0x42  Code  Lc  lz77_init.o [4]
+PIT0_IRQHandler         0x2000'01b7   0x7e  Code  Gb  main.o [1]
+PITCnt                  0x1fff'f824    0x4  Data  Gb  main.o [1]
+PIT_ClearStatusFlags         0xf739    0xe  Code  Lc  main.o [1]
+PIT_EnableInterrupts       0x1'05e5   0x20  Code  Lc  pit_congfig.o [1]
+PIT_GetDefaultConfig       0x1'05c9   0x1c  Code  Lc  pit_congfig.o [1]
+PIT_GetInstance            0x1'071b   0x2e  Code  Lc  fsl_pit.o [1]
+PIT_GetStatusFlags           0xf729   0x10  Code  Lc  main.o [1]
+PIT_Init                   0x1'0749   0x74  Code  Gb  fsl_pit.o [1]
+PIT_SetTimerPeriod           0x5455   0x2e  Code  Lc  ModBus.o [1]
+PIT_SetTimerPeriod         0x1'0605   0x2a  Code  Lc  pit_congfig.o [1]
+PIT_StartTimer               0x5483   0x1e  Code  Lc  ModBus.o [1]
+PIT_StopTimer                0x54a1   0x1e  Code  Lc  ModBus.o [1]
+PNH2612                 0x2000'12f0  0x11c  Data  Gb  MultiturnOpticalEncoder.o [1]
+PORTE_IRQHandler        0x2000'0235   0x52  Code  Gb  main.o [1]
+PORT_ClearPinsInterruptFlags
+                             0xf6e1    0x6  Code  Lc  main.o [1]
+PORT_SetPinConfig          0x1'0259   0x26  Code  Lc  gpio_config.o [1]
+PORT_SetPinInterruptConfig
+                           0x1'029d   0x1e  Code  Lc  gpio_config.o [1]
+PORT_SetPinMux             0x1'027f   0x1e  Code  Lc  gpio_config.o [1]
+PORT_SetPinMux               0x7cfb   0x1e  Code  Lc  uart_config.o [1]
+PrdInfoCollectMessage        0x81e7   0x80  Code  Gb  SensAREncoder.o [1]
+RTU_CRC                 0x1fff'f23b   0x48  Code  Gb  ModBus.o [1]
+Region$$Table$$Base        0x1'1770          --   Gb  - Linker created -
+Region$$Table$$Limit       0x1'17ac          --   Gb  - Linker created -
+SMC_GetPowerModeState      0x1'015d    0x4  Code  Lc  clock_config.o [1]
+SMC_SetPowerModeHsrun      0x1'0691   0x12  Code  Gb  fsl_smc.o [1]
+SMC_SetPowerModeProtection
+                           0x1'0159    0x4  Code  Lc  clock_config.o [1]
+SNDigitsAreIncorrect         0x7a51   0x68  Code  Gb  ModBus.o [1]
+SPI0_DriverIRQHandler      0x1'11bb   0x24  Code  Gb  fsl_dspi.o [1]
+SensAR                  0x2000'105c  0x294  Data  Gb  SensAREncoder.o [1]
+SensARDataInitialization
+                             0x8127   0xc0  Code  Gb  SensAREncoder.o [1]
+SensARTest                   0x83c3  0x364  Code  Gb  SensAREncoder.o [1]
+SensAR_Crc                   0x810d   0x1a  Code  Gb  SensAREncoder.o [1]
+SensAR_RX                    0x8829  0x33c  Code  Gb  SensAREncoder.o [1]
+SetStringMrging              0x8267  0x10c  Code  Gb  SensAREncoder.o [1]
+SystemCoreClock         0x1fff'f6b8    0x4  Data  Gb  system_MKV30F12810.o [1]
+SystemInit                 0x1'16c5   0x28  Code  Gb  system_MKV30F12810.o [1]
+TamagawaEncoder         0x2000'0404  0x350  Data  Gb  TamagawaEncoder.o [1]
+TamagawaEncoderRX            0xeb8d  0x386  Code  Gb  TamagawaEncoder.o [1]
+TamagawaEncoderTest     0x1fff'f66d   0x42  Code  Gb  TamagawaEncoder.o [1]
+TmagawaEncoderMultiturnReset
+                             0xf0db   0x34  Code  Gb  TamagawaEncoder.o [1]
+TmagawaEncoderReadMTP        0xf645   0x66  Code  Gb  TamagawaEncoder.o [1]
+TmagawaEncoderReadMTPDefine
+                             0xf623   0x1e  Code  Gb  TamagawaEncoder.o [1]
+TmagawaEncoderSingleTurnReset
+                             0xf10f   0x34  Code  Gb  TamagawaEncoder.o [1]
+TmagawaEncoderTX             0xef19  0x1c2  Code  Gb  TamagawaEncoder.o [1]
+TuosidaEncoderReadMTPDefine
+                             0xf479  0x1aa  Code  Gb  TamagawaEncoder.o [1]
+TuosidaMTPprintf             0x5ad7  0x118  Code  Gb  ModBus.o [1]
+UART0_RX_TX_IRQHandler  0x2000'0069   0x56  Code  Gb  main.o [1]
+UART1_RX_TX_IRQHandler  0x2000'00bf   0x54  Code  Gb  main.o [1]
+UART1_SendDMA0          0x1fff'f215   0x26  Code  Gb  ModBus.o [1]
+UART_ClearStatusFlags        0xa0ff   0x44  Code  Gb  fsl_uart.o [1]
+UART_EnableInterrupts        0xa0bb   0x2c  Code  Gb  fsl_uart.o [1]
+UART_EnableRx                0xf6e7   0x1c  Code  Lc  main.o [1]
+UART_EnableRx                0xdc31   0x1c  Code  Lc  MGTMagneticEncoder.o [1]
+UART_EnableRx                0x54bf   0x1c  Code  Lc  ModBus.o [1]
+UART_EnableRx                0xb38d   0x1c  Code  Lc  MultiturnMagneticEncoder.o [1]
+UART_EnableRx                0xca55   0x1c  Code  Lc  MultiturnOpticalEncoder.o [1]
+UART_EnableRx              0x1'07d5   0x1c  Code  Lc  NXPMagneticEncoder.o [1]
+UART_EnableRx                0xeb71   0x1c  Code  Lc  TamagawaEncoder.o [1]
+UART_EnableTxDMA             0x7d19   0x2c  Code  Lc  uart_config.o [1]
+UART_GetInstance             0x9ee1   0x36  Code  Gb  fsl_uart.o [1]
+UART_GetStatusFlags          0xa0e7   0x18  Code  Gb  fsl_uart.o [1]
+UART_Init                    0x9f17  0x1a4  Code  Gb  fsl_uart.o [1]
+UART_SendDMA0           0x1fff'f18d   0x24  Code  Gb  Function.o [1]
+Variable_ReadReset_Flag
+                        0x1fff'f832    0x1  Data  Gb  main.o [1]
+Variable_Reset               0xa3c1  0x108  Code  Gb  Function.o [1]
+Variable_Reset_Flag     0x1fff'f830    0x1  Data  Gb  Function.o [1]
+Work_Alarm              0x1fff'f831    0x1  Data  Gb  main.o [1]
+_GenldFullNoMb               0x9689  0x274  Code  Lc  xprintffull_nomb.o [2]
+_LdtobFullNoMb               0x9285  0x3d6  Code  Lc  xprintffull_nomb.o [2]
+_LitobFullNoMb               0x9135  0x10a  Code  Lc  xprintffull_nomb.o [2]
+_PrintfFullNoMb              0x8b99  0x19e  Code  Gb  xprintffull_nomb.o [2]
+_PutcharsFullNoMb            0x98fd   0x2e  Code  Lc  xprintffull_nomb.o [2]
+_PutfldFullNoMb              0x8dc1  0x268  Code  Lc  xprintffull_nomb.o [2]
+_PuttxtFullNoMb              0x9029  0x10c  Code  Lc  xprintffull_nomb.o [2]
+_SNProut                     0x7c13   0x1a  Code  Gb  xsnprout.o [2]
+__NVIC_EnableIRQ           0x1'01d9   0x1e  Code  Lc  gpio_config.o [1]
+__NVIC_EnableIRQ             0x5411   0x20  Code  Lc  ModBus.o [1]
+__NVIC_EnableIRQ           0x1'0549   0x1e  Code  Lc  pit_congfig.o [1]
+__NVIC_EnableIRQ             0x7c79   0x20  Code  Lc  uart_config.o [1]
+__NVIC_SetPriority         0x1'01f7   0x2c  Code  Lc  gpio_config.o [1]
+__NVIC_SetPriority         0x1'0567   0x2c  Code  Lc  pit_congfig.o [1]
+__NVIC_SetPriority           0x7c99   0x2c  Code  Lc  uart_config.o [1]
+__NVIC_SystemReset           0x7c2d   0x1e  Code  Lc  iap_function.o [1]
+__Vectors                    0x5000          --   Gb  startup_MKV30F12810.o [1]
+__Vectors_End                0x5400         Data  Gb  startup_MKV30F12810.o [1]
+__Vectors_Size {Abs}          0x400          --   Gb  startup_MKV30F12810.o [1]
+__aeabi_assert               0x7ad9   0x24  Code  Gb  ABIassert.o [5]
+__aeabi_cdcmple              0xaca1         Code  Gb  DblCmpLe.o [3]
+__aeabi_cdrcmple             0xacd1         Code  Gb  DblCmpGe.o [3]
+__aeabi_d2iz                 0xae3d         Code  Gb  DblToS32.o [3]
+__aeabi_d2uiz                0xb1c9         Code  Gb  DblToU32.o [3]
+__aeabi_ddiv                 0xaf81         Code  Gb  DblDiv.o [3]
+__aeabi_dmul                 0xa9e5         Code  Gb  DblMul.o [3]
+__aeabi_dsub                 0xae9d         Code  Gb  DblSub.o [3]
+__aeabi_f2d                  0x80bd         Code  Gb  FltToDbl.o [3]
+__aeabi_i2d                  0xae79         Code  Gb  S32ToDbl.o [3]
+__aeabi_ldiv0                0xb20d         Code  Gb  I64DivZer.o [4]
+__aeabi_memcpy               0xab89         Code  Gb  ABImemcpy.o [4]
+__aeabi_memcpy4              0xaba9         Code  Gb  ABImemcpy.o [4]
+__aeabi_memcpy8              0xaba9         Code  Gb  ABImemcpy.o [4]
+__aeabi_memset               0x7afd         Code  Gb  ABImemset.o [4]
+__aeabi_ui2d                 0xb1f1         Code  Gb  U32ToDbl.o [3]
+__aeabi_uldivmod             0xa7b5         Code  Gb  I64DivMod.o [4]
+__cmain                    0x1'17ad         Code  Gb  cmain.o [4]
+__exit                       0xa6f1   0x14  Code  Gb  exit.o [5]
+__iar_Fail_s                 0xa71d   0x1c  Code  Gb  xfail_s.o [2]
+__iar_Memchr                 0xa75d         Code  Gb  memchr.o [4]
+__iar_Memset                 0x7afd         Code  Gb  ABImemset.o [4]
+__iar_Memset_word            0x7b05         Code  Gb  ABImemset.o [4]
+__iar_Strchr                 0xa705         Code  Gb  strchr.o [4]
+__iar_dadd                   0xaead         Code  Gb  DblSub.o [3]
+__iar_data_init3           0x1'1725   0x28  Code  Gb  data_init.o [4]
+__iar_dsub                   0xb211         Code  Gb  DblAdd.o [3]
+__iar_dsubStart              0xb223         Code  Gb  DblAdd.o [3]
+__iar_frexp                  0xac3d         Code  Gb  frexp.o [3]
+__iar_frexpl                 0xac3d         Code  Gb  frexp.o [3]
+__iar_init_vfp             0x1'174d         Code  Gb  fpinit_M.o [3]
+__iar_ldexp64                0xad01         Code  Gb  ldexp.o [3]
+__iar_lz77_init3           0x1'0ee3  0x178  Code  Gb  lz77_init.o [4]
+__iar_program_start        0x1'1b6d         Code  Gb  cstartup_M.o [4]
+__iar_scalbln64              0xad01         Code  Gb  ldexp.o [3]
+__iar_scalbn64               0xad01         Code  Gb  ldexp.o [3]
+__iar_softfp___iar_frexp64
+                             0xac31         Code  Gb  frexp.o [3]
+__iar_softfp_frexp           0xac31         Code  Gb  frexp.o [3]
+__iar_softfp_frexpl          0xac31         Code  Gb  frexp.o [3]
+__iar_zero_init3             0x7b63   0x3a  Code  Gb  zero_init3.o [4]
+__low_level_init           0x1'17cb    0x4  Code  Gb  low_level_init.o [2]
+__vector_table               0x5000         Data  Gb  startup_MKV30F12810.o [1]
+__vector_table_0x1c          0x501c         Data  Gb  startup_MKV30F12810.o [1]
+_call_main                 0x1'17b9         Code  Gb  cmain.o [4]
+_exit                      0x1'17d5         Code  Gb  cexit.o [4]
+_main                      0x1'17c7         Code  Gb  cmain.o [4]
+abort                        0x8b91    0x6  Code  Gb  abort.o [2]
+abs                          0x8105    0x8  Code  Gb  abs.o [2]
+exit                       0x1'17cf    0x4  Code  Gb  exit.o [2]
+g_dspiHandle            0x1fff'f80c    0x4  Data  Lc  fsl_dspi.o [1]
+g_xtal0Freq             0x1fff'f804    0x4  Data  Gb  fsl_clock.o [1]
+g_xtal32Freq            0x1fff'f808    0x4  Data  Gb  fsl_clock.o [1]
+hexToAsciiString             0x5501   0x18  Code  Gb  ModBus.o [1]
+ldexp                        0xad01         Code  Gb  ldexp.o [3]
+ldexpl                       0xad01         Code  Gb  ldexp.o [3]
+main                         0xf749   0x8e  Code  Gb  main.o [1]
+mcgConfig_BOARD_BootClockRUN
+                           0x1'1b78    0x8  Data  Gb  clock_config.o [1]
+memchr                       0xa75d         Code  Gb  memchr.o [4]
+myprintf                     0x5519   0x90  Code  Gb  ModBus.o [1]
+myprintf::SendBuff      0x2000'14d4   0xc8  Data  Lc  ModBus.o [1]
+s_EDMAHandle            0x1fff'f7d0   0x10  Data  Lc  fsl_edma.o [1]
+s_dspiMasterIsr         0x1fff'f810    0x4  Data  Lc  fsl_dspi.o [1]
+s_dspiSlaveIsr          0x1fff'f814    0x4  Data  Lc  fsl_dspi.o [1]
+s_fastIrcFreq           0x1fff'f6b4    0x4  Data  Lc  fsl_clock.o [1]
+s_i2cHandle             0x1fff'f818    0x4  Data  Lc  fsl_i2c.o [1]
+s_i2cMasterIsr          0x1fff'f81c    0x4  Data  Lc  fsl_i2c.o [1]
+s_i2cSlaveIsr           0x1fff'f820    0x4  Data  Lc  fsl_i2c.o [1]
+s_pitBases                 0x1'1be0    0x4  Data  Lc  fsl_pit.o [1]
+s_pitClocks                0x1'1be4    0x4  Data  Lc  fsl_pit.o [1]
+s_slowIrcFreq           0x1fff'f6b0    0x4  Data  Lc  fsl_clock.o [1]
+s_uartBases                0x1'1b88    0x8  Data  Lc  fsl_uart.o [1]
+s_uartClock                0x1'1b90    0x8  Data  Lc  fsl_uart.o [1]
+scalbln                      0xad01         Code  Gb  ldexp.o [3]
+scalblnl                     0xad01         Code  Gb  ldexp.o [3]
+scalbn                       0xad01         Code  Gb  ldexp.o [3]
+scalbnl                      0xad01         Code  Gb  ldexp.o [3]
+scale                        0x923f   0x46  Code  Lc  xprintffull_nomb.o [2]
+sec_hand                0x1fff'f82c    0x4  Data  Lc  xfail_s.o [2]
+simConfig_BOARD_BootClockRUN
+                           0x1'1b80    0x8  Data  Gb  clock_config.o [1]
+strchr                       0xa705         Code  Gb  strchr.o [4]
+strcmp                       0x7bd9         Code  Gb  strcmp.o [4]
+strlen                       0xa6b9         Code  Gb  strlen.o [4]
+strncmp                      0x7beb   0x28  Code  Gb  strncmp.o [2]
+uart0_transfer          0x1fff'f7f4    0x8  Data  Gb  Function.o [1]
+uart1_transfer          0x1fff'f7fc    0x8  Data  Gb  ModBus.o [1]
+vsnprintf                    0x7b9d   0x3c  Code  Gb  vsnprint.o [2]
+
+
+[1] = C:\Users\zhangch64\Desktop\FCT\Program\EncoderTest_V2.2\EWARM\Debug\Obj
+[2] = dl7M_tln.a
+[3] = m7M_tls.a
+[4] = rt7M_tl.a
+[5] = shb_l.a
+
+  49 756 bytes of readonly  code memory
+   6 832 bytes of readwrite code memory
+   6 841 bytes of readonly  data memory
+   6 426 bytes of readwrite data memory
+
+Errors: none
+Warnings: none

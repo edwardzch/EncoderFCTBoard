@@ -1,0 +1,50 @@
+#Generating source browse information for project Encoder_kv30_ada4571
+
+
+#Abbreviations
+cc = D$:\Program$ Files$ (x86)\IAR$ Systems\Embedded$ Workbench$ 8.3\common\bin\SourceIndexer.exe
+ll = D$:\Program$ Files$ (x86)\IAR$ Systems\Embedded$ Workbench$ 8.3\common\bin\PbdLink.exe
+bd = D$:\Program$ Files$ (x86)\IAR$ Systems\Embedded$ Workbench$ 8.3\common\bin\makeBrowseData.exe
+
+
+
+#Rules
+rule index
+  depfile = $out.dep
+  command = $cc -out=$out -f $in
+rule link
+  command = $ll -M $out $in
+rule browsedata
+  command = $bd $in -output  $out
+
+
+
+#Build steps
+build main.pbi : index main.xcl
+build MyTable2b.pbi : index MyTable2b.xcl
+build adc.pbi : index adc.xcl
+build clock_config.pbi : index clock_config.xcl
+build eeprom.pbi : index eeprom.xcl
+build ftm.pbi : index ftm.xcl
+build ioport.pbi : index ioport.xcl
+build smartabs.pbi : index smartabs.xcl
+build system_MKV30F12810.pbi : index system_MKV30F12810.xcl
+build fsl_adc16.pbi : index fsl_adc16.xcl
+build fsl_clock.pbi : index fsl_clock.xcl
+build fsl_edma.pbi : index fsl_edma.xcl
+build fsl_ftm.pbi : index fsl_ftm.xcl
+build fsl_gpio.pbi : index fsl_gpio.xcl
+build fsl_i2c.pbi : index fsl_i2c.xcl
+build fsl_pdb.pbi : index fsl_pdb.xcl
+build fsl_smc.pbi : index fsl_smc.xcl
+build fsl_uart.pbi : index fsl_uart.xcl
+build fsl_uart_edma.pbi : index fsl_uart_edma.xcl
+build Encoder_kv30_ada4571_part0.pbi : link main.pbi MyTable2b.pbi adc.pbi clock_config.pbi
+build Encoder_kv30_ada4571_part1.pbi : link eeprom.pbi ftm.pbi ioport.pbi smartabs.pbi
+build Encoder_kv30_ada4571_part2.pbi : link system_MKV30F12810.pbi fsl_adc16.pbi fsl_clock.pbi fsl_edma.pbi
+build Encoder_kv30_ada4571_part3.pbi : link fsl_ftm.pbi fsl_gpio.pbi fsl_i2c.pbi fsl_pdb.pbi
+build Encoder_kv30_ada4571_part4.pbi : link fsl_smc.pbi fsl_uart.pbi fsl_uart_edma.pbi
+build Encoder_kv30_ada4571.pbd : link Encoder_kv30_ada4571_part0.pbi Encoder_kv30_ada4571_part1.pbi Encoder_kv30_ada4571_part2.pbi Encoder_kv30_ada4571_part3.pbi Encoder_kv30_ada4571_part4.pbi
+build Encoder_kv30_ada4571.pbw : browsedata Encoder_kv30_ada4571.pbd
+
+

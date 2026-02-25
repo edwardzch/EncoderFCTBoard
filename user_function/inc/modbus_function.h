@@ -10,17 +10,19 @@ extern "C" {
 #include "stm32g4xx_hal.h"
 
 
-/* ¼Ä´æÆ÷Êı×é´óĞ¡ */
+/* å¯„å­˜å™¨æ•°ç»„å¤§å° */
 #define MODBUS_REGISTER_COUNT 58
+#define MODBUS_REG_BASE_ADDR 0x1000  // æ™®é€šå¯„å­˜å™¨åŸºåœ°å€ (0x1000-0x1039)
 
-/* Modbus ¹¦ÄÜÂë */
+/* Modbus åŠŸèƒ½ç  */
 #define MODBUS_FUNC_READ_HOLDING_REGISTERS  0x03
 #define MODBUS_FUNC_READ_INPUT_REGISTERS    0x04
 #define MODBUS_FUNC_WRITE_SINGLE_REGISTER   0x06
 #define MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS 0x10
 
 #define FirmwareVersion  1.0
-/* Modbus ×´Ì¬Ã¶¾Ù */
+#define HardwareVersion  1.0
+/* Modbus çŠ¶æ€æšä¸¾ */
 typedef enum {
     MODBUS_OK = 0,
     MODBUS_ERROR_CRC,
@@ -31,24 +33,24 @@ typedef enum {
     MODBUS_ERROR_TIMEOUT
 } ModbusStatus_t;
 
-/* --- Modbus Êı¾İ½á¹¹¶¨Òå --- */
+/* --- Modbus æ•°æ®ç»“æ„å®šä¹‰ --- */
 
-// Ô­Ê¼½ÓÊÕÖ¡½á¹¹ (Ö÷ÒªÓÃÓÚ´Ó»ú½âÎöÇëÇó)
+// åŸå§‹æ¥æ”¶å¸§ç»“æ„ (ä¸»è¦ç”¨äºä»æœºè§£æè¯·æ±‚)
 typedef struct{
 	uint8_t		DataAddrHigh;
 	uint8_t		DataAddrLow;
 	uint16_t	DataAddr;
 	uint8_t		DataCountHigh;
 	uint8_t		DataCountLow;
-	uint8_t     DataHigh[MODBUS_REGISTER_COUNT]; // »º³åÇø´óĞ¡
+	uint8_t     DataHigh[MODBUS_REGISTER_COUNT]; // ç¼“å†²åŒºå¤§å°
 	uint8_t     DataLow[MODBUS_REGISTER_COUNT];
 	uint16_t    Data[MODBUS_REGISTER_COUNT];
-	uint8_t		DataSize; // ×Ö½ÚÊı
+	uint8_t		DataSize; // å­—èŠ‚æ•°
 	uint8_t		CRCLow;
 	uint8_t		CRCHigh;
 } strModBusRx;
 
-// Ô­Ê¼·¢ËÍÖ¡½á¹¹ (»ù±¾ÓÃ²»µ½£¬ÒòÎªÊı¾İÔÚº¯ÊıÄÚÖ±½Ó×é×°)
+// åŸå§‹å‘é€å¸§ç»“æ„ (åŸºæœ¬ç”¨ä¸åˆ°ï¼Œå› ä¸ºæ•°æ®åœ¨å‡½æ•°å†…ç›´æ¥ç»„è£…)
 typedef struct{
 	uint8_t		DataAddrHigh;
 	uint8_t		DataAddrLow;
@@ -60,40 +62,63 @@ typedef struct{
 	uint8_t		CRCHigh;
 } strModBusTx;
 
-// Ö÷»ú½á¹¹Ìå
+// ä¸»æœºç»“æ„ä½“
 typedef struct{
-	uint8_t    	ADDR; // Ö÷»ú×ÔÉíµØÖ·(Í¨³£Îª0»ò²»Ê¹ÓÃ)
-	uint8_t    	CMD;  // ½ÓÊÕµ½µÄÃüÁî
-	strModBusRx	Rx;   // ¶ÔÖ÷»ú½ÓÊÕÒâÒå²»´ó£¬±£ÁôÒÔ¼æÈİ¾É½á¹¹
+	uint8_t    	ADDR; // ä¸»æœºè‡ªèº«åœ°å€(é€šå¸¸ä¸º0æˆ–ä¸ä½¿ç”¨)
+	uint8_t    	CMD;  // æ¥æ”¶åˆ°çš„å‘½ä»¤
+	strModBusRx	Rx;   // å¯¹ä¸»æœºæ¥æ”¶æ„ä¹‰ä¸å¤§ï¼Œä¿ç•™ä»¥å…¼å®¹æ—§ç»“æ„
 	strModBusTx Tx;
-  uint16_t    DisplayRegisters[MODBUS_REGISTER_COUNT]; // ´æ´¢´ÓÉè±¸¶Á»ØµÄÊı¾İ
+  uint16_t    DisplayRegisters[MODBUS_REGISTER_COUNT]; // å­˜å‚¨ä»è®¾å¤‡è¯»å›çš„æ•°æ®
 
-    // ¡¾¹Ø¼ü¡¿±£´æÉÏÒ»´Î·¢ËÍÇëÇóµÄĞÅÏ¢
+    // ã€å…³é”®ã€‘ä¿å­˜ä¸Šä¸€æ¬¡å‘é€è¯·æ±‚çš„ä¿¡æ¯
     struct {
-        uint8_t  SlaveADDR;   // ÇëÇóµÄ´ÓÕ¾µØÖ·
-        uint16_t StartAddr;   // ÇëÇóµÄÆğÊ¼¼Ä´æÆ÷µØÖ·
+        uint8_t  SlaveADDR;   // è¯·æ±‚çš„ä»ç«™åœ°å€
+        uint16_t StartAddr;   // è¯·æ±‚çš„èµ·å§‹å¯„å­˜å™¨åœ°å€
     } LastReq;
 
 } strModBusMaster;
 
-// ´Ó»ú½á¹¹Ìå
+// ä»æœºç»“æ„ä½“
 typedef struct{
-	uint8_t    	ADDR; // ´Ó»ú×ÔÉíµØÖ·
-	uint8_t    	CMD;  // ½ÓÊÕµ½µÄÃüÁî
+	uint8_t    	ADDR; // ä»æœºè‡ªèº«åœ°å€
+	uint8_t    	CMD;  // æ¥æ”¶åˆ°çš„å‘½ä»¤
 	strModBusRx	Rx;
 	strModBusTx Tx;
-  uint16_t    DisplayRegisters[MODBUS_REGISTER_COUNT]; // ´æ´¢¹©Ö÷»ú¶ÁĞ´µÄÊı¾İ
+  uint16_t    DisplayRegisters[MODBUS_REGISTER_COUNT]; // å­˜å‚¨ä¾›ä¸»æœºè¯»å†™çš„æ•°æ®
 } strModBusSlave;
+
+// é”™è¯¯æ ‡å¿—ç»“æ„
+typedef union {
+    uint8_t all;
+    struct {
+        uint8_t DC : 1; // Disconnect/Timeout (è¶…æ—¶)
+        uint8_t EC : 1; // Error CRC (æ ¡éªŒé”™)
+        uint8_t SN : 1; // SN Error (åºåˆ—å·é”™)
+        uint8_t Reserved : 5;
+    } bit;
+} strModBusError;
 
 typedef struct{
 	strModBusMaster	Master;
 	strModBusSlave  Slave;
+    strModBusError  Error; // æ–°å¢é”™è¯¯æ ‡å¿—
 } strModBus;
 
 extern volatile strModBus   ModBus;
 void ModBus_SlaveRx(void);
 void Usart1_ReceiveStringHandler(void);
 void Usart1_SendStringHandler(void);
+
+// ================= é”™è¯¯å¤„ç†å‡½æ•° (ç§»æ¤è‡ªæ—§é¡¹ç›®) =================
+void Encoder_Timeout(void);
+void Encoder_CrcError(void);
+void Communication_Address_Error(void);
+void Communication_Length_Error(void);
+void Communication_FunctionCode_Error(void);
+void Communication_SlaveAddress_Error(void);
+void ModBus_Crc_Error(void);
+void NotSetEncoderType(void);
+void SNDigitsAreIncorrect(void);
 #ifdef __cplusplus
 }
 #endif
