@@ -10,6 +10,10 @@
 #include "encoder_dispatcher.h"
 #include "Encoder_MultiturnMag.h"
 #include <string.h>
+#include "encoder_modbus.h"
+#include "Encoder_MultiturnOpt.h"
+#include "Encoder_MGTMag.h"
+#include "Encoder_Tamagawa.h"
 
 // ================= DMA 通道映射 =================
 // CubeMX 配置: USART3_RX -> DMA1_Channel4, USART3_TX -> DMA1_Channel5
@@ -33,6 +37,7 @@ static uint8_t s_RxBuffer[ENC_RX_BUFFER_SIZE];
 static volatile uint16_t s_RxLen = 0;
 static volatile uint16_t s_ExpectedRxLen = 0;
 
+MotorEncoder_t g_MotorEncoder = {0};
 /****************************************************************************************
 * 函数名称：EncDrv_Init
 * 函数功能：初始化编码器驱动，配置波特率
@@ -61,6 +66,57 @@ void EncDrv_SetBaudRate(uint32_t baudrate)
     USART3->CR1 &= ~USART_CR1_UE;
     USART3->BRR = (pclk + baudrate / 2) / baudrate;
     USART3->CR1 |= USART_CR1_UE;
+}
+
+/****************************************************************************************
+* 函数名称：EncDrv_TimeoutCntUpdate
+* 函数功能：停止 DMA 收发通道，关闭 USART DMA 请求
+* 输入参量：无
+* 输出参量：无
+* 编写日期：2026-2-24
+****************************************************************************************/
+void EncDrv_TimeoutCntUpdate(void)
+{
+		switch (g_EncoderConfig.Type) {
+				case ENC_TYPE_MULTITURN_MAG:
+						g_MulMag.TimeoutCnt ++;
+				
+						if (g_MulMag.TimeoutCnt > 5) {
+							g_MulMag.Error.bit.DC = 1;
+							Work_Alarm = WORK_ALARM_TIMEOUT;										 
+						}		
+						break;
+						
+				case ENC_TYPE_MULTITURN_OPT:
+						g_MulOpt.TimeoutCnt ++;
+				
+						if (g_MulOpt.TimeoutCnt > 5) {
+							g_MulOpt.Error.bit.DC = 1;
+							Work_Alarm = WORK_ALARM_TIMEOUT;										 
+						}					
+						break;
+						
+				case ENC_TYPE_MGT_MAG:
+						g_MGT.TimeoutCnt ++;
+				
+						if (g_MGT.TimeoutCnt > 5) {
+							g_MGT.Error.bit.DC = 1;
+							Work_Alarm = WORK_ALARM_TIMEOUT;										 
+						}						
+						break;
+						
+				case ENC_TYPE_TAMAGAWA:
+						g_Tmgw.TimeoutCnt ++;
+				
+						if (g_Tmgw.TimeoutCnt > 5) {
+							g_Tmgw.Error.bit.DC = 1;
+							Work_Alarm = WORK_ALARM_TIMEOUT;										 
+						}
+						break;
+						
+				default:
+						break;
+		}
 }
 
 /****************************************************************************************
@@ -162,6 +218,7 @@ static void EncDrv_StopDMA(void)
 void EncDrv_SendDMA(uint8_t *data, uint16_t len, uint16_t rx_len)
 {
     if (s_State == ENC_DRV_TX_BUSY || s_State == ENC_DRV_RX_WAIT) {
+			  
         return;
     }
     
@@ -208,7 +265,8 @@ void EncDrv_USART_IRQHandler(void)
         // 1. 清除 TC 标志, 禁用 TC 中断
         USART3->ICR = USART_ICR_TCCF;
         USART3->CR1 &= ~USART_CR1_TCIE;
-        
+			
+				EncDrv_TimeoutCntUpdate();
         // 2. 切换到接收模式
         RS485_RX_ENABLE();
         
@@ -283,10 +341,12 @@ void EncDrv_TimeoutCheck(void)
     if (s_State == ENC_DRV_RX_WAIT) {
         uint16_t remaining = DMA_RX_CH->CNDTR;
         uint16_t received = s_ExpectedRxLen - remaining;
-        if (received >= s_ExpectedRxLen) {
-            EncDrv_StopDMA();
-            EncDrv_RxCompleteCallback(received);
-        }
+        
+        // 只要处在 RX_WAIT 状态进入本周期 (说明上一次请求的数据还没收完), 强制结束接收
+        EncDrv_StopDMA();
+        
+        // 如果一整个周期都没收够字节 (或者完全没收到), 作为超时/残缺包处理
+        EncDrv_RxCompleteCallback(received);
     }
 }
 

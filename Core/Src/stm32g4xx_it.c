@@ -25,6 +25,7 @@
 #include "uart_config.h"
 #include "modbus_function.h"
 #include "DigitalTube_Control.h"
+#include "delay_function.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,7 +45,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+extern volatile uint8_t Need_Reset_Board;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -335,6 +336,12 @@ void USART1_IRQHandler(void)
 		USART1->CR1 = USART1->CR1 & ~(USART_CR1_TCIE | USART_CR1_TE);	
 		EnableUARTReceive(&huart1);	
 		Usart1RxEnable();		
+	
+		if (Need_Reset_Board) {
+				Need_Reset_Board = 0;
+				HAL_Delay(2); 
+				PWR_CTRL_Enable(); // 数据发完了，安心复位！
+		}
 	}
 	// 空闲中断 (IDLE) - 一帧数据接收完成
 	else if(USART1->ISR & USART_ISR_IDLE){

@@ -142,6 +142,28 @@ EncoderFCTBoard/
 
 - 每个参数配置：符号(有符号/无符号)、显示进制(DEC/HEX/BIN)、位宽(16/32位)、范围限制
 
+**PA 参数表 (可读写, Flash 持久化)：**
+
+| 参数 | 功能 | 格式 | 范围 | 默认值 | 说明 |
+|------|------|------|------|--------|------|
+| PA000 | Modbus 从机地址 | DEC | 1~255 | 5 | |
+| PA001 | 波特率 / 100 | DEC | 12~1152 | 576 | 576=57600 |
+| PA002 | 校验位 | 文字 | 0~2 | 1(odd) | 显示 nonE / odd / EuEn |
+| PA003 | K1-K4 继电器 | BIN | b.0000~b.1111 | 0 | bit0=K1, bit3=K4 |
+| PA004 | K5-K8 继电器 | BIN | b.0000~b.1111 | 0 | bit0=K5, bit3=K8 |
+| PA005 | 恢复出厂设置 | DEC | 0~9999 | 0 | 输入 1234 触发恢复 |
+| PA010 | ReadReg 地址 | HEX | 0x0000~0xFFFF | 0 | 编码器寄存器读地址 |
+| PA011 | WriteReg 地址 | HEX | 0x0000~0xFFFF | 0 | 编码器寄存器写地址 |
+| PA012 | WriteReg 数据 | HEX | 0x0000~0xFFFF | 0 | 保存后立即写入 |
+
+**DP 参数表 (只读, 运行时更新)：**
+
+| 参数 | 功能 | 格式 | 说明 |
+|------|------|------|------|
+| DP000 | 固件版本 | DEC | 1.0 → 显示 10 |
+| DP001 | 继电器状态 | BIN | K1-K4 / K5-K8 分页, UP/DOWN 切换 |
+| DP010 | ReadReg 返回值 | HEX | 进入时自动读取 PA010 地址 |
+
 ### 8. Flash 存储 (`Flash_Storage`)
 
 | 文件 | 说明 |
@@ -151,12 +173,18 @@ EncoderFCTBoard/
 - 使用 Flash 末尾 2 页 (Page 126 + 127) 双页交替存储
 - 每条记录 256 字节 (Header 8B + Data 240B + Footer 8B)，每页 8 条
 - CRC32 校验，Magic 标识有效记录，Index 递增序列号
+- 加载返回值：0=成功, 1=Flash 为空(Err.10), 2=CRC 失败(Err.11)
 
 ### 9. 继电器控制 (`relay_control`)
 
 | 文件 | 说明 |
 | ---- | ---- |
 | `relay_control.h/c` | 8 路继电器开关控制 |
+
+- 支持单路控制 (On/Off/Toggle)、掩码控制 (SetByMask)、逐个测试 (Relay_Test)
+- Modbus 地址 `0x1000`：按位掩码控制 K1-K8
+- Modbus 地址 `0x1009`：继电器逐个测试
+- PA003/PA004：面板参数控制 K1-K4/K5-K8
 
 ### 10. IAP 功能 (`iap_function`)
 
@@ -178,7 +206,7 @@ EncoderFCTBoard/
 
 | 外设   | 用途               | 备注                          |
 | ------ | ------------------ | ----------------------------- |
-| USART1 | Modbus RTU 从机    | RS485, DMA 收发               |
+| USART1 | Modbus RTU 从机    | RS485, DMA 收发, PA 参数可配置波特率/校验 |
 | USART3 | 编码器通讯         | RS485 半双工, DMA TX/RX       |
 | TIM1   | 编码器通信调度定时  | 可配置周期 (默认 62.5μs)      |
 | SPI2   | 数码管驱动         | → 74AHC595D 移位寄存器        |
@@ -197,6 +225,8 @@ EncoderFCTBoard/
 | 0x04 | `WORK_ALARM_MODBUS_CRC` | Modbus CRC 错误 |
 | 0x05 | `WORK_ALARM_NO_ENC_TYPE` | 未设置编码器类型 |
 | 0x06 | `WORK_ALARM_SN_ERROR` | SN 错误 |
+| 10   | — | Flash 为空 (Err.10, 首次使用) |
+| 11   | — | Flash CRC 校验失败 (Err.11) |
 
 ---
 
@@ -218,6 +248,20 @@ EncoderFCTBoard/
 ---
 
 ## 更新日志
+
+### 2026-02-26
+- 新增 PA 参数 Modbus 通讯配置 (PA000 从机地址, PA001 波特率, PA002 校验位)
+- 新增 PA003/PA004 面板继电器控制 (二进制掩码)
+- 新增 PA005 恢复出厂设置 (输入 1234 触发)
+- 新增 PA010/PA011/PA012 编码器寄存器读写 (HEX)
+- 新增 DP000 固件版本显示
+- 新增 DP001 继电器状态显示 (K1-K4/K5-K8 分页, b 带点区分)
+- 新增 DP010 编码器寄存器读取返回值显示
+- PA002 数码管显示优化: nonE / odd / EuEn 文字替代数字
+- Flash 加载错误区分: Err.10(为空) / Err.11(CRC 失败)
+- DTC_SaveParams_Callback 改为按参数分发操作 (不再全局 ApplyConfig)
+- 优化 Flash_Storage / Parameter_Module / DigitalTube_Control 函数注释格式
+- 修复开机数码管闪 0 问题 (RawData 初始化为 SEG_OFF)
 
 ### 2026-02-25
 - 所有编码器 TX 函数统一使用 switch-case 风格

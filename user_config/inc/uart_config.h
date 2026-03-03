@@ -26,6 +26,7 @@ typedef struct{
   uint8_t  		TxData[Usart1TxSize];
   uint8_t  		RxData[Usart1RxSize];	
 	uint16_t    DataCnt;          // 接收到的数据长度
+	uint16_t    StringDataCnt;    // 字符串数据长度	
 	uint8_t     StringFlag;       // 字符串接收完成标志
 	strUsart1Tx Tx;
 } strUsart1;	

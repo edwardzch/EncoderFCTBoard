@@ -120,7 +120,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>竊?喑爓竊?喑爓竊?</Name>
+          <Name>喑Sw窱?喑Sw窱?</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -157,18 +157,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>232</LineNumber>
+          <LineNumber>220</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134270790</Address>
+          <Address>134250624</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\user_function\src\Encoder_MultiturnMag.c</Filename>
+          <Filename>..\user_function\src\encoder_driver.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\EncoderFCTBoard\../user_function/src/Encoder_MultiturnMag.c\232</Expression>
+          <Expression>\\EncoderFCTBoard\../user_function/src/encoder_driver.c\220</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -180,62 +180,52 @@
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>DTC_DMA_Buffer</ItemText>
+          <ItemText>PA_Buffer,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>PA_Data</ItemText>
+          <ItemText>DP_Buffer</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>PA_Buffer,0x0A</ItemText>
+          <ItemText>g_MulMag</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>testcnt</ItemText>
+          <ItemText>g_EncoderConfig,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>errcnt</ItemText>
+          <ItemText>g_MotorEncoder,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>DP_Buffer</ItemText>
+          <ItemText>Work_Alarm</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>g_MulMag</ItemText>
+          <ItemText>Usart1</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>g_EncoderConfig,0x0A</ItemText>
+          <ItemText>ModBus</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>g_MotorEncoder</ItemText>
+          <ItemText>s_State</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>test111</ItemText>
-        </Ww>
-        <Ww>
-          <count>11</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>s_ExpectedRxLen</ItemText>
-        </Ww>
-        <Ww>
-          <count>12</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Work_Alarm</ItemText>
+          <ItemText>EncDrvState_t</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
@@ -869,30 +859,6 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\user_function\src\Encoder_NXPMag.c</PathWithFileName>
-      <FilenameWithoutPath>Encoder_NXPMag.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>44</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\user_function\src\Encoder_SensAR.c</PathWithFileName>
-      <FilenameWithoutPath>Encoder_SensAR.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>45</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
       <PathWithFileName>..\user_function\src\Encoder_Tamagawa.c</PathWithFileName>
       <FilenameWithoutPath>Encoder_Tamagawa.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -900,7 +866,7 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
-      <FileNumber>46</FileNumber>
+      <FileNumber>44</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -912,7 +878,7 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
-      <FileNumber>47</FileNumber>
+      <FileNumber>45</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>

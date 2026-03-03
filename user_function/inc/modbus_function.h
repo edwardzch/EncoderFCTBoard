@@ -106,6 +106,7 @@ typedef struct{
 
 extern volatile strModBus   ModBus;
 void ModBus_SlaveRx(void);
+void Modbus_ApplyConfig(void);
 void Usart1_ReceiveStringHandler(void);
 void Usart1_SendStringHandler(void);
 

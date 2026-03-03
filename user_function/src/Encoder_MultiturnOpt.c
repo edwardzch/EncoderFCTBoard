@@ -4,8 +4,8 @@
  * @note      原文件 1530 行，包含 35 个函数。这是骨架实现，具体逻辑需要补充。
  ****************************************************************************************/
 #include "Encoder_MultiturnOpt.h"
-#include "Encoder_MultiturnMag.h"  // for MotorEncoder_t, Enc_CRC8
 #include "encoder_driver.h"
+#include "modbus_function.h"
 #include <string.h>
 
 // ================= 全局变量 =================
@@ -73,7 +73,7 @@ void MulOpt_TX(uint8_t cmd, uint8_t addr, uint8_t data)
             g_MulOpt.TxData[3] = 1;
             g_MulOpt.TxData[4] = data;
             g_MulOpt.TxData[5] = Enc_CRC8(g_MulOpt.TxData, 5);
-            EncDrv_SendDMA(g_MulOpt.TxData, 6, 4);
+            EncDrv_SendDMA(g_MulOpt.TxData, 6, 6);
             break;
             
         default:
@@ -82,6 +82,7 @@ void MulOpt_TX(uint8_t cmd, uint8_t addr, uint8_t data)
     
     if (g_MulOpt.TimeoutCnt > 5) {
         Work_Alarm = 0x01;
+        g_MulOpt.Error.bit.DC = 1;
     }
 }
 
@@ -120,12 +121,13 @@ void MulOpt_RxComplete(void)
                 g_MulOpt.CrcData = Enc_CRC8(g_MulOpt.RxData, 10);
                 crc_ok = (g_MulOpt.CrcData == g_MulOpt.RxData[10]);
                 if (!crc_ok) {
-                    g_MulOpt.CrcError = 1;
+                    g_MulOpt.Error.bit.EC = 1;
                     Work_Alarm = 0x02;
                     g_MulOpt.RxDataCnt = 0;
                     return;
                 }
                 g_MulOpt.TimeoutCnt = 0;
+                g_MulOpt.Error.bit.DC = 0;
                 g_MulOpt.RxID = cmd;
                 g_MulOpt.Status.all = g_MulOpt.RxData[1];
                 g_MulOpt.SingleTurnPosition = ((uint32_t)g_MulOpt.RxData[4] << 16) | 
@@ -133,8 +135,8 @@ void MulOpt_RxComplete(void)
                                               g_MulOpt.RxData[2];
                 g_MulOpt.ResolutionID = g_MulOpt.RxData[5];
                 g_MulOpt.MultiTurnPosition = ((uint16_t)g_MulOpt.RxData[7] << 8) | g_MulOpt.RxData[6];
-                g_MulOpt.Error = g_MulOpt.RxData[9];
-                g_MulOpt.CrcError = 0;
+                g_MulOpt.Alarm.all = g_MulOpt.RxData[9];
+                g_MulOpt.Error.bit.EC = 0;
             }
             break;
             
@@ -143,20 +145,22 @@ void MulOpt_RxComplete(void)
                 g_MulOpt.CrcData = Enc_CRC8(g_MulOpt.RxData, 5);
                 crc_ok = (g_MulOpt.CrcData == g_MulOpt.RxData[5]);
                 if (!crc_ok) {
-                    g_MulOpt.CrcError = 1;
+                    g_MulOpt.Error.bit.EC = 1;
                     Work_Alarm = 0x02;
                     g_MulOpt.RxDataCnt = 0;
                     return;
                 }
                 g_MulOpt.TimeoutCnt = 0;
+                g_MulOpt.Error.bit.DC = 0;
                 g_MulOpt.RxID = cmd;
-                g_MulOpt.CrcError = 0;
+                g_MulOpt.Error.bit.EC = 0;
             }
             break;
             
         case 0x25:
             if (g_MulOpt.RxDataCnt >= 8) {
                 g_MulOpt.TimeoutCnt = 0;
+                g_MulOpt.Error.bit.DC = 0;
                 g_MulOpt.RxID = cmd;
                 g_MulOpt.Hall = (g_MulOpt.RxData[5] >> 4) & 0x0F;
                 g_MulOpt.MTAB = g_MulOpt.RxData[5] & 0x0F;
@@ -166,16 +170,144 @@ void MulOpt_RxComplete(void)
         case 0x3D:
             if (g_MulOpt.RxDataCnt >= 6) {
                 g_MulOpt.TimeoutCnt = 0;
+                g_MulOpt.Error.bit.DC = 0;
                 g_MulOpt.RxID = cmd;
-                g_MulOpt.Battery = ((uint16_t)g_MulOpt.RxData[2] << 8) | g_MulOpt.RxData[1];
-                g_MulOpt.Temperature = ((uint16_t)g_MulOpt.RxData[4] << 8) | g_MulOpt.RxData[3];
+							  g_MulOpt.Temperature = g_MulOpt.RxData[3];
+                g_MulOpt.Battery = g_MulOpt.RxData[4];
             }
             break;
             
         case 0x6D:
             if (g_MulOpt.RxDataCnt >= 6) {
+                g_MulOpt.CrcData = Enc_CRC8(g_MulOpt.RxData, 5);
+                if (g_MulOpt.CrcData != g_MulOpt.RxData[5]) {
+                    g_MulOpt.Error.bit.EC = 1; 
+                    Work_Alarm = 0x02;
+                    g_MulOpt.RxDataCnt = 0;
+                    return;
+                }
                 g_MulOpt.TimeoutCnt = 0;
+                g_MulOpt.Error.bit.DC = 0;
                 g_MulOpt.RxID = cmd;
+                g_MulOpt.Status0x6D = g_MulOpt.RxData[4];
+                g_MulOpt.Error.bit.EC = 0;
+            }
+            break;
+            
+        case 0xEA:
+            if (g_MulOpt.RxDataCnt == 4) {
+                g_MulOpt.CrcData = Enc_CRC8(g_MulOpt.RxData, 3);
+                if (g_MulOpt.CrcData != g_MulOpt.RxData[3]) {
+                    g_MulOpt.Error.bit.EC = 1; 
+                    Work_Alarm = 0x02;
+                    g_MulOpt.RxDataCnt = 0;
+                    return;
+                }
+                g_MulOpt.TimeoutCnt = 0;
+                g_MulOpt.Error.bit.DC = 0;
+                g_MulOpt.RxID = cmd;
+                
+                g_MulOpt.EepromAddr = g_MulOpt.RxData[1] & 0x7F;
+                if (g_MulOpt.EepromAddr == 0x7F) {
+                    g_MulOpt.EepromPage = g_MulOpt.RxData[2];
+                    g_MulOpt.EepromData[g_MulOpt.EepromPage][g_MulOpt.EepromAddr] = g_MulOpt.RxData[2];
+                } else if (g_MulOpt.EepromAddr < 0x7F) {
+                    g_MulOpt.EepromData[g_MulOpt.EepromPage][g_MulOpt.EepromAddr] = g_MulOpt.RxData[2];
+                }
+                g_MulOpt.Error.bit.EC = 0;
+            }
+            break;
+            
+        case 0x32:
+            if (g_MulOpt.RxDataCnt == 4) {
+                g_MulOpt.CrcData = Enc_CRC8(g_MulOpt.RxData, 3);
+                if (g_MulOpt.CrcData != g_MulOpt.RxData[3]) {
+                    g_MulOpt.Error.bit.EC = 1; 
+                    Work_Alarm = 0x02;
+                    g_MulOpt.RxDataCnt = 0;
+                    return;
+                }
+                g_MulOpt.TimeoutCnt = 0;
+                g_MulOpt.Error.bit.DC = 0;
+                g_MulOpt.RxID = cmd;
+                
+                g_MulOpt.EepromAddr = g_MulOpt.RxData[1];
+                g_MulOpt.EepromData[g_MulOpt.EepromPage][g_MulOpt.EepromAddr] = g_MulOpt.RxData[2];
+                g_MulOpt.Error.bit.EC = 0;
+            }
+            break;
+            
+        case 0x85:
+            if (g_MulOpt.RxDataCnt == 12) {
+                g_MulOpt.CrcData = Enc_CRC8(g_MulOpt.RxData, 11);
+                if (g_MulOpt.CrcData != g_MulOpt.RxData[11]) {
+                    g_MulOpt.Error.bit.EC = 1; 
+                    Work_Alarm = 0x02;
+                    g_MulOpt.RxDataCnt = 0;
+                    return;
+                }
+                g_MulOpt.TimeoutCnt = 0;
+                g_MulOpt.Error.bit.DC = 0;
+                g_MulOpt.RxID = cmd;
+                g_MulOpt.HallSector = (g_MulOpt.RxData[10] & 0x30) >> 4;
+                g_MulOpt.MTABSector = (g_MulOpt.RxData[10] & 0x03);
+                g_MulOpt.Error.bit.EC = 0;
+            }
+            break;
+            
+        case 0xAD:
+            {
+                uint8_t dnum = g_MulOpt.RxData[3];
+                uint8_t expected_len = 5 + dnum;
+                if (g_MulOpt.RxDataCnt >= expected_len) {
+                    g_MulOpt.CrcData = Enc_CRC8(g_MulOpt.RxData, expected_len - 1);
+                    crc_ok = (g_MulOpt.CrcData == g_MulOpt.RxData[expected_len - 1]);
+                    if (!crc_ok) {
+                        g_MulOpt.Error.bit.EC = 1;
+                        Work_Alarm = 0x02;
+                        g_MulOpt.RxDataCnt = 0;
+                        return;
+                    }
+                    g_MulOpt.TimeoutCnt = 0;
+                    g_MulOpt.Error.bit.DC = 0;
+                    g_MulOpt.RxID = cmd;
+                    uint8_t page = g_MulOpt.RxData[1];
+                    uint8_t addr = g_MulOpt.RxData[2];
+                    if (page < MULOPT_PAGE_NUMBER) {
+                        for (uint8_t i = 0; i < dnum && (addr + i) < MULOPT_EEPROM_ADDR; i++) {
+                            g_MulOpt.EepromData[page][addr + i] = g_MulOpt.RxData[4 + i];
+                        }
+                    }
+                    g_MulOpt.Error.bit.EC = 0;
+                }
+            }
+            break;
+            
+        case 0x35:
+            {
+                uint8_t dnum = g_MulOpt.RxData[3];
+                uint8_t expected_len = 5 + dnum;
+                if (g_MulOpt.RxDataCnt >= expected_len) {
+                    g_MulOpt.CrcData = Enc_CRC8(g_MulOpt.RxData, expected_len - 1);
+                    crc_ok = (g_MulOpt.CrcData == g_MulOpt.RxData[expected_len - 1]);
+                    if (!crc_ok) {
+                        g_MulOpt.Error.bit.EC = 1;
+                        Work_Alarm = 0x02;
+                        g_MulOpt.RxDataCnt = 0;
+                        return;
+                    }
+                    g_MulOpt.TimeoutCnt = 0;
+                    g_MulOpt.Error.bit.DC = 0;
+                    g_MulOpt.RxID = cmd;
+                    uint8_t page = g_MulOpt.RxData[1];
+                    uint8_t addr = g_MulOpt.RxData[2];
+                    if (page < MULOPT_PAGE_NUMBER) {
+                        for (uint8_t i = 0; i < dnum && (addr + i) < MULOPT_EEPROM_ADDR; i++) {
+                            g_MulOpt.EepromData[page][addr + i] = g_MulOpt.RxData[4 + i];
+                        }
+                    }
+                    g_MulOpt.Error.bit.EC = 0;
+                }
             }
             break;
             
@@ -221,9 +353,9 @@ void MulOpt_Test(uint8_t testItem)
             break;
             
         case MulOpt_Test_Initialize:
-            if (g_MulOpt.CFced < 5) {
+            if (g_MulOpt.CFCED < 5) {
                 MulOpt_TX(0x6D, 0x00, 0x00);
-                g_MulOpt.CFced++;
+                g_MulOpt.CFCED++;
             } else {
                 g_MotorEncoder.TestItem = MulOpt_Test_Stop;
             }
@@ -265,18 +397,22 @@ uint8_t MulOpt_Modbus_IsMyAddr(uint16_t addr)
 uint16_t MulOpt_Modbus_Read(uint16_t addr)
 {
     switch (addr) {
-        case 0x0300: return g_MulOpt.MTAB;
-        case 0x0301: return g_MulOpt.Hall;
-        case 0x0302: return g_MulOpt.Status.all;
-        case 0x0303: return g_MulOpt.HallResult;
-        case 0x0304: return g_MulOpt.Error;
-        case 0x0305: return g_MulOpt.ResolutionID;
-        case 0x0306: return g_MulOpt.EepromData[3][20];  // HW 版本
-        case 0x0307: return g_MulOpt.EepromData[3][21];
-        case 0x0308: return g_MulOpt.EepromData[3][22];
-        case 0x0309: return g_MulOpt.EepromData[3][23];
+        case 0x0300: return g_MulOpt.MTABSector;
+        case 0x0301: return g_MulOpt.HallSector;
+        case 0x0302: return g_MulOpt.Status0x6D;
+        case 0x0303: return g_MulOpt.EepromData[2][0];
+        case 0x0304: return g_MulOpt.Status.all;
+        case 0x0305: return g_MulOpt.Alarm.all;
+        case 0x0306: return g_MulOpt.EepromData[0x03][0x14];
+        case 0x0307: return g_MulOpt.EepromData[0x03][0x15];
+        case 0x0308: return g_MulOpt.EepromData[0x03][0x16];
+        case 0x0309: return g_MulOpt.EepromData[0x03][0x17];
         case 0x030A: return g_MulOpt.Battery;
         case 0x030B: return g_MulOpt.Temperature;
+        case 0x030C: return g_MulOpt.EepromData[0x02][0x68];  // FCT年
+        case 0x030D: return g_MulOpt.EepromData[0x02][0x69];  // FCT月
+        case 0x030E: return g_MulOpt.EepromData[0x02][0x6A];  // FCT日
+        case 0x030F: return g_MulOpt.EepromData[0x02][0x6B];  // FCT时
         case 0x0310: return g_MulOpt.MSinMax;
         case 0x0311: return g_MulOpt.MCosMax;
         case 0x0312: return g_MulOpt.NSinMax;
@@ -289,9 +425,31 @@ uint16_t MulOpt_Modbus_Read(uint16_t addr)
         case 0x0319: return g_MulOpt.NCos;
         case 0x031A: return g_MulOpt.SSin;
         case 0x031B: return g_MulOpt.SCos;
-        case 0x031C: return g_MulOpt.LightIntensity;
-        case 0x032C: return g_MulOpt.DACValue;
-        default: return 0xFFFF;
+        case 0x031C: return g_MulOpt.LEDTestDACResult;
+        case 0x031D: return g_MulOpt.InternalAlarm1;
+        case 0x031E: return g_MulOpt.InternalAlarm2;
+        case 0x031F: return g_MulOpt.InternalAlarm3;
+        case 0x0320:
+            g_MulOpt.HallSector = ((g_MulOpt.HallBuffer[0] << 12) | (g_MulOpt.HallBuffer[1] << 8) | (g_MulOpt.HallBuffer[2] << 4) | g_MulOpt.HallBuffer[3]) & 0xFFFF;
+            return g_MulOpt.HallSector;
+        case 0x0321:
+            g_MulOpt.MTABSector = ((g_MulOpt.MTABBuffer[0] << 12) | (g_MulOpt.MTABBuffer[1] << 8) | (g_MulOpt.MTABBuffer[2] << 4) | g_MulOpt.MTABBuffer[3]) & 0xFFFF;
+            return g_MulOpt.MTABSector;
+        case 0x0322: return (g_MulOpt.HallResult << 1) | g_MulOpt.MTABResult;
+        case 0x0323: return (g_MulOpt.MSin > g_MulOpt.MCos) ? (g_MulOpt.MSin - g_MulOpt.MCos) : (g_MulOpt.MCos - g_MulOpt.MSin);
+        case 0x0324: return (g_MulOpt.NSin > g_MulOpt.NCos) ? (g_MulOpt.NSin - g_MulOpt.NCos) : (g_MulOpt.NCos - g_MulOpt.NSin);
+        case 0x0325: return (g_MulOpt.SSin > g_MulOpt.SCos) ? (g_MulOpt.SSin - g_MulOpt.SCos) : (g_MulOpt.SCos - g_MulOpt.SSin);
+        case 0x0326: return g_MulOpt.MFeedbackSpeed;
+        case 0x0330: return g_MulOpt.HallResult;
+        case 0x0331: return g_MulOpt.MTABCheck;
+        case 0x0332: return g_MulOpt.MTABGlitchCnt;
+        case 0x0333: return g_MulOpt.MTABJitterCnt;
+        case 0x0334: return g_MulOpt.MTABCountErrCnt;
+        case 0x0335: return g_MulOpt.MTABCountErrCnt;
+        case 0x0336: return g_MulOpt.MNSAnalogSyncResult;
+        default:
+            Communication_Address_Error();
+            return 0xFFFF;
     }
 }
 
@@ -305,34 +463,86 @@ uint16_t MulOpt_Modbus_Read(uint16_t addr)
 uint8_t MulOpt_Modbus_Write(uint16_t addr, uint16_t value)
 {
     switch (addr) {
-        case 0x0300:
+        case 0x0300:  // 读取 EEPROM
             if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_ReadAllEeprom;
             return 0;
-        case 0x0301:
+        case 0x0301:  // 编码器初始化
             if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_Initialize;
             return 0;
-        case 0x0302:
-            if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_Hall;
+        case 0x0302:  // 6路模拟信号采集
+            if (value == 1) {
+                g_MulOpt.Flag.bit.AMD = 1;
+                g_MotorEncoder.TestItem = MulOpt_Test_AnalogData;
+            }
             return 0;
-        case 0x0303:
-            if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_WriteResult;
+        case 0x0303:  // 写入测试结果 (value==1或==9)
+            if (value == 1) {
+                g_MulOpt.TestResult = (uint8_t)value;
+                g_MotorEncoder.TestItem = MulOpt_Test_WriteResult;
+            } else if (value == 9) {
+                g_MulOpt.TestResult = (uint8_t)value;
+                g_MotorEncoder.TestItem = MulOpt_Test_WriteResult;
+            }
             return 0;
-        case 0x0304:
+        case 0x0304:  // 获取全部数据
             if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_GetAllData;
             return 0;
-        case 0x0305:
+        case 0x0305:  // 多圈复位
             if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_MultiturnReset;
             return 0;
-        case 0x0306:
+        case 0x0306:  // 电池电压/温度
             if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_TB;
             return 0;
-        case 0x0307:
+        case 0x0307:  // 打开内部协议
             if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_OIP;
             return 0;
-        case 0x0308:
+        case 0x0308:  // 关闭内部协议
             if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_CIP;
             return 0;
+        case 0x0309:  // 设置 DAC
+            g_MulOpt.LEDTestDAC = value;
+            g_MulOpt.Flag.bit.AMD = 0;
+            g_MotorEncoder.TestItem = MulOpt_Test_DAC;
+            return 0;
+        case 0x030A:  // 光强度测试
+            if (value == 1) {
+                g_MulOpt.Flag.bit.LedDac = 1;
+                g_MotorEncoder.TestItem = MulOpt_Test_LightIntensity;
+            }
+            return 0;
+        case 0x030B:  // 读取内部报警
+            if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_ReadInternalAlarm;
+            return 0;
+        case 0x030C:  // RMRNRS 初始化
+            if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_RMRNRSInitialize;
+            return 0;
+        case 0x030D:  // 写入硬件版本
+            g_MotorEncoder.HWRevData = (uint8_t)value;
+            g_MotorEncoder.TestItem = MulOpt_Test_WriteHWRev;
+            return 0;
+        case 0x030E:  // 设置 MTAB/HALL 扇区标志
+            g_MulOpt.Flag.bit.MTABHALL = (uint8_t)value;
+            return 0;
+        case 0x030F:  // MTAB/HALL 扇区测试
+            if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_Sector;
+            return 0;
+        case 0x0310:  // MNS 位置读取
+            if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_MNSPosition;
+            return 0;
+        case 0x0311:  // 记录 M 位置
+            if (value == 1) g_MulOpt.MPositionFlag++;
+            return 0;
+        case 0x0312:  // MNS 模拟最大值检测
+            if (value == 1) {
+                g_MulOpt.Flag.bit.AMD = 2;
+                g_MotorEncoder.TestItem = MulOpt_Test_MNSAnalogMaxCheck;
+            }
+            return 0;
+        case 0x0313:  // 读取模拟数据
+            if (value == 1) g_MotorEncoder.TestItem = MulOpt_Test_ReadAnalogData;
+            return 0;
         default:
+            Communication_Address_Error();
             return 1;
     }
 }

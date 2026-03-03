@@ -3,8 +3,8 @@
  * @brief     MGT 磁编码器协议框架 (移植自 MGTMagneticEncoder.c, 33KB)
  ****************************************************************************************/
 #include "Encoder_MGTMag.h"
-#include "Encoder_MultiturnMag.h"  // for MotorEncoder_t, Enc_CRC8
 #include "encoder_driver.h"
+#include "modbus_function.h"
 #include <string.h>
 
 // ================= 全局变量 =================
@@ -41,12 +41,7 @@ void MGT_TX(uint8_t cmd, uint16_t addr, uint8_t data)
         case 0x1A:  // 读取全部数据
             EncDrv_SendDMA(g_MGT.TxData, 1, 11);
             break;
-        case 0x25:  // Hall 读取
-            EncDrv_SendDMA(g_MGT.TxData, 1, 8);
-            break;
         case 0x62:  // 多圈复位
-        case 0x75:  // 报警读取
-        case 0x3D:  // 电池/温度
             EncDrv_SendDMA(g_MGT.TxData, 1, 6);
             break;
             
@@ -69,31 +64,13 @@ void MGT_TX(uint8_t cmd, uint16_t addr, uint8_t data)
             EncDrv_SendDMA(g_MGT.TxData, 5, 6);
             break;
             
-        case 0xAD:  // 批量读 EEPROM
-
-            g_MGT.TxData[1] = g_MGT.EepromPage;
-            g_MGT.TxData[2] = 0x00;
-            g_MGT.TxData[3] = 0x80;
-            g_MGT.TxData[4] = Enc_CRC8(g_MGT.TxData, 4);
-            EncDrv_SendDMA(g_MGT.TxData, 5, 0x80 + 5);
-            break;
-            
-        case 0x35:  // 批量写 EEPROM
-
-            g_MGT.TxData[1] = g_MGT.EepromPage;
-            g_MGT.TxData[2] = (uint8_t)addr;
-            g_MGT.TxData[3] = 1;
-            g_MGT.TxData[4] = data;
-            g_MGT.TxData[5] = Enc_CRC8(g_MGT.TxData, 5);
-            EncDrv_SendDMA(g_MGT.TxData, 6, 4);
-            break;
-            
         default:
             break;
     }
     
     if (g_MGT.TimeoutCnt > 5) {
         Work_Alarm = 0x01;
+        g_MGT.Error.bit.DC = 1;
     }
 }
 
@@ -132,12 +109,13 @@ void MGT_RxComplete(void)
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 10);
                 crc_ok = (g_MGT.CrcData == g_MGT.RxData[10]);
                 if (!crc_ok) {
-                    g_MGT.CrcError = 1;
+                    g_MGT.Error.bit.EC = 1;
                     Work_Alarm = 0x02;
                     g_MGT.RxDataCnt = 0;
                     return;
                 }
                 g_MGT.TimeoutCnt = 0;
+                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.Status = g_MGT.RxData[1];
                 g_MGT.SingleTurnPosition = ((uint32_t)g_MGT.RxData[4] << 16) | 
@@ -145,8 +123,8 @@ void MGT_RxComplete(void)
                                            g_MGT.RxData[2];
                 g_MGT.ResolutionID = g_MGT.RxData[5];
                 g_MGT.MultiTurnPosition = ((uint16_t)g_MGT.RxData[7] << 8) | g_MGT.RxData[6];
-                g_MGT.Error = g_MGT.RxData[9];
-                g_MGT.CrcError = 0;
+                g_MGT.Alarm = g_MGT.RxData[9];
+                g_MGT.Error.bit.EC = 0;
             }
             break;
             
@@ -155,42 +133,122 @@ void MGT_RxComplete(void)
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 5);
                 crc_ok = (g_MGT.CrcData == g_MGT.RxData[5]);
                 if (!crc_ok) {
-                    g_MGT.CrcError = 1;
+                    g_MGT.Error.bit.EC = 1;
                     Work_Alarm = 0x02;
                     g_MGT.RxDataCnt = 0;
                     return;
                 }
                 g_MGT.TimeoutCnt = 0;
+                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxID = cmd;
-                g_MGT.CrcError = 0;
-            }
-            break;
-            
-        case 0x25:
-            if (g_MGT.RxDataCnt >= 8) {
-                g_MGT.TimeoutCnt = 0;
-                g_MGT.RxID = cmd;
-                g_MGT.Hall[0] = (g_MGT.RxData[5] >> 4) & 0x0F;
-                g_MGT.Hall[1] = g_MGT.RxData[5] & 0x0F;
-                g_MGT.Hall[2] = (g_MGT.RxData[6] >> 4) & 0x0F;
-                g_MGT.Hall[3] = g_MGT.RxData[6] & 0x0F;
-            }
-            break;
-            
-        case 0x3D:
-            if (g_MGT.RxDataCnt >= 6) {
-                g_MGT.TimeoutCnt = 0;
-                g_MGT.RxID = cmd;
-                g_MGT.Battery = ((uint16_t)g_MGT.RxData[2] << 8) | g_MGT.RxData[1];
-                g_MGT.Temperature = ((uint16_t)g_MGT.RxData[4] << 8) | g_MGT.RxData[3];
+                g_MGT.Error.bit.EC = 0;
             }
             break;
             
         case 0x6D:
             if (g_MGT.RxDataCnt >= 6) {
                 g_MGT.TimeoutCnt = 0;
+                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.Status0x6D = g_MGT.RxData[4];
+            }
+            break;
+            
+        case 0xEA:
+            if (g_MGT.RxDataCnt == 4) {
+                g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 3);
+                if (g_MGT.CrcData != g_MGT.RxData[3]) {
+                    g_MGT.Error.bit.EC = 1; 
+                    Work_Alarm = 0x02;
+                    g_MGT.RxDataCnt = 0;
+                    return;
+                }
+                g_MGT.TimeoutCnt = 0;
+                g_MGT.Error.bit.DC = 0;
+                g_MGT.RxID = cmd;
+                
+                g_MGT.EepromParams.ReturnAddress = g_MGT.RxData[1] & 0x7F;
+                if (g_MGT.EepromParams.ReturnAddress == 0x7F) {
+                    g_MGT.EepromParams.ReturnPage = g_MGT.RxData[2];
+                    g_MGT.EepromData[g_MGT.EepromParams.ReturnPage][g_MGT.EepromParams.ReturnAddress] = g_MGT.RxData[2];
+                } else if (g_MGT.EepromParams.ReturnAddress < 0x7F) {
+                    g_MGT.EepromData[g_MGT.EepromParams.ReturnPage][g_MGT.EepromParams.ReturnAddress] = g_MGT.RxData[2];
+                }
+                g_MGT.Error.bit.EC = 0;
+            }
+            break;
+            
+        case 0x32:
+            if (g_MGT.RxDataCnt == 4) {
+                g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 3);
+                if (g_MGT.CrcData != g_MGT.RxData[3]) {
+                    g_MGT.Error.bit.EC = 1; 
+                    Work_Alarm = 0x02;
+                    g_MGT.RxDataCnt = 0;
+                    return;
+                }
+                g_MGT.TimeoutCnt = 0;
+                g_MGT.Error.bit.DC = 0;
+                g_MGT.RxID = cmd;
+                
+                g_MGT.EepromParams.ReturnAddress = g_MGT.RxData[1] & 0x7F;
+                if (g_MGT.EepromParams.ReturnAddress == 0x7F) {
+                    g_MGT.EepromParams.ReturnPage = g_MGT.RxData[2];
+                    g_MGT.EepromData[g_MGT.EepromParams.ReturnPage][g_MGT.EepromParams.ReturnAddress] = g_MGT.RxData[2];
+                } else if (g_MGT.EepromParams.ReturnAddress < 0x7F) {
+                    g_MGT.EepromData[g_MGT.EepromParams.ReturnPage][g_MGT.EepromParams.ReturnAddress] = g_MGT.RxData[2];
+                }
+                g_MGT.Error.bit.EC = 0;
+            }
+            break;
+            
+        case 0x40:
+            if (g_MGT.RxDataCnt >= 3) {
+                switch (g_MGT.RxData[1]) {
+                    case 0x10:
+                        if (g_MGT.RxDataCnt == 7) {
+                            g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 6);
+                            if (g_MGT.CrcData != g_MGT.RxData[6]) {
+                                g_MGT.Error.bit.EC = 1;
+                                Work_Alarm = 0x02;
+                                g_MGT.RxDataCnt = 0;
+                                return;
+                            }
+                            g_MGT.TimeoutCnt = 0;
+                            g_MGT.Error.bit.DC = 0;
+                            g_MGT.RxID = cmd;
+                            // Dummy map Firmware parsing
+                            g_MGT.Error.bit.EC = 0;
+                        }
+                        break;
+                    case 0x45:
+                        if (g_MGT.RxDataCnt == 4) {
+                            g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 3);
+                            if (g_MGT.CrcData != g_MGT.RxData[3]) {
+                                g_MGT.Error.bit.EC = 1;
+                                Work_Alarm = 0x02;
+                                g_MGT.RxDataCnt = 0;
+                                return;
+                            }
+                            g_MGT.TimeoutCnt = 0;
+                            g_MGT.ResolutionID = g_MGT.RxData[2];
+                            g_MGT.Error.bit.EC = 0;
+                        }
+                        break;
+                    case 0x46:
+                        if (g_MGT.RxDataCnt == 3) {
+                            if (g_MGT.RxData[2] != 0xF0) {
+                                g_MGT.Error.bit.EC = 1;
+                                Work_Alarm = 0x02;
+                            } else {
+                                g_MGT.TimeoutCnt = 0;
+                                g_MGT.Error.bit.EC = 0;
+                            }
+                            g_MGT.RxDataCnt = 0;
+                            return;
+                        }
+                        break;
+                }
             }
             break;
             
@@ -236,22 +294,12 @@ void MGT_Test(uint8_t testItem)
             break;
             
         case MGT_Test_Initialize:
-            if (g_MGT.CFced < 5) {
+            if (g_MGT.CFCED < 5) {
                 MGT_TX(0x6D, 0x00, 1);  // ced
-                g_MGT.CFced++;
+                g_MGT.CFCED++;
             } else {
                 g_MotorEncoder.TestItem = MGT_Test_Stop;
             }
-            break;
-            
-        case MGT_Test_Hall:
-            MGT_TX(0x25, 0x00, 0x00);
-            if (g_MGT.CF25 < 100) g_MGT.CF25++;
-            break;
-            
-        case MGT_Test_TB:
-            MGT_TX(0x3D, 0x00, 0x00);
-            g_MotorEncoder.TestItem = MGT_Test_Stop;
             break;
             
         case MGT_Test_OIP:
@@ -295,15 +343,18 @@ uint8_t MGT_Modbus_IsMyAddr(uint16_t addr)
 uint16_t MGT_Modbus_Read(uint16_t addr)
 {
     switch (addr) {
-        case 0x0400: return g_MGT.HallResult;
+        case 0x0400: return g_MotorEncoder.TestItem;
         case 0x0401: return g_MotorEncoder.ActualSpeed;
-        case 0x0402: return g_MGT.Status0x6D;
-        case 0x0403: return g_MGT.EepromData[2][0];
-        case 0x0404: return g_MGT.Status;
-        case 0x0405: return g_MGT.Error;
-        case 0x040A: return g_MGT.Battery;
-        case 0x040B: return g_MGT.Temperature;
-        default: return 0xFFFF;
+        case 0x0402: return g_MGT.EepromData[0][0x6F];
+        case 0x0403: return g_MGT.EepromData[0][0x70];
+        case 0x0404: return g_MGT.FW;
+        case 0x0405: return g_MGT.EepromData[g_MGT.EepromParams.ReturnPage][g_MGT.EepromParams.ReturnAddress];
+        case 0x0406: return g_MGT.EepromParams.Data;
+        case 0x0407: return (uint16_t)(g_MGT.Firmware & 0xFFFF);
+        case 0x0408: return g_MGT.ResolutionID;
+        default:
+            Communication_Address_Error();
+            return 0xFFFF;
     }
 }
 
@@ -324,27 +375,71 @@ uint8_t MGT_Modbus_Write(uint16_t addr, uint16_t value)
             if (value == 1) g_MotorEncoder.TestItem = MGT_Test_Initialize;
             return 0;
         case 0x0402:
-            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_Hall;
+            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_Speed;
             return 0;
         case 0x0403:
-            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_WriteResult;
+            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_FirmwareVersion;
             return 0;
         case 0x0404:
-            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_GetAllData;
+            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_WriteAllEeprom;
             return 0;
         case 0x0405:
-            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_MultiturnReset;
+            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_GetAllData;
             return 0;
         case 0x0406:
-            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_TB;
+            g_MGT.EepromParams.SetAddress = value >> 8;
+            g_MGT.EepromParams.Data = value & 0xFF;
+            g_MotorEncoder.TestItem = MGT_Test_Command0x32;
             return 0;
         case 0x0407:
-            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_OIP;
+            g_MGT.EepromParams.SetAddress = value >> 8;
+            g_MotorEncoder.TestItem = MGT_Test_Command0xEA;
             return 0;
         case 0x0408:
+            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_OIP;
+            return 0;
+        case 0x0409:
             if (value == 1) g_MotorEncoder.TestItem = MGT_Test_CIP;
             return 0;
+        case 0x040A:
+            g_MGT.EepromParams.Address = value & 0xFF;
+            return 0;
+        case 0x040B:
+            g_MGT.EepromParams.Data = value >> 8;
+            g_MotorEncoder.TestItem = MGT_Test_Command0x7A;
+            return 0;
+        case 0x040C:
+            g_MGT.EepromParams.Address = value & 0xFF;
+            g_MotorEncoder.TestItem = MGT_Test_Command0xA2;
+            return 0;
+        case 0x040D:
+            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_Firmware;
+            return 0;
+        case 0x040E:
+            g_MotorEncoder.SetResolutionID = (uint8_t)value;
+            g_MotorEncoder.TestItem = MGT_Test_SetResolution;
+            return 0;
+        case 0x040F:
+            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_ReadResolution;
+            return 0;
+        case 0x0410:
+            if (value == 1) {
+                // g_MotorEncoder.HWRevAddr = 0x030D;
+                // g_MGT.EepromParams.Status.bit.Write = 1;
+                g_MotorEncoder.TestItem = MGT_Test_WriteHWRev;
+            }
+            return 0;
+        case 0x0411:
+            if (value == 1) {
+                // g_MotorEncoder.HWRevAddr = 0x030D;
+                g_MotorEncoder.TestItem = MGT_Test_ReadHWRev;
+            }
+            return 0;
+        case 0x0412:
+            if (value == 1) g_MotorEncoder.TestItem = MGT_Test_Timeout;
+            return 0;
         default:
+            Communication_Address_Error();
             return 1;
     }
 }

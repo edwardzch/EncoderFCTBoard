@@ -11,9 +11,8 @@
 #include "Encoder_MultiturnMag.h"
 #include "Encoder_MultiturnOpt.h"
 #include "Encoder_MGTMag.h"
-#include "Encoder_NXPMag.h"
 #include "Encoder_Tamagawa.h"
-#include "Encoder_SensAR.h"
+#include "encoder_driver.h"
 #include "tim.h"
 #include <string.h>
 
@@ -39,23 +38,14 @@ void Encoder_DispatchTest(void)
             MGT_Test(g_MotorEncoder.TestItem);
             break;
             
-        case ENC_TYPE_NXP_MAG:
-            NXP_Test(g_MotorEncoder.TestItem);
-            break;
-            
         case ENC_TYPE_TAMAGAWA:
             Tmgw_Test(g_MotorEncoder.TestItem);
-            break;
-            
-        case ENC_TYPE_SENSAR:
-            if (g_SensAR.CycleFlag) {
-                SensAR_Test(g_SensAR.TestContent);
-            }
             break;
             
         default:
             break;
     }
+    g_EncoderConfig.CurrentTest = (TestItem_t)g_MotorEncoder.TestItem;
 }
 
 /****************************************************************************************
@@ -69,7 +59,7 @@ void Encoder_DispatchRx(uint8_t *data, uint16_t len)
 {
     switch (g_EncoderConfig.Type) {
         case ENC_TYPE_MULTITURN_MAG:
-            memcpy(g_MulMag.RxData, data, len);
+            memcpy((uint8_t *)g_MulMag.RxData, data, len);
             g_MulMag.RxDataCnt = len;
             MulMag_RxComplete();
             break;
@@ -86,22 +76,10 @@ void Encoder_DispatchRx(uint8_t *data, uint16_t len)
             MGT_RxComplete();
             break;
             
-        case ENC_TYPE_NXP_MAG:
-            memcpy(g_NXP.RxData, data, len);
-            g_NXP.RxDataCnt = len;
-            NXP_RxComplete();
-            break;
-            
         case ENC_TYPE_TAMAGAWA:
             memcpy(g_Tmgw.RxData, data, len);
             g_Tmgw.RxDataCnt = len;
             Tmgw_RxComplete();
-            break;
-            
-        case ENC_TYPE_SENSAR:
-            memcpy(g_SensAR.RxData, data, len);
-            g_SensAR.RxDataCnt = len;
-            SensAR_RxComplete();
             break;
             
         default:
@@ -122,7 +100,6 @@ static uint32_t Encoder_GetSingleTurnPos(void)
         case ENC_TYPE_MULTITURN_MAG: return g_MulMag.SingleTurnPos;
         case ENC_TYPE_MULTITURN_OPT: return g_MulOpt.SingleTurnPosition;
         case ENC_TYPE_MGT_MAG:       return g_MGT.SingleTurnPosition;
-        case ENC_TYPE_NXP_MAG:       return g_NXP.SingleTurnPosition;
         case ENC_TYPE_TAMAGAWA:      return g_Tmgw.SingleTurnPosition;
         default: return 0;
     }
@@ -141,7 +118,6 @@ static uint8_t Encoder_GetResolutionBits(void)
         case ENC_TYPE_MULTITURN_MAG: return g_MulMag.ResolutionID;
         case ENC_TYPE_MULTITURN_OPT: return g_MulOpt.ResolutionID;
         case ENC_TYPE_MGT_MAG:       return g_MGT.ResolutionID;
-        case ENC_TYPE_NXP_MAG:       return g_NXP.ResolutionID;
         case ENC_TYPE_TAMAGAWA:      return g_Tmgw.ResolutionID;
         default: return 0;
     }
@@ -157,11 +133,13 @@ static uint8_t Encoder_GetResolutionBits(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim->Instance == TIM1) {
+        // 先检查上周期的接收是否超时未完成
+        EncDrv_TimeoutCheck();
+        
         Encoder_DispatchTest();
         
         // 速度计算 (SensAR 无单圈位置, 跳过)
-        if (g_EncoderConfig.Type != ENC_TYPE_NONE && 
-            g_EncoderConfig.Type != ENC_TYPE_SENSAR) {
+        if (g_EncoderConfig.Type != ENC_TYPE_NONE) {
             // 自动检测编码器报告的分辨率, 动态更新 SpeedCalc
             uint8_t res_bits = Encoder_GetResolutionBits();
             if (res_bits > 0 && res_bits != g_SpeedCalc.ResolutionBits) {

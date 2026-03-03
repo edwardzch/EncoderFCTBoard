@@ -21,6 +21,8 @@ void Relay_AllOn(void);
 void Relay_AllOff(void);
 uint8_t Relay_GetStatus(uint8_t relayNum);
 void Relay_SetMultiple(uint8_t mask, uint8_t state);
+void Relay_SetByMask(uint8_t mask);
+void Relay_Test(void);
 
 #ifdef __cplusplus
 }

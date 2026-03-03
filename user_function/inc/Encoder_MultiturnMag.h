@@ -10,40 +10,20 @@
 
 #include "main.h"
 
-// ================= 命令字定义 =================
-#define CMD_GET_ALLDATA         0x1A
-#define CMD_GET_SINGLETURN      0x02
-#define CMD_GET_MULTITURN       0x62
-#define CMD_READ_EEPROM         0xEA
-#define CMD_WRITE_EEPROM        0x32
-#define CMD_MULTITURN_RESET     0x85
-#define CMD_READ_ALARM          0x75
-#define CMD_READ_HALL_POS       0x25
-#define CMD_READ_BATCH_EEPROM   0xAD
-#define CMD_WRITE_BATCH_EEPROM  0x35
-#define CMD_READ_BATTERY        0x3D
-#define CMD_INIT_RESULT         0x6D
-#define CMD_SET_RESOLUTION      0x40
 
 // ================= 初始化测试类型 =================
 #define Encoder_ced_Test        1
 #define Encoder_CIP_Test        2
 #define Encoder_OIP_Test        3
 
-// ================= 报警码定义 =================
-#define WORK_ALARM_TIMEOUT      0x01
-#define WORK_ALARM_CRC_ERROR    0x02
-#define WORK_ALARM_ADDR_ERROR   0x03
-#define WORK_ALARM_MODBUS_CRC   0x04
-#define WORK_ALARM_NO_ENC_TYPE  0x05
-#define WORK_ALARM_SN_ERROR     0x06
 
 // ================= 常量定义 =================
-#define MULENC_TX_SIZE          16
-#define MULENC_RX_SIZE          64
+#define MULENC_TX_SIZE          10
+#define MULENC_RX_SIZE          135
 #define MULENC_EEPROM_PAGES     6
 #define MULENC_EEPROM_ADDRS     0x80
 #define MULENC_PAGE_NUMBER      4
+#define MULENC_PNS_ADDR         127
 
 // ================= 测试项目枚举 =================
 typedef enum {
@@ -106,7 +86,8 @@ typedef union {
     struct {
         uint8_t DC:1;    // 通讯超时
         uint8_t EC:1;    // CRC 错误
-        uint8_t reserved:6;
+        uint8_t F0:1;    // 需要返回0xF0,实际没有			
+        uint8_t reserved:5;
     } bit;
 } MulMag_Error_t;
 
@@ -114,14 +95,17 @@ typedef union {
 typedef struct {
     uint8_t CF62;
     uint8_t CF25;
-    uint8_t CFced;
+    uint8_t CFCED;
     uint8_t CFOIP;
 } MulMag_Cnt_t;
 
 // ================= Hall 结构 =================
 typedef struct {
-    uint8_t Buffer[4];
-    uint8_t Result;
+  uint8_t   Sector;
+  uint8_t   Buffer[4];
+  uint8_t   Result; 
+  uint8_t   Cnt;
+  uint8_t   Check;
 } MulMag_Hall_t;
 
 // ================= EEPROM 管理结构 =================
@@ -132,11 +116,18 @@ typedef struct {
     uint8_t ReturnPage;
     uint8_t SetDNum;
     uint8_t Status;
+		uint8_t ReturnDNum;
     uint8_t DataBuffer[MULENC_EEPROM_PAGES][MULENC_EEPROM_ADDRS];
 } MulMag_Eeprom_t;
 
 // ================= MT6835 寄存器结构 =================
 typedef struct {
+    uint8_t Reg0x11;
+    uint8_t Reg0xDA;
+    uint8_t Reg0xEA;
+    uint8_t Reg0xEC;
+    uint8_t Reg0x12;
+
     uint8_t Reg0x11_True;
     uint8_t Reg0xDA_True;
     uint8_t Reg0xEA_True;
@@ -145,11 +136,11 @@ typedef struct {
     union {
         uint8_t all;
         struct {
-            uint8_t b0:1;
-            uint8_t b1:1;
-            uint8_t b2:1;
-            uint8_t b3:1;
-            uint8_t b4:1;
+            uint8_t Bit11:1;
+            uint8_t BitDA:1;
+            uint8_t BitEA:1;
+            uint8_t BitEC:1;
+            uint8_t Bit12:1;
             uint8_t res:3;
         } bit;
     } RegBit;
@@ -158,31 +149,30 @@ typedef struct {
 
 // ================= 编码器主结构体 =================
 typedef struct {
-    uint8_t TxData[MULENC_TX_SIZE];
-    uint8_t RxData[MULENC_RX_SIZE];
-    uint8_t RxDataCnt;
-    uint8_t TxID;
-    uint8_t RxID;
+    volatile uint8_t TxData[MULENC_TX_SIZE];
+    volatile uint8_t RxData[MULENC_RX_SIZE];
+    volatile uint8_t RxDataCnt;
+    volatile uint8_t TxID;
+    volatile uint8_t RxID;
     
     uint32_t SingleTurnPos;
     uint16_t MultiTurnPos;
     uint8_t ResolutionID;
     uint8_t ReadResolutionID;
     
-    MulMag_Status_t Status;
-    MulMag_Alarm_t Alarm;
-    uint8_t InternalAlarm1;
-    uint8_t InternalAlarm2;
-    uint8_t InternalAlarm3;
+    volatile MulMag_Status_t Status;
+    volatile MulMag_Alarm_t Alarm;
+    volatile uint8_t InternalAlarm1;
+    volatile uint8_t InternalAlarm2;
+    volatile uint8_t InternalAlarm3;
     
-    MulMag_Error_t Error;
-    uint8_t Status0x6D;
+    volatile MulMag_Error_t Error;
+    volatile uint8_t Status0x6D;
     
-    uint8_t CrcData;
-    uint8_t CrcError;
-    uint8_t XorCrcError; // XOR Check Error (0x75)
-    uint16_t TimeoutCnt;
-    
+    volatile uint8_t CrcData;
+    volatile uint8_t CrcError;
+    volatile uint16_t TimeoutCnt;
+    volatile uint16_t TimeoutCnt1;    
     MulMag_Eeprom_t Eeprom;
     uint8_t IPID;
     MulMag_Hall_t Hall;
@@ -192,31 +182,14 @@ typedef struct {
     uint16_t Temperature;
 } MulMag_t;
 
-// ================= MotorEncoder 结构体 =================
-typedef struct {
-    uint8_t TestItem;               // 当前测试项 (各编码器模块共用, 值为各自枚举)
-    uint8_t SetResolutionID;
-    uint8_t HWRevData;
-    uint8_t TestYear;
-    uint8_t TestMoon;
-    uint8_t TestDay;
-    uint8_t TestHour;
-    uint16_t PitCnt;
-    int16_t ActualSpeed;
-    
-    // ASCII 协议响应缓冲区
-    char HWRevBuffer[16];           // 硬件版本字符串 (如 "H.M.1.1")
-    char FWRevBuffer[16];           // 固件版本字符串 (如 "2.1.1.R")
-} MotorEncoder_t;
 
 // ================= 全局变量声明 =================
 extern MulMag_t g_MulMag;
-extern MotorEncoder_t g_MotorEncoder;
+
 extern MT6835_Addr_t g_MT6835Addr;
 extern volatile uint8_t Work_Alarm;
 
 // ================= 接口函数 =================
-uint8_t Enc_CRC8(uint8_t *data, uint8_t len);
 void MulMag_Init(void);
 void MulMag_TX(uint8_t cmd, uint16_t addr, uint8_t data);
 void MulMag_TxRegister(uint8_t cmd, uint8_t status, uint8_t addr, uint8_t data);
@@ -250,5 +223,10 @@ uint8_t  MulMag_Modbus_Write(uint16_t addr, uint16_t value);  // 返回0成功�
 uint8_t MulMag_GetWorkAlarm(void);
 uint8_t MulMag_HasError(void);
 void MulMag_ClearError(void);
+
+// ================= Hall及转速检测 =================
+void MulMag_HallCWCheck(void);
+void MulMag_HallCCWCheck(void);
+void MulMag_HallCheck(void);
 
 #endif /* __ENCODER_MULTITURN_MAG_H */

@@ -18,9 +18,10 @@
 #include "Encoder_MultiturnMag.h"
 #include "Encoder_MultiturnOpt.h"
 #include "Encoder_MGTMag.h"
-#include "Encoder_NXPMag.h"
 #include "Encoder_Tamagawa.h"
-#include "Encoder_SensAR.h"
+
+// 引入 modbus_function.h 中的 ModBus 变量用于同步错误标志
+extern volatile strModBus ModBus;
 
 // ================= 全局变量 =================
 EncoderConfig_t g_EncoderConfig = {
@@ -35,6 +36,22 @@ EncoderData_t g_EncoderData = {0};
 
 // ================= 前向声明 =================
 static void EncoderModbus_ApplyConfig(void);
+
+/****************************************************************************************
+* 函数名称：Enc_CRC8
+* 函数功能：计算 XOR 校验值（与编码器端算法一致）
+* 输入参量：data 数据指针，len 数据长度
+* 输出参量：校验值
+* 编写日期：2026-2-24
+****************************************************************************************/
+uint8_t Enc_CRC8(uint8_t *data, uint16_t len)
+{
+    uint8_t crc = 0;
+    while (len--) {
+        crc ^= *data++;
+    }
+    return crc;
+}
 
 /****************************************************************************************
 * 函数名称：EncoderModbus_Init
@@ -63,9 +80,7 @@ void EncoderModbus_Init(void)
     MulMag_Init();
     MulOpt_Init();
     MGT_Init();
-    NXP_Init();
     Tmgw_Init();
-    SensAR_Init();
 }
 
 /****************************************************************************************
@@ -80,8 +95,7 @@ uint8_t EncoderModbus_IsMyAddress(uint16_t addr)
     // 配置区 0x0000-0x00FF
     if (addr <= REG_CONFIG_END) return 1;
     
-    // 编码器区 0x0200-0x07FF
-    if (addr >= REG_MULTITURN_MAG_START && addr <= REG_SENSAR_END) return 1;
+    if (addr >= REG_MULTITURN_MAG_START && addr <= REG_TAMAGAWA_END) return 1;
     
     return 0;
 }
@@ -137,9 +151,8 @@ static uint8_t BasicSettings(uint16_t addr, uint16_t value)
             
         case REG_SET_COMM_CYCLE:    // 0x0003: 设置通讯周期并启动 (单位: us, 整数)
             g_EncoderConfig.CommCycle_us = (float)value;
-            TIM1_SetPeriod_Direct(g_EncoderConfig.CommCycle_us);
+            EncoderModbus_ApplyConfig();
             SpeedCalc_SetPeriod(&g_SpeedCalc, g_EncoderConfig.CommCycle_us);
-            TIM1_Start_Direct();
             return 0;
             
         case REG_SET_ENCODER_TYPE:  // 0x0004: 设置编码器类型
@@ -163,20 +176,10 @@ static uint8_t BasicSettings(uint16_t addr, uint16_t value)
                         g_EncoderConfig.CommCycle_us = 125;
                         res_bits = 17;
                         break;
-                    case ENC_TYPE_NXP_MAG:        // 4 - 17位
+                    case ENC_TYPE_TAMAGAWA:       // 4 - 17位
                         g_EncoderConfig.BaudRate = 2500000;
                         g_EncoderConfig.CommCycle_us = 125;
                         res_bits = 17;
-                        break;
-                    case ENC_TYPE_TAMAGAWA:       // 5 - 17位
-                        g_EncoderConfig.BaudRate = 2500000;
-                        g_EncoderConfig.CommCycle_us = 125;
-                        res_bits = 17;
-                        break;
-                    case ENC_TYPE_SENSAR:          // 6 - 无单圈位置
-                        g_EncoderConfig.BaudRate = 115200;
-                        g_EncoderConfig.CommCycle_us = 500;
-                        res_bits = 0;  // SensAR 不计算速度
                         break;
                     default:
                         break;
@@ -190,7 +193,10 @@ static uint8_t BasicSettings(uint16_t addr, uint16_t value)
             return 0;
             
         case REG_SPEED_TEST:        // 0x0005: 准备检测速度波动
-            // 各编码器有各自的速度测试项
+            // TODO: MGT 单圈测试速度波动
+            if (value == 1 && g_EncoderConfig.Type == ENC_TYPE_MGT_MAG) {
+                // g_MotorEncoder.TestItem = MgtMagneticEncoderSpeedTest;
+            }
             return 0;
             
         case REG_WRITE_YEAR:        // 0x0006: 写入测试年
@@ -261,14 +267,8 @@ uint16_t EncoderModbus_ReadReg(uint16_t addr)
     if (addr >= REG_MGT_MAG_START && addr <= REG_MGT_MAG_END) {
         return MGT_Modbus_Read(addr);
     }
-    if (addr >= REG_NXP_MAG_START && addr <= REG_NXP_MAG_END) {
-        return NXP_Modbus_Read(addr);
-    }
     if (addr >= REG_TAMAGAWA_START && addr <= REG_TAMAGAWA_END) {
         return Tmgw_Modbus_Read(addr);
-    }
-    if (addr >= REG_SENSAR_START && addr <= REG_SENSAR_END) {
-        return SensAR_Modbus_Read(addr);
     }
     
     return 0xFFFF;
@@ -298,17 +298,46 @@ uint8_t EncoderModbus_WriteReg(uint16_t addr, uint16_t value)
     if (addr >= REG_MGT_MAG_START && addr <= REG_MGT_MAG_END) {
         return MGT_Modbus_Write(addr, value);
     }
-    if (addr >= REG_NXP_MAG_START && addr <= REG_NXP_MAG_END) {
-        return NXP_Modbus_Write(addr, value);
-    }
     if (addr >= REG_TAMAGAWA_START && addr <= REG_TAMAGAWA_END) {
         return Tmgw_Modbus_Write(addr, value);
     }
-    if (addr >= REG_SENSAR_START && addr <= REG_SENSAR_END) {
-        return SensAR_Modbus_Write(addr, value);
-    }
     
     return 1;
+}
+
+/****************************************************************************************
+* 函数名称：EncoderModbus_UpdateErrors
+* 函数功能：将当前选中编码器模块的通讯和校验错误同步到 ModBus 全局结构体
+* 输入参量：无
+* 输出参量：无
+* 编写日期：2026-2-28
+****************************************************************************************/
+void EncoderModbus_UpdateErrors(void)
+{
+    switch (g_EncoderConfig.Type) {
+        case ENC_TYPE_MULTITURN_MAG:
+            ModBus.Error.bit.DC = g_MulMag.Error.bit.DC;
+            ModBus.Error.bit.EC = g_MulMag.Error.bit.EC;
+            break;
+            
+        case ENC_TYPE_MULTITURN_OPT:
+            ModBus.Error.bit.DC = g_MulOpt.Error.bit.DC;
+            ModBus.Error.bit.EC = g_MulOpt.Error.bit.EC;
+            break;
+            
+        case ENC_TYPE_MGT_MAG:
+            ModBus.Error.bit.DC = g_MGT.Error.bit.DC;
+            ModBus.Error.bit.EC = g_MGT.Error.bit.EC;
+            break;
+            
+        case ENC_TYPE_TAMAGAWA:
+            ModBus.Error.bit.DC = g_Tmgw.Error.bit.DC;
+            ModBus.Error.bit.EC = g_Tmgw.Error.bit.EC;
+            break;
+            
+        default:
+            break;
+    }
 }
 
 /****************************************************************************************
@@ -320,7 +349,7 @@ uint8_t EncoderModbus_WriteReg(uint16_t addr, uint16_t value)
 ****************************************************************************************/
 static void EncoderModbus_ApplyConfig(void)
 {
-    RS485_SetBaudRate_Direct(g_EncoderConfig.BaudRate);
+    EncDrv_SetBaudRate(g_EncoderConfig.BaudRate);
     TIM1_SetPeriod_Direct(g_EncoderConfig.CommCycle_us);
 }
 

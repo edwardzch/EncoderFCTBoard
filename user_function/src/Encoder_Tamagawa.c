@@ -5,8 +5,8 @@
  * @date      2026-02-09
  ****************************************************************************************/
 #include "Encoder_Tamagawa.h"
-#include "Encoder_MultiturnMag.h"  // for MotorEncoder_t, Enc_CRC8
 #include "encoder_driver.h"
+#include "modbus_function.h"
 #include <string.h>
 
 // ================= 全局变量 =================
@@ -71,6 +71,7 @@ void Tmgw_TX(uint8_t cmd, uint16_t addr, uint8_t data)
     
     if (g_Tmgw.TimeoutCnt > 5) {
         Work_Alarm = 0x01;  // 超时报警
+        g_Tmgw.Error.bit.DC = 1;
     }
 }
 
@@ -109,12 +110,13 @@ void Tmgw_RxComplete(void)
                 g_Tmgw.XorCrcData = Enc_CRC8(g_Tmgw.RxData, 10);
                 crc_ok = (g_Tmgw.XorCrcData == g_Tmgw.RxData[10]);
                 if (!crc_ok) {
-                    g_Tmgw.XorCrcError = 1;
+                    g_Tmgw.Error.bit.EC = 1;
                     Work_Alarm = 0x02;
                     g_Tmgw.RxDataCnt = 0;
                     return;
                 }
                 g_Tmgw.TimeoutCnt = 0;
+                g_Tmgw.Error.bit.DC = 0;
                 g_Tmgw.RxID = cmd;
                 g_Tmgw.Status.all = g_Tmgw.RxData[1];
                 g_Tmgw.SingleTurnPosition = ((uint32_t)g_Tmgw.RxData[4] << 16) | 
@@ -126,8 +128,8 @@ void Tmgw_RxComplete(void)
                 g_Tmgw.Phase = g_Tmgw.SingleTurnPosition % g_Tmgw.SinglePoleResolution;
                 g_Tmgw.PhaseAngle = 360 - ((g_Tmgw.Phase * 360) / g_Tmgw.SinglePoleResolution);
                 g_Tmgw.MultiTurnPosition = ((uint16_t)g_Tmgw.RxData[7] << 8) | g_Tmgw.RxData[6];
-                g_Tmgw.Error.all = g_Tmgw.RxData[9];
-                g_Tmgw.XorCrcError = 0;
+                g_Tmgw.Alarm.all = g_Tmgw.RxData[9];
+                g_Tmgw.Error.bit.EC = 0;
                 
                 // 同步到共享结构
                 g_MotorEncoder.ActualSpeed = 0;  // 多摩川无直接速度
@@ -141,18 +143,19 @@ void Tmgw_RxComplete(void)
                 g_Tmgw.XorCrcData = Enc_CRC8(g_Tmgw.RxData, 5);
                 crc_ok = (g_Tmgw.XorCrcData == g_Tmgw.RxData[5]);
                 if (!crc_ok) {
-                    g_Tmgw.XorCrcError = 1;
+                    g_Tmgw.Error.bit.EC = 1;
                     Work_Alarm = 0x02;
                     g_Tmgw.RxDataCnt = 0;
                     return;
                 }
                 g_Tmgw.TimeoutCnt = 0;
+                g_Tmgw.Error.bit.DC = 0;
                 g_Tmgw.RxID = cmd;
                 g_Tmgw.Status.all = g_Tmgw.RxData[1];
                 g_Tmgw.SingleTurnPosition = ((uint32_t)g_Tmgw.RxData[4] << 16) | 
                                             ((uint32_t)g_Tmgw.RxData[3] << 8) | 
                                             g_Tmgw.RxData[2];
-                g_Tmgw.XorCrcError = 0;
+                g_Tmgw.Error.bit.EC = 0;
             }
             break;
             
@@ -312,19 +315,19 @@ uint8_t Tmgw_Modbus_IsMyAddr(uint16_t addr)
 uint16_t Tmgw_Modbus_Read(uint16_t addr)
 {
     switch (addr) {
-        case 0x0600: return g_Tmgw.Status.all;
-        case 0x0601: return g_Tmgw.ResolutionID;
-        case 0x0602: return (uint16_t)(g_Tmgw.SingleTurnPosition >> 16);
-        case 0x0603: return (uint16_t)(g_Tmgw.SingleTurnPosition & 0xFFFF);
-        case 0x0604: return g_Tmgw.MultiTurnPosition;
-        case 0x0605: return g_Tmgw.Error.all;
-        case 0x0606: return g_Tmgw.PhaseAngle;
-        case 0x0607: return (uint16_t)(g_Tmgw.Resolution >> 16);
-        case 0x0608: return (uint16_t)(g_Tmgw.Resolution & 0xFFFF);
-        case 0x0609: return g_TmgwMTP.RatedSpeed;
-        case 0x060A: return g_TmgwMTP.MaximumSpeed;
-        case 0x060B: return g_TmgwMTP.NumberOfPolePairs;
-        default: return 0xFFFF;
+        case 0x0600: return g_Tmgw.ResolutionID;
+        case 0x0601: return g_Tmgw.Status.all;
+        case 0x0602: return g_Tmgw.Alarm.all;
+        case 0x0603: return g_Tmgw.MultiTurnPosition;
+        case 0x0604: return g_Tmgw.Eeprom.DataBuffer[g_Tmgw.Eeprom.ReturnPage][g_Tmgw.Eeprom.ReturnAddress];
+        case 0x0605: return (uint16_t)(g_Tmgw.SingleTurnPosition & 0xFFFF);
+        case 0x0606: return 0xFFFF; // Original triggers print action
+        case 0x0607: return g_Tmgw.PhaseAngle;
+        case 0x0608: return g_Tmgw.Eeprom.DataBuffer[0][g_Tmgw.Eeprom.ReturnAddress];
+        case 0x0609: return g_Tmgw.Eeprom.DataBuffer[2][g_Tmgw.Eeprom.ReturnAddress];
+        default: 
+            Communication_Address_Error();
+            return 0xFFFF;
     }
 }
 
@@ -344,25 +347,26 @@ uint8_t Tmgw_Modbus_Write(uint16_t addr, uint16_t value)
             }
             return 0;
             
-        case 0x0601:  // 单圈复位
-            if (value == 1) {
-                g_MotorEncoder.TestItem = Tmgw_Test_SingleTurnReset;
-            }
-            return 0;
-            
-        case 0x0602:  // 获取全部数据
+        case 0x0601:  // 获取全部数据
             if (value == 1) {
                 g_MotorEncoder.TestItem = Tmgw_Test_GetAllData;
             }
             return 0;
             
-        case 0x0603:  // 读取 MTP
+        case 0x0602:  // 读取 MTP
             if (value == 1) {
                 g_MotorEncoder.TestItem = Tmgw_Test_ReadMTP;
             }
             return 0;
             
+        case 0x0603:  // 单圈复位
+            if (value == 1) {
+                g_MotorEncoder.TestItem = Tmgw_Test_SingleTurnReset;
+            }
+            return 0;
+            
         default:
+            Communication_Address_Error();
             return 1;
     }
 }

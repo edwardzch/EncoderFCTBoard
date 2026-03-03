@@ -23,8 +23,8 @@ typedef enum {
 // ================= 常量定义 =================
 #define TMGW_PAGE_NUMBER      6
 #define TMGW_EEPROM_ADDR      0x80
-#define TMGW_TX_SIZE          4
-#define TMGW_RX_SIZE          16
+#define TMGW_TX_SIZE          5
+#define TMGW_RX_SIZE          12
 #define TMGW_PNS_ADDR         0x7F
 
 // ================= SF 状态位 =================
@@ -82,13 +82,24 @@ typedef struct {
     uint16_t CF62;
 } Tmgw_Cnt_t;
 
+// ================= 错误标志位 =================
+typedef union {
+    uint8_t all;
+    struct {
+        uint8_t DC:1;    // 通讯超时
+        uint8_t EC:1;    // CRC 错误
+        uint8_t reserved:6;
+    } bit;
+} Tmgw_Error_t;
+
 // ================= 编码器主结构体 =================
 typedef struct {
     uint8_t TxID;
     uint8_t RxID;
     Tmgw_Status_t Status;
     uint8_t ResolutionID;
-    Tmgw_Alarm_t Error;
+    Tmgw_Alarm_t Alarm;
+    Tmgw_Error_t Error;
     uint8_t XorCrcData;
     uint8_t XorCrcError;
     uint32_t SingleTurnPosition;

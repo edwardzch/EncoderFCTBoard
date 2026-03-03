@@ -15,11 +15,21 @@ typedef enum {
     ENC_TYPE_MULTITURN_MAG,         // MULTITURNMagneticEncoder
     ENC_TYPE_MULTITURN_OPT,         // MULTITURNOpticalEncoder
     ENC_TYPE_MGT_MAG,               // MGTMagneticEncoder
-    ENC_TYPE_NXP_MAG,               // NXPMagneticEncoder
     ENC_TYPE_TAMAGAWA,              // TAMAGAWAEncoder
-    ENC_TYPE_SENSAR,                // SENSAREncoder
     ENC_TYPE_COUNT
 } EncoderType_t;
+
+// ================= 报警码定义 (对应 ModBus_SlaveRx 中的错误响应) =================
+#define WORK_ALARM_TIMEOUT      0x01
+#define WORK_ALARM_CRC_ERROR    0x02
+#define WORK_ALARM_ADDR_ERROR   0x03
+#define WORK_ALARM_MODBUS_CRC   0x04
+#define WORK_ALARM_NO_ENC_TYPE  0x05
+#define WORK_ALARM_SN_ERROR     0x06
+#define WORK_ALARM_Length_ERROR 0x07
+#define WORK_ALARM_FUNC_ERROR   0x08
+#define WORK_ALARM_SLAVE_ERROR  0x09
+#define WORK_ALARM_F0_ERROR     0x0A
 
 // ================= 测试项目定义 =================
 typedef enum {
@@ -70,17 +80,9 @@ typedef struct {
 #define REG_MGT_MAG_START       0x0400
 #define REG_MGT_MAG_END         0x04FF
 
-// 0x0500 - 0x05FF: NXPMagneticEncoder 测试
-#define REG_NXP_MAG_START       0x0500
-#define REG_NXP_MAG_END         0x05FF
-
 // 0x0600 - 0x06FF: TamagawaEncoder 测试
 #define REG_TAMAGAWA_START      0x0600
 #define REG_TAMAGAWA_END        0x06FF
-
-// 0x0700 - 0x07FF: SensarEncoder 测试
-#define REG_SENSAR_START        0x0700
-#define REG_SENSAR_END          0x07FF
 
 // ================= 配置区寄存器 - 03H 读取 (0x00xx) =================
 #define REG_FW_VERSION          0x0000  // 软件版本
@@ -111,6 +113,9 @@ uint16_t EncoderModbus_ReadReg(uint16_t addr);
 
 // 06H 写入处理 (返回 0=成功, 1=失败)
 uint8_t EncoderModbus_WriteReg(uint16_t addr, uint16_t value);
+
+// 同步各编码器的通讯错误 (DC/EC) 到 ModBus 结构体
+void EncoderModbus_UpdateErrors(void);
 
 // 检查地址是否属于编码器模块
 uint8_t EncoderModbus_IsMyAddress(uint16_t addr);

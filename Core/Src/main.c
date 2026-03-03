@@ -107,6 +107,7 @@ int main(void)
 	uart_config();
 	Relay_AllOff();
   PM_Init();  // 初始化参数模块 (自动加载Flash)
+	Modbus_ApplyConfig();  // 应用 PA000/PA001/PA002 配置到 Modbus
 	DTC_Init(); // 初始化数码管   
     
 	HAL_TIM_Base_Start_IT(&htim6);

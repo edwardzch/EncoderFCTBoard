@@ -619,16 +619,6 @@
               <FilePath>..\user_function\src\Encoder_MultiturnOpt.c</FilePath>
             </File>
             <File>
-              <FileName>Encoder_NXPMag.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\user_function\src\Encoder_NXPMag.c</FilePath>
-            </File>
-            <File>
-              <FileName>Encoder_SensAR.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\user_function\src\Encoder_SensAR.c</FilePath>
-            </File>
-            <File>
               <FileName>Encoder_Tamagawa.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user_function\src\Encoder_Tamagawa.c</FilePath>

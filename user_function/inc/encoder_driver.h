@@ -24,8 +24,8 @@
 #define RS485_RX_ENABLE()   (RS485_DE_PORT->BRR = RS485_DE_PIN)
 
 // ================= 缓冲区定义 =================
-#define ENC_TX_BUFFER_SIZE  32
-#define ENC_RX_BUFFER_SIZE  64
+#define ENC_TX_BUFFER_SIZE  10
+#define ENC_RX_BUFFER_SIZE  135
 
 // ================= 驱动状态 =================
 typedef enum {
@@ -37,6 +37,24 @@ typedef enum {
     ENC_DRV_ERROR
 } EncDrvState_t;
 
+// ================= MotorEncoder 结构体 =================
+typedef struct {
+    volatile uint8_t TestItem;      // 当前测试项 (各编码器模块共用, 值为各自枚举)
+    uint8_t SetResolutionID;
+    uint8_t HWRevData;
+    uint8_t TestYear;
+    uint8_t TestMoon;
+    uint8_t TestDay;
+    uint8_t TestHour;
+    uint16_t PitCnt;
+    int16_t ActualSpeed;
+    
+    // ASCII 协议响应缓冲区
+    char HWRevBuffer[16];           // 硬件版本字符串 (如 "H.M.1.1")
+    char FWRevBuffer[16];           // 固件版本字符串 (如 "2.1.1.R")
+} MotorEncoder_t;
+
+extern MotorEncoder_t g_MotorEncoder;
 // ================= 接口声明 =================
 
 /**
@@ -80,6 +98,11 @@ uint8_t* EncDrv_GetRxBuffer(void);
 uint16_t EncDrv_GetRxLen(void);
 
 /**
+ * @brief  超时检查 (可由 TIM1 中断调用)
+ */
+void EncDrv_TimeoutCheck(void);
+
+/**
  * @brief  TX 完成回调 (由 DMA ISR 调用)
  */
 void EncDrv_TxCompleteCallback(void);
@@ -89,11 +112,6 @@ void EncDrv_TxCompleteCallback(void);
  * @param  len: 接收到的数据长度
  */
 void EncDrv_RxCompleteCallback(uint16_t len);
-
-/**
- * @brief  超时检查 (可由 TIM1 中断调用)
- */
-void EncDrv_TimeoutCheck(void);
 
 /**
  * @brief  设置 TIM1 周期 (直接寄存器)
@@ -111,8 +129,6 @@ void TIM1_Stop_Direct(void);
 void EncDrv_DMA_TX_IRQHandler(void);    // DMA1_Channel5 (USART3_TX)
 void EncDrv_DMA_RX_IRQHandler(void);    // DMA1_Channel4 (USART3_RX)
 
-// ================= 兼容旧接口 =================
-#define RS485_Init          EncDrv_Init
-#define RS485_SetBaudRate_Direct  EncDrv_SetBaudRate
+uint8_t Enc_CRC8(uint8_t *data, uint16_t len);
 
 #endif /* __ENCODER_DRIVER_H */

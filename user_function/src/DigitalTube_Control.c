@@ -7,6 +7,10 @@
 #include "DigitalTube_Control.h"
 #include "Flash_Storage.h"
 #include "Parameter_Module.h" // 引用参数模块
+#include "modbus_function.h"  // Modbus_ApplyConfig
+#include "relay_control.h"    // Relay_GetStatus
+#include "encoder_modbus.h"   // EncoderModbus_ReadReg/WriteReg
+#include "Encoder_MultiturnMag.h"
 #include <string.h>
 
 // 引用外部 SPI 句柄
@@ -18,12 +22,12 @@ extern volatile uint8_t Work_Alarm;
 DTC_State_t DTC_Dev;
 
 // 字库表 (共阳极段码)
-// 索引: 0-15(0-F), 16(-), 17(Off), 18(H), 19(L), 20(P), 21(E), 22(_), 23(r), 24(t), 25(S)
+// 索引: 0-15(0-F), 16(-), 17(Off), 18(H), 19(L), 20(P), 21(E), 22(_), 23(r), 24(t), 25(S), 26(o), 27(n), 28(u)
 const uint8_t DTC_SegTable[] = {
     0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8, 
     0x80, 0x90, 0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8E, 
     0xBF, 0xFF, 0x89, 0xC7, 0x8C, 0x86, 0xF7, 0xAF, 
-    0x87, 0x92, 0xA3, 0xAB
+    0x87, 0x92, 0xA3, 0xAB, 0xE3
 };
 
 // 字库索引宏定义
@@ -41,9 +45,11 @@ const uint8_t DTC_SegTable[] = {
 #define SEG_S           25
 #define SEG_o           26
 #define SEG_n           27
+#define SEG_u           28
 
 // 【自定义】最高位分页符号 (0xFE = 上横杠)
 #define SEG_HIGH_FLAG   0xFE 
+#define SEG_b_DOT      0xFD  // b 带小数点 (表示 K5-K8 页)
 
 // 位选码表
 const uint8_t DTC_PosTable[] = {0x01, 0x02, 0x04, 0x08, 0x10};
@@ -55,10 +61,10 @@ static uint8_t DTC_DMA_Buffer[2];
 
 /****************************************************************************************
 * 函数名称：DTC_Update_Buffer
-* 函数功能：根据当前模式和数据刷新显存
+* 函数功能：根据当前模式和数据刷新数码管显存
 * 输入参量：无
 * 输出参量：无
-* 编写日期：2026-02-09
+* 编写日期：2026-2-26
 ****************************************************************************************/
 static void DTC_Update_Buffer(void)
 {
@@ -92,6 +98,35 @@ static void DTC_Update_Buffer(void)
     PM_ParamConfig_t cfg = PM_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
     int32_t val = DTC_Dev.EditVal;
 
+    // --- 特殊文字显示: PA002 校验位 (nonE / odd / EuEn) ---
+    if (DTC_Dev.GroupIdx == 0 && DTC_Dev.ParamNum == 2) {
+        DTC_Dev.RawData[4] = SEG_OFF;
+        switch (val) {
+            case 0:  // nonE
+                DTC_Dev.RawData[3] = SEG_n;
+                DTC_Dev.RawData[2] = SEG_o;
+                DTC_Dev.RawData[1] = SEG_n;
+                DTC_Dev.RawData[0] = SEG_E;
+                break;
+            case 1:  // odd
+                DTC_Dev.RawData[3] = SEG_OFF;
+                DTC_Dev.RawData[2] = SEG_o;
+                DTC_Dev.RawData[1] = SEG_d;
+                DTC_Dev.RawData[0] = SEG_d;
+                break;
+            case 2:  // EuEn
+                DTC_Dev.RawData[3] = SEG_E;
+                DTC_Dev.RawData[2] = SEG_u;
+                DTC_Dev.RawData[1] = SEG_E;
+                DTC_Dev.RawData[0] = SEG_n;
+                break;
+            default:
+                DTC_Dev.RawData[0] = val % 10;
+                break;
+        }
+        return;
+    }
+
     // A. HEX 格式 (H.xxxx)
     if (cfg.Format == FMT_HEX) {
         DTC_Dev.RawData[4] = SEG_H;
@@ -101,11 +136,27 @@ static void DTC_Update_Buffer(void)
     }
     // B. BIN 格式 (b.xxxx)
     else if (cfg.Format == FMT_BIN) {
-        // Bin 格式下不需要光标位移 (或者固定位移?) 
-        // 修正: 32位Bin显不下，假设只有低4位
-        DTC_Dev.RawData[4] = SEG_b;
-        for(int i=0; i<4; i++) { 
-            DTC_Dev.RawData[i] = (val >> i) & 1; 
+        // DP001 特殊处理: 8位二进制分页显示
+        if (DTC_Dev.GroupIdx == 1 && DTC_Dev.ParamNum == 1) {
+            if (DTC_Dev.Page == PAGE_LOW) {
+                // 低页: K1-K4 (bit0-3), 显示 "b.XXXX"
+                DTC_Dev.RawData[4] = SEG_b;
+                for(int i=0; i<4; i++) {
+                    DTC_Dev.RawData[i] = (val >> i) & 1;
+                }
+            } else {
+                // 高页: K5-K8 (bit4-7), 显示 "ḃ.XXXX" (b带小数点)
+                DTC_Dev.RawData[4] = SEG_b_DOT;
+                for(int i=0; i<4; i++) {
+                    DTC_Dev.RawData[i] = (val >> (i + 4)) & 1;
+                }
+            }
+        } else {
+            // 通用 4位 BIN 显示
+            DTC_Dev.RawData[4] = SEG_b;
+            for(int i=0; i<4; i++) {
+                DTC_Dev.RawData[i] = (val >> i) & 1;
+            }
         }
     }
     // C. DEC 格式 (含分页)
@@ -153,7 +204,12 @@ static void DTC_Update_Buffer(void)
 
 /****************************************************************************************
 * 函数名称：DTC_DMA_Transmitter
-* 函数功能：底层 DMA 传输 (阻塞式)
+* 函数功能：底层 SPI DMA 传输一帧数据 (阻塞式)
+* 输入参量：
+* - seg：段码数据
+* - pos：位选码
+* 输出参量：无
+* 编写日期：2026-2-26
 ****************************************************************************************/
 static void DTC_DMA_Transmitter(uint8_t seg, uint8_t pos)
 {
@@ -182,11 +238,11 @@ static void DTC_DMA_Transmitter(uint8_t seg, uint8_t pos)
 
 /****************************************************************************************
 * 函数名称：DTC_Apply_Edit
-* 函数功能：执行参数数值的加减运算以 (含Clamp逻辑)
+* 函数功能：执行参数数值的加减运算 (含 Clamp 限幅逻辑)
 * 输入参量：
-* - is_up：1为加，0为减
+* - is_up：1=加, 0=减
 * 输出参量：无
-* 编写日期：2026-02-09
+* 编写日期：2026-2-26
 ****************************************************************************************/
 static void DTC_Apply_Edit(uint8_t is_up)
 {
@@ -209,8 +265,16 @@ static void DTC_Apply_Edit(uint8_t is_up)
     }
     // B. 在编辑界面：修改数值内容
     else {
-        // dP 参数组 (GroupIdx == 1) 为只读，不允许修改数值
-        if (DTC_Dev.GroupIdx == 1) return;
+        // dP 参数组 (GroupIdx == 1) 为只读
+        if (DTC_Dev.GroupIdx == 1) {
+            // DP001: UP/DOWN 切换 K1-K4 / K5-K8 页面
+            if (DTC_Dev.ParamNum == 1) {
+                if (is_up) DTC_Dev.Page = PAGE_MID;   // 上键: K5-K8
+                else       DTC_Dev.Page = PAGE_LOW;   // 下键: K1-K4
+                DTC_Update_Buffer();
+            }
+            return;
+        }
 
         PM_ParamConfig_t cfg = PM_GetConfig(DTC_Dev.GroupIdx, DTC_Dev.ParamNum);
         int64_t step = 1; 
@@ -248,6 +312,9 @@ static void DTC_Apply_Edit(uint8_t is_up)
 /****************************************************************************************
 * 函数名称：DTC_Key_Logic
 * 函数功能：按键处理状态机 (含长短按复用、连发加速)
+* 输入参量：无
+* 输出参量：无
+* 编写日期：2026-2-26
 ****************************************************************************************/
 static void DTC_Key_Logic(void)
 {
@@ -263,7 +330,7 @@ static void DTC_Key_Logic(void)
     if (k2_press && k3_press) {
         if (DTC_Dev.Mode == DTC_MODE_ERROR) {
             DTC_Dev.KeyTimer++;
-            // 需要持续按下一小段时间防止误触 (比如50ms)
+            // 需要持续按下一小段时间防止误触 (例如50ms)
             if (DTC_Dev.KeyTimer >= 50 && !DTC_Dev.LongPressDone) {
                  DTC_Dev.LongPressDone = 1;
                  DTC_Dev.Mode = DTC_MODE_SELECT;
@@ -316,6 +383,23 @@ static void DTC_Key_Logic(void)
             if (DTC_Dev.Mode == DTC_MODE_SELECT) {
                 // 长按：进入编辑模式
                 DTC_Dev.Mode = DTC_MODE_EDIT;
+                
+                // DP 组进入时实时刷新只读数据
+                if (DTC_Dev.GroupIdx == 1) {
+                    if (DTC_Dev.ParamNum == 1) {
+                        // DP001: 读取继电器 K1-K8 当前状态
+                        uint8_t relay_status = 0;
+                        for (uint8_t i = 1; i <= 8; i++) {
+                            if (Relay_GetStatus(i)) relay_status |= (1 << (i - 1));
+                        }
+                        DP_Buffer[1] = (int32_t)relay_status;
+                    }
+                    else if (DTC_Dev.ParamNum == 10) {
+                        // DP010: 执行 ReadReg 读取编码器寄存器
+                        DP_Buffer[10] = (int32_t)EncoderModbus_ReadReg((uint16_t)PA_Buffer[10]);
+                    }
+                }
+                
                 // 从 Parameter Module 加载数据到临时编辑变量
                 DTC_Dev.EditVal = (DTC_Dev.GroupIdx == 0) ? PA_Buffer[DTC_Dev.ParamNum] : DP_Buffer[DTC_Dev.ParamNum];
                 DTC_Dev.Page = PAGE_LOW; 
@@ -326,10 +410,47 @@ static void DTC_Key_Logic(void)
             }
             else if (DTC_Dev.Mode == DTC_MODE_EDIT) {
                 // 长按：保存并退出
-                if (DTC_Dev.GroupIdx == 0) PA_Buffer[DTC_Dev.ParamNum] = DTC_Dev.EditVal;
+                if (DTC_Dev.GroupIdx == 0) {
+                    PA_Buffer[DTC_Dev.ParamNum] = DTC_Dev.EditVal;
+                }
                 else DP_Buffer[DTC_Dev.ParamNum] = DTC_Dev.EditVal;
                 
-                DTC_SaveParams_Callback(); // 触发外部保存
+                DTC_SaveParams_Callback(); // 保存参数到 Flash
+                
+                // 根据修改的参数执行对应操作
+                if (DTC_Dev.GroupIdx == 0) {
+                    switch (DTC_Dev.ParamNum) {
+                        case 0:  // PA000: Modbus 地址
+                        case 1:  // PA001: 波特率
+                        case 2:  // PA002: 校验位
+                            Modbus_ApplyConfig();
+                            break;
+                        case 3:  // PA003: K1-K4 继电器
+                        case 4: {// PA004: K5-K8 继电器
+                            uint8_t mask = ((uint8_t)(PA_Buffer[4] & 0x0F) << 4) | ((uint8_t)(PA_Buffer[3] & 0x0F));
+                            Relay_SetByMask(mask);
+                            break;
+                        }
+                        case 5:  // PA005: 恢复出厂设置
+                            if (PA_Buffer[5] == 1234) {
+                                // 恢复默认值
+                                memset(PA_Buffer, 0, sizeof(int32_t) * PA_SIZE);
+                                PA_Buffer[0] = 5;    // Modbus 地址
+                                PA_Buffer[1] = 576;  // 波特率 57600
+                                PA_Buffer[2] = 1;    // 校验 odd
+                                PM_SaveParams();     // 写入默认值到 Flash
+                                Modbus_ApplyConfig();
+                                Relay_SetByMask(0);  // 继电器全断开
+                            }
+                            PA_Buffer[5] = 0;  // 复位为 0 (防止重复触发)
+                            break;
+                        case 12: // PA012: WriteReg 数据 (立即执行写入)
+                            EncoderModbus_WriteReg((uint16_t)PA_Buffer[11], (uint16_t)PA_Buffer[12]);
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 
                 // 恢复光标位置
                  DTC_Dev.EditBit = DTC_Dev.ErrCode; 
@@ -416,7 +537,10 @@ static void DTC_Key_Logic(void)
 
 /****************************************************************************************
 * 函数名称：DTC_HandleStartupAnimation
-* 函数功能：执行开机动画
+* 函数功能：执行开机动画序列
+* 输入参量：无
+* 输出参量：无
+* 编写日期：2026-2-26
 ****************************************************************************************/
 static void DTC_HandleStartupAnimation(void)
 {
@@ -453,10 +577,14 @@ static void DTC_HandleStartupAnimation(void)
 /****************************************************************************************
 * 函数名称：DTC_Init
 * 函数功能：初始化硬件寄存器与软件状态
+* 输入参量：无
+* 输出参量：无
+* 编写日期：2026-2-26
 ****************************************************************************************/
 void DTC_Init(void)
 {
     memset(&DTC_Dev, 0, sizeof(DTC_Dev));
+    memset(DTC_Dev.RawData, SEG_OFF, 5);  // 初始化显存为全灭, 避免开机显示 0
     
     // 初始化 SPI 与 DMA
     SPI2->CR2 |= (SPI_CR2_FRXTH | SPI_CR2_TXDMAEN); 
@@ -473,12 +601,19 @@ void DTC_Init(void)
 
 /****************************************************************************************
 * 函数名称：DTC_ScanHandler
+* 函数功能：数码管扫描主函数 (定时器中断调用)
+* 输入参量：无
+* 输出参量：无
+* 编写日期：2026-2-26
 ****************************************************************************************/
 void DTC_ScanHandler(void)
 {
     static uint8_t scan_idx = 0;
     static uint8_t last_alarm = 0;
     uint8_t char_code;
+
+    // 实时更新 DP020 显示 TimeoutCnt
+    DP_Buffer[20] = g_MulMag.TimeoutCnt;
 
     // --- 0. 全局报警监测 (Work_Alarm) ---
     // 优先级最高: 只要有报警，强制切到错误模式
@@ -515,9 +650,11 @@ void DTC_ScanHandler(void)
         DTC_Key_Logic(); 
     }
 
-    // 2. 获取段码 (处理 0xFE 特殊符号)
+    // 2. 获取段码 (处理特殊符号)
     if (DTC_Dev.RawData[scan_idx] == SEG_HIGH_FLAG) {
         char_code = SEG_HIGH_FLAG; 
+    } else if (DTC_Dev.RawData[scan_idx] == SEG_b_DOT) {
+        char_code = DTC_SegTable[SEG_b] & 0x7F; // b 带小数点
     } else {
         char_code = DTC_SegTable[DTC_Dev.RawData[scan_idx]];
     }
@@ -591,6 +728,11 @@ void DTC_ScanHandler(void)
 
 /****************************************************************************************
 * 函数名称：DTC_SetError
+* 函数功能：设置报错码并切换到错误显示模式
+* 输入参量：
+* - code：报错码
+* 输出参量：无
+* 编写日期：2026-2-26
 ****************************************************************************************/
 void DTC_SetError(uint16_t code) 
 { 
@@ -601,6 +743,10 @@ void DTC_SetError(uint16_t code)
 
 /****************************************************************************************
 * 函数名称：DTC_SaveParams_Callback
+* 函数功能：参数保存回调，显示保存提示并写入 Flash
+* 输入参量：无
+* 输出参量：无
+* 编写日期：2026-2-26
 ****************************************************************************************/
 void DTC_SaveParams_Callback(void) 
 {
@@ -609,13 +755,10 @@ void DTC_SaveParams_Callback(void)
     DTC_Dev.MsgTimer = 0;
     
     // 确保 Flash 写入期间数码管全灭
-    DTC_RCLK_L(); 
-    uint8_t temp_buf[2] = {0, 0xFF}; // Pos=0, Seg=OFF
-    HAL_SPI_Transmit(&hspi2, temp_buf, 2, 10);
-    DTC_RCLK_H();
+    DTC_DMA_Transmitter(0xFF, 0x00);
     
     HAL_Delay(5); 
     
-    // 2. 保存参数到 Flash (调用 PM 模块接口)
+    // 2. 保存参数到 Flash
     PM_SaveParams();
 }
