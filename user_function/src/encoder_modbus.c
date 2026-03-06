@@ -19,6 +19,7 @@
 #include "Encoder_MultiturnOpt.h"
 #include "Encoder_MGTMag.h"
 #include "Encoder_Tamagawa.h"
+#include "blackbox.h"
 
 // 引入 modbus_function.h 中的 ModBus 变量用于同步错误标志
 extern volatile strModBus ModBus;
@@ -191,36 +192,54 @@ static uint8_t BasicSettings(uint16_t addr, uint16_t value)
                 }
             }
             return 0;
-            
-        case REG_SPEED_TEST:        // 0x0005: 准备检测速度波动
-            // TODO: MGT 单圈测试速度波动
-            if (value == 1 && g_EncoderConfig.Type == ENC_TYPE_MGT_MAG) {
-                // g_MotorEncoder.TestItem = MgtMagneticEncoderSpeedTest;
+        
+        case 0x0020:                // 0x0020: 黑匣子控制
+            if (value == 0x5AA5) {   // 0x5AA5: 开启 (清空+归零+开始录制)
+                BlackBox_Enable();
+            } else if (value == 0xA55A) { // 0xA55A: 关闭 (停止录制, 缓冲区保留可读)
+                BlackBox_Disable();
             }
             return 0;
             
         case REG_WRITE_YEAR:        // 0x0006: 写入测试年
             g_MotorEncoder.TestYear = (uint8_t)value;
+            if (g_EncoderConfig.Type == ENC_TYPE_MGT_MAG) {
+                g_MotorEncoder.TestDate = g_MotorEncoder.TestYear;
+                g_MotorEncoder.TestDateCnt++;
+                g_MotorEncoder.TestItem = MGT_Test_WriteDate;
+            }
             return 0;
             
         case REG_WRITE_MONTH:       // 0x0007: 写入测试月
             g_MotorEncoder.TestMoon = (uint8_t)value;
+            if (g_EncoderConfig.Type == ENC_TYPE_MGT_MAG) {
+                g_MotorEncoder.TestDate = g_MotorEncoder.TestMoon;
+                g_MotorEncoder.TestDateCnt++;
+                g_MotorEncoder.TestItem = MGT_Test_WriteDate;
+            }
             return 0;
             
         case REG_WRITE_DAY:         // 0x0008: 写入测试日
             g_MotorEncoder.TestDay = (uint8_t)value;
+            if (g_EncoderConfig.Type == ENC_TYPE_MGT_MAG) {
+                g_MotorEncoder.TestDate = g_MotorEncoder.TestDay;
+                g_MotorEncoder.TestDateCnt++;
+                g_MotorEncoder.TestItem = MGT_Test_WriteDate;
+            }
             return 0;
             
         case REG_WRITE_HOUR:        // 0x0009: 写入测试时 (写入后触发日期写入测试)
             g_MotorEncoder.TestHour = (uint8_t)value;
             switch (g_EncoderConfig.Type) {
-                case ENC_TYPE_MULTITURN_MAG:
+                case ENC_TYPE_MULTITURN_MAG:						
                     g_MotorEncoder.TestItem = MulMag_Test_WriteDate;
                     break;
                 case ENC_TYPE_MULTITURN_OPT:
                     g_MotorEncoder.TestItem = MulOpt_Test_WriteDate;
                     break;
                 case ENC_TYPE_MGT_MAG:
+										g_MotorEncoder.TestDate = g_MotorEncoder.TestHour;
+										g_MotorEncoder.TestDateCnt++;												
                     g_MotorEncoder.TestItem = MGT_Test_WriteDate;
                     break;
                 default:
@@ -250,7 +269,7 @@ static uint8_t BasicSettings(uint16_t addr, uint16_t value)
 * 输出参量：对应地址的数据值
 * 编写日期：2026-2-24
 ****************************************************************************************/
-uint16_t EncoderModbus_ReadReg(uint16_t addr)
+uint32_t EncoderModbus_ReadReg(uint16_t addr)
 {
     // 基础配置区 (0x0000-0x00FF)
     if (addr <= REG_CONFIG_END) {
@@ -271,7 +290,7 @@ uint16_t EncoderModbus_ReadReg(uint16_t addr)
         return Tmgw_Modbus_Read(addr);
     }
     
-    return 0xFFFF;
+    return 0xFFFFFFFF; // 未知地址
 }
 
 /****************************************************************************************

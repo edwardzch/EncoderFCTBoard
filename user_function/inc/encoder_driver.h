@@ -42,10 +42,13 @@ typedef struct {
     volatile uint8_t TestItem;      // 当前测试项 (各编码器模块共用, 值为各自枚举)
     uint8_t SetResolutionID;
     uint8_t HWRevData;
+    uint16_t HWRevAddr;             // 硬件版本写入当前地址 (MGT: 0x030D-0x0310)
     uint8_t TestYear;
     uint8_t TestMoon;
     uint8_t TestDay;
     uint8_t TestHour;
+    uint8_t TestDate;               // MGT 日期写入: 当前要写入的日期数据
+    uint8_t TestDateCnt;            // MGT 日期写入: 当前写入地址偏移 (0x0304 + Cnt)
     uint16_t PitCnt;
     int16_t ActualSpeed;
     

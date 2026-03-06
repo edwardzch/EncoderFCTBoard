@@ -15,6 +15,7 @@
 #include "encoder_driver.h"   // TIM1_Stop_Direct
 #include "Encoder_MultiturnMag.h"  // g_MotorEncoder
 #include "Parameter_Module.h"      // PA_Buffer
+#include "blackbox.h"
 
 extern volatile uint8_t Work_Alarm;
 extern UART_HandleTypeDef huart1;
@@ -178,7 +179,92 @@ void ModBus_SlaveReturnTx03(uint16_t ReturnDataStart, uint16_t ReturnDataLen)
     
     Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
     Usart1.Tx.DataSize = frame_len_no_crc + 2;
+    BlackBox_Log(BB_a, (uint8_t *)Usart1.TxData, (uint8_t)Usart1.Tx.DataSize);
     Usart1TransmitterDMA(&Usart1.Tx);
+}
+
+/****************************************************************************************
+* 函数名称：ModBus_EncoderReturn32bitTx03
+* 函数功能：Modbus 03H 特定 32-bit 大端序返回 (如版本号)
+* 输入参量：ReturnDataStart 寄存器起始地址, ReturnDataLen 寄存器数量
+* 编写日期：2026-03-06
+****************************************************************************************/
+void ModBus_EncoderReturn32bitTx03(uint16_t ReturnDataStart, uint16_t ReturnDataLen)
+{
+    uint32_t regValue32 = EncoderModbus_ReadReg(ReturnDataStart);
+    
+    // 如果该地址不支持读取，则不响应（与 16-bit 循环读取的行为一致）
+    if (regValue32 == 0xFFFFFFFF) {
+        return;
+    }
+
+    uint8_t data_bytes = ReturnDataLen * 2;
+    uint8_t frame_len_no_crc = 3 + data_bytes;
+
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD;
+    Usart1.TxData[2] = data_bytes;
+
+    Usart1.TxData[3] = (uint8_t)((regValue32 & 0x0000FF00) >> 8);
+    Usart1.TxData[4] = (uint8_t)(regValue32 & 0x000000FF);
+    if (ReturnDataLen >= 2) {
+        Usart1.TxData[5] = (uint8_t)((regValue32 >> 24) & 0xFF);
+        Usart1.TxData[6] = (uint8_t)((regValue32 & 0x00FF0000) >> 16);
+    }
+    
+    // 如果长度多于2，用0xFF填充剩余字节
+    for (uint16_t i = 2; i < ReturnDataLen; i++) {
+        Usart1.TxData[3 + i * 2] = 0xFF;
+        Usart1.TxData[4 + i * 2] = 0xFF;
+    }
+
+    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, frame_len_no_crc);
+    Usart1.TxData[frame_len_no_crc] = (uint8_t)(crc & 0xFF);
+    Usart1.TxData[frame_len_no_crc + 1] = (uint8_t)(crc >> 8);
+    
+    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+    Usart1.Tx.DataSize = frame_len_no_crc + 2;
+    BlackBox_Log(BB_a, (uint8_t *)Usart1.TxData, (uint8_t)Usart1.Tx.DataSize);
+    Usart1TransmitterDMA(&Usart1.Tx);
+}
+
+/****************************************************************************************
+* 函数名称：ModBus_EncoderReturnTx03
+* 函数功能：处理编码器模块 03H 命令 16-bit 循环读取
+* 输入参量：DataAddr 起始地址, DataSize 寄存器数量
+* 编写日期：2026-03-06
+****************************************************************************************/
+void ModBus_EncoderReturnTx03(uint16_t DataAddr, uint16_t DataSize)
+{
+    uint16_t i;
+    uint8_t data_bytes = DataSize * 2;
+    uint8_t frame_len_no_crc = 3 + data_bytes;
+    
+    Usart1.TxData[0] = ModBus.Slave.ADDR;
+    Usart1.TxData[1] = ModBus.Slave.CMD;
+    Usart1.TxData[2] = data_bytes;
+    
+    uint8_t has_error = 0;
+    for (i = 0; i < DataSize; i++) {
+        uint32_t regValue32 = EncoderModbus_ReadReg(DataAddr + i);
+        if (regValue32 == 0xFFFFFFFF) {
+            has_error = 1;
+            break; // 获取失败
+        }
+        Usart1.TxData[3 + i * 2] = (uint8_t)(regValue32 >> 8);
+        Usart1.TxData[4 + i * 2] = (uint8_t)(regValue32 & 0xFF);
+    }
+    
+    if (!has_error) {
+        uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, frame_len_no_crc);
+        Usart1.TxData[frame_len_no_crc] = (uint8_t)(crc & 0xFF);
+        Usart1.TxData[frame_len_no_crc + 1] = (uint8_t)(crc >> 8);
+        
+        Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
+        Usart1.Tx.DataSize = frame_len_no_crc + 2;
+        BlackBox_Log(BB_a, (uint8_t *)Usart1.TxData, (uint8_t)Usart1.Tx.DataSize);
+        Usart1TransmitterDMA(&Usart1.Tx);
+    }
 }
 
 /****************************************************************************************
@@ -195,37 +281,16 @@ void ModBus_SlaveRx03(void)
         if(Usart1.RxData[6] != ModBus.Slave.Rx.CRCLow || Usart1.RxData[7] != ModBus.Slave.Rx.CRCHigh){
             ModBus_Crc_Error(); // CRC 校验错误
         }else{
-            // 检查是否为编码器模块地址 (0x01xx)
+            // 检查是否为编码器模块地址 (0x01xx - 0x06xx)
             if (EncoderModbus_IsMyAddress(ModBus.Slave.Rx.DataAddr)) {
-                // 编码器模块处理
-                uint16_t i;
-                uint8_t data_bytes = ModBus.Slave.Rx.DataSize * 2;
-                uint8_t frame_len_no_crc = 3 + data_bytes;
-                
-                Usart1.TxData[0] = ModBus.Slave.ADDR;
-                Usart1.TxData[1] = ModBus.Slave.CMD;
-                Usart1.TxData[2] = data_bytes;
-                
-                uint8_t has_error = 0;
-                for (i = 0; i < ModBus.Slave.Rx.DataSize; i++) {
-                    uint16_t regValue = EncoderModbus_ReadReg(ModBus.Slave.Rx.DataAddr + i);
-                    if (regValue == 0xFFFF) {
-                        has_error = 1;
-                        break;
-                    }
-                    Usart1.TxData[3 + i * 2] = (uint8_t)(regValue >> 8);
-                    Usart1.TxData[4 + i * 2] = (uint8_t)(regValue & 0xFF);
+                // 如果读取长度为2，交给专门的 32-bit 返回函数处理
+                if (ModBus.Slave.Rx.DataSize == 2) {
+                    ModBus_EncoderReturn32bitTx03(ModBus.Slave.Rx.DataAddr, ModBus.Slave.Rx.DataSize);
+                } else {
+                    // 常规的编码器 16-bit 循环读取
+                    ModBus_EncoderReturnTx03(ModBus.Slave.Rx.DataAddr, ModBus.Slave.Rx.DataSize);
                 }
                 
-                if (!has_error) {
-                    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, frame_len_no_crc);
-                    Usart1.TxData[frame_len_no_crc] = (uint8_t)(crc & 0xFF);
-                    Usart1.TxData[frame_len_no_crc + 1] = (uint8_t)(crc >> 8);
-                    
-                    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
-                    Usart1.Tx.DataSize = frame_len_no_crc + 2;
-                    Usart1TransmitterDMA(&Usart1.Tx);
-                }
             } else if (ModBus.Slave.Rx.DataAddr >= MODBUS_REG_BASE_ADDR && 
                        (ModBus.Slave.Rx.DataAddr - MODBUS_REG_BASE_ADDR + ModBus.Slave.Rx.DataSize) <= MODBUS_REGISTER_COUNT) {
                  ModBus_SlaveReturnTx03(ModBus.Slave.Rx.DataAddr - MODBUS_REG_BASE_ADDR, ModBus.Slave.Rx.DataSize);
@@ -572,6 +637,9 @@ void ModBus_SlaveRx(void)
     }
 
     // ================= 2. 正常接收处理 =================
+    // 记录 FCT 上位机发给测试板的帧 (BB_A通道)
+    BlackBox_Log(BB_A, (uint8_t *)Usart1.RxData, (uint8_t)Usart1.DataCnt);
+    
     ModBus.Slave.ADDR = Usart1.RxData[0];
     ModBus.Slave.CMD = Usart1.RxData[1];
 
@@ -677,6 +745,8 @@ void Usart1_SendStringHandler(void)
         Usart1_Print("%s", g_MotorEncoder.HWRevBuffer);
     }else if(strcmp((char *)Usart1.RxData, "GetFWRev") == 0){
         Usart1_Print("%s", g_MotorEncoder.FWRevBuffer);
+    }else if(strcmp((char *)Usart1.RxData, "GetTestContent") == 0){
+        BlackBox_SendAll();
     }else{
         EnableUARTReceive(&huart1);
     }

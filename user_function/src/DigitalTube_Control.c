@@ -52,7 +52,12 @@ const uint8_t DTC_SegTable[] = {
 #define SEG_b_DOT      0xFD  // b 带小数点 (表示 K5-K8 页)
 
 // 位选码表
-const uint8_t DTC_PosTable[] = {0x01, 0x02, 0x04, 0x08, 0x10};
+// 改前（当前）:
+//const uint8_t DTC_PosTable[] = {0x01, 0x02, 0x04, 0x08, 0x10};
+
+// 改后（反转）:
+const uint8_t DTC_PosTable[] = {0x10, 0x08, 0x04, 0x02, 0x01};
+
 
 // DMA 发送缓冲
 static uint8_t DTC_DMA_Buffer[2];

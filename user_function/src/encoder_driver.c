@@ -14,6 +14,7 @@
 #include "Encoder_MultiturnOpt.h"
 #include "Encoder_MGTMag.h"
 #include "Encoder_Tamagawa.h"
+#include "blackbox.h"
 
 // ================= DMA 通道映射 =================
 // CubeMX 配置: USART3_RX -> DMA1_Channel4, USART3_TX -> DMA1_Channel5
@@ -231,6 +232,7 @@ void EncDrv_SendDMA(uint8_t *data, uint16_t len, uint16_t rx_len)
     
     RS485_TX_ENABLE();
     EncDrv_StartDMA_TX(s_TxBuffer, len);
+    BlackBox_Log(BB_B, data, (uint8_t)len);
 }
 
 /****************************************************************************************
@@ -295,6 +297,9 @@ void EncDrv_RxCompleteCallback(uint16_t len)
     
     s_RxLen = len;
     s_State = ENC_DRV_COMPLETE;
+    
+    // 记录编码器回包
+    BlackBox_Log(BB_b, s_RxBuffer, (uint8_t)len);
     
     // 分发到对应编码器
     Encoder_DispatchRx(s_RxBuffer, len);

@@ -394,7 +394,7 @@ uint8_t MulOpt_Modbus_IsMyAddr(uint16_t addr)
 * 输出参量：对应地址的数据值
 * 编写日期：2026-2-24
 ****************************************************************************************/
-uint16_t MulOpt_Modbus_Read(uint16_t addr)
+uint32_t MulOpt_Modbus_Read(uint16_t addr)
 {
     switch (addr) {
         case 0x0300: return g_MulOpt.MTABSector;

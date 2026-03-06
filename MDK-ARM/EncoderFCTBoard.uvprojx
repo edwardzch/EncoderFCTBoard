@@ -633,6 +633,11 @@
               <FileType>1</FileType>
               <FilePath>..\user_function\src\encoder_speed.c</FilePath>
             </File>
+            <File>
+              <FileName>blackbox.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_function\src\blackbox.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

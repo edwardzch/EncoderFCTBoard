@@ -109,7 +109,8 @@ typedef struct {
 void EncoderModbus_Init(void);
 
 // 03H 读取处理
-uint16_t EncoderModbus_ReadReg(uint16_t addr);
+// 03H 读取处理
+uint32_t EncoderModbus_ReadReg(uint16_t addr);
 
 // 06H 写入处理 (返回 0=成功, 1=失败)
 uint8_t EncoderModbus_WriteReg(uint16_t addr, uint16_t value);
