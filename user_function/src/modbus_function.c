@@ -21,7 +21,7 @@ extern volatile uint8_t Work_Alarm;
 extern UART_HandleTypeDef huart1;
 
 volatile strModBus ModBus = {0};
-volatile uint8_t Need_Reset_Board = 0;
+volatile uint8_t Need_Reset_Board = 0, Need_MCU_Reset = 0;
 
 /****************************************************************************************
 * 函数名称：Modbus_ApplyConfig
@@ -184,51 +184,6 @@ void ModBus_SlaveReturnTx03(uint16_t ReturnDataStart, uint16_t ReturnDataLen)
 }
 
 /****************************************************************************************
-* 函数名称：ModBus_EncoderReturn32bitTx03
-* 函数功能：Modbus 03H 特定 32-bit 大端序返回 (如版本号)
-* 输入参量：ReturnDataStart 寄存器起始地址, ReturnDataLen 寄存器数量
-* 编写日期：2026-03-06
-****************************************************************************************/
-void ModBus_EncoderReturn32bitTx03(uint16_t ReturnDataStart, uint16_t ReturnDataLen)
-{
-    uint32_t regValue32 = EncoderModbus_ReadReg(ReturnDataStart);
-    
-    // 如果该地址不支持读取，则不响应（与 16-bit 循环读取的行为一致）
-    if (regValue32 == 0xFFFFFFFF) {
-        return;
-    }
-
-    uint8_t data_bytes = ReturnDataLen * 2;
-    uint8_t frame_len_no_crc = 3 + data_bytes;
-
-    Usart1.TxData[0] = ModBus.Slave.ADDR;
-    Usart1.TxData[1] = ModBus.Slave.CMD;
-    Usart1.TxData[2] = data_bytes;
-
-    Usart1.TxData[3] = (uint8_t)((regValue32 & 0x0000FF00) >> 8);
-    Usart1.TxData[4] = (uint8_t)(regValue32 & 0x000000FF);
-    if (ReturnDataLen >= 2) {
-        Usart1.TxData[5] = (uint8_t)((regValue32 >> 24) & 0xFF);
-        Usart1.TxData[6] = (uint8_t)((regValue32 & 0x00FF0000) >> 16);
-    }
-    
-    // 如果长度多于2，用0xFF填充剩余字节
-    for (uint16_t i = 2; i < ReturnDataLen; i++) {
-        Usart1.TxData[3 + i * 2] = 0xFF;
-        Usart1.TxData[4 + i * 2] = 0xFF;
-    }
-
-    uint16_t crc = Modbus_CRC16((uint8_t *)Usart1.TxData, frame_len_no_crc);
-    Usart1.TxData[frame_len_no_crc] = (uint8_t)(crc & 0xFF);
-    Usart1.TxData[frame_len_no_crc + 1] = (uint8_t)(crc >> 8);
-    
-    Usart1.Tx.Data = (uint8_t *)Usart1.TxData;
-    Usart1.Tx.DataSize = frame_len_no_crc + 2;
-    BlackBox_Log(BB_a, (uint8_t *)Usart1.TxData, (uint8_t)Usart1.Tx.DataSize);
-    Usart1TransmitterDMA(&Usart1.Tx);
-}
-
-/****************************************************************************************
 * 函数名称：ModBus_EncoderReturnTx03
 * 函数功能：处理编码器模块 03H 命令 16-bit 循环读取
 * 输入参量：DataAddr 起始地址, DataSize 寄存器数量
@@ -246,13 +201,13 @@ void ModBus_EncoderReturnTx03(uint16_t DataAddr, uint16_t DataSize)
     
     uint8_t has_error = 0;
     for (i = 0; i < DataSize; i++) {
-        uint32_t regValue32 = EncoderModbus_ReadReg(DataAddr + i);
-        if (regValue32 == 0xFFFFFFFF) {
+        uint16_t regValue = EncoderModbus_ReadReg(DataAddr + i);
+        if (regValue == 0xFFFF) {
             has_error = 1;
             break; // 获取失败
         }
-        Usart1.TxData[3 + i * 2] = (uint8_t)(regValue32 >> 8);
-        Usart1.TxData[4 + i * 2] = (uint8_t)(regValue32 & 0xFF);
+        Usart1.TxData[3 + i * 2] = (uint8_t)(regValue >> 8);
+        Usart1.TxData[4 + i * 2] = (uint8_t)(regValue & 0xFF);
     }
     
     if (!has_error) {
@@ -283,13 +238,8 @@ void ModBus_SlaveRx03(void)
         }else{
             // 检查是否为编码器模块地址 (0x01xx - 0x06xx)
             if (EncoderModbus_IsMyAddress(ModBus.Slave.Rx.DataAddr)) {
-                // 如果读取长度为2，交给专门的 32-bit 返回函数处理
-                if (ModBus.Slave.Rx.DataSize == 2) {
-                    ModBus_EncoderReturn32bitTx03(ModBus.Slave.Rx.DataAddr, ModBus.Slave.Rx.DataSize);
-                } else {
-                    // 常规的编码器 16-bit 循环读取
-                    ModBus_EncoderReturnTx03(ModBus.Slave.Rx.DataAddr, ModBus.Slave.Rx.DataSize);
-                }
+                // 常规的编码器 16-bit 循环读取
+                ModBus_EncoderReturnTx03(ModBus.Slave.Rx.DataAddr, ModBus.Slave.Rx.DataSize);
                 
             } else if (ModBus.Slave.Rx.DataAddr >= MODBUS_REG_BASE_ADDR && 
                        (ModBus.Slave.Rx.DataAddr - MODBUS_REG_BASE_ADDR + ModBus.Slave.Rx.DataSize) <= MODBUS_REGISTER_COUNT) {
@@ -465,12 +415,19 @@ void ModBus_SlaveRx06(void)
                             Relay_Off(idx);
                         break;
                     case 0x1009:  // 继电器逐个测试 (K1-K8 依次吸合1s后断开)
-                        Relay_Test();
+                        g_RelayTestActive = 1;
                         break;
                     case 0x100A:
                         Need_Reset_Board = 1;         // 第一步：只打标记
                         ModBus_SlaveReturnTx06();     // 第二步：触发 DMA 发送
                         return;
+                    case 0x1010:
+												if(ModBus.Slave.Rx.Data[0] == 0x5AA5) {
+													Need_MCU_Reset = 1;         // 第一步：只打标记
+													ModBus_SlaveReturnTx06();     // 第二步：触发 DMA 发送													
+												}
+
+                        return;										
                     default:
                         break;  // 其他地址只写寄存器，无硬件动作
                 }

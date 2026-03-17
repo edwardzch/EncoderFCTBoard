@@ -216,7 +216,7 @@ void MulMag_ReadRegister(void);
 
 // ================= Modbus 接口 (返回值用于判断是否成功) =================
 uint8_t  MulMag_Modbus_IsMyAddr(uint16_t addr);
-uint32_t MulMag_Modbus_Read(uint16_t addr);
+uint16_t MulMag_Modbus_Read(uint16_t addr);
 uint8_t  MulMag_Modbus_Write(uint16_t addr, uint16_t value);  // 返回0成功，非0错误
 
 // ================= 错误处理 (返回报警码给上位机) =================

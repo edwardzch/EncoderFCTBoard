@@ -849,7 +849,7 @@ uint8_t MGT_Modbus_IsMyAddr(uint16_t addr)
 * 输出参量：对应地址的数据值
 * 编写日期：2026-2-24
 ****************************************************************************************/
-uint32_t MGT_Modbus_Read(uint16_t addr)
+uint16_t MGT_Modbus_Read(uint16_t addr)
 {
     switch (addr) {
         case 0x0400: return g_MotorEncoder.TestItem;
@@ -859,8 +859,9 @@ uint32_t MGT_Modbus_Read(uint16_t addr)
         case 0x0404: return g_MGT.FW;        // 读取软件版本 (0xA2@0x0305)
         case 0x0405: return g_MGT.Eeprom.DataBuffer[g_MGT.Eeprom.ReturnPage][g_MGT.Eeprom.ReturnAddress]; // 0xEA 返回值
         case 0x0406: return g_MGT.Eeprom.Data;             // 0xA2 返回值
-        case 0x0407: return g_MGT.Firmware; // 32位 软件版本 (0x40/0x10)
-        case 0x0408: return g_MGT.ResolutionID;
+        case 0x0407: return (uint16_t)(g_MGT.Firmware & 0xFFFF); // 32位 软件版本 低字 Low Word
+        case 0x0408: return (uint16_t)((g_MGT.Firmware >> 16) & 0xFFFF); // 32位 软件版本 高字 High Word
+        case 0x0409: return g_MGT.ResolutionID;
         default:     return 0xFFFF;
     }
 }

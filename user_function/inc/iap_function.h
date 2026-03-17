@@ -10,8 +10,8 @@ extern "C" {
 #include <stdint.h>
 
 /*
-  APP ∆ ºµÿ÷∑£¨∏˘æ›ƒ„π§≥Ã µº …Ë÷√£®ƒ„∏¯≥ˆµƒ « 0x08005000£©
-  Bootloader ’º”√ 0x08000000 ~ 0x08004FFF (0x5000 = 20KB)
+  APP Ëµ∑ÂßãÂú∞ÂùÄÔºåÊ†πÊçÆÂ∑•Á®ãÂÆûÈôÖÈÖçÁΩÆËÆæÁΩÆÔºåËøôÈáåÈªòËÆ§‰∏∫ 0x08005000„ÄÇ
+  Bootloader Âç†Áî® 0x08000000 ~ 0x08004FFF (0x5000 = 20KB)
 */
 #define FLASH_BASE_ADDR    0x08000000U
 #define APP_ADDRESS        0x08005000U
@@ -21,8 +21,8 @@ extern "C" {
 #define IAP_HEADER2        0xAAU
 #define IAP_MAX_PAYLOAD    1024U
 
-// ÃÊ¥˙∑Ω∞∏£∫÷±Ω” π”√ ˝÷µ
-#define RCC_APB1ENR1_TAMPEN	SET_BIT(RCC->APB1ENR1, 0x00000001)// TAMPEN Õ®≥£ « APB1ENR1 µƒµ⁄ 0 Œª
+// Â¶ÇÊûúÊú™ÂÆö‰πâËØ•ÂÆèÂàôÁõ¥Êé•‰ΩøÁî®Ê≠§Êï∞ÂÄº
+#define RCC_APB1ENR1_TAMPEN	SET_BIT(RCC->APB1ENR1, 0x00000001)// TAMPEN ÂØπÂ∫î‰∫é APB1ENR1 ÁöÑÁ¨¨ 0 ‰Ωç
 
 /* exported functions */
 uint16_t IAP_CRC16_Calc(uint8_t *data, uint32_t len);

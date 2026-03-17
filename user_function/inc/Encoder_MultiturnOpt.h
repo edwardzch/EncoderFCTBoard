@@ -180,7 +180,7 @@ void MulOpt_Test(uint8_t testItem);
 
 // ================= Modbus 接口 (0x0300-0x03FF) =================
 uint8_t  MulOpt_Modbus_IsMyAddr(uint16_t addr);
-uint32_t MulOpt_Modbus_Read(uint16_t addr);
+uint16_t MulOpt_Modbus_Read(uint16_t addr);
 uint8_t  MulOpt_Modbus_Write(uint16_t addr, uint16_t value);
 
 #endif /* __ENCODER_MULTITURN_OPT_H */

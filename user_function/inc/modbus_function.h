@@ -105,6 +105,7 @@ typedef struct{
 } strModBus;
 
 extern volatile strModBus   ModBus;
+extern volatile uint8_t Need_Reset_Board, Need_MCU_Reset;
 void ModBus_SlaveRx(void);
 void Modbus_ApplyConfig(void);
 void Usart1_ReceiveStringHandler(void);

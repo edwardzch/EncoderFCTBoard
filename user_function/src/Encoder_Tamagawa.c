@@ -312,7 +312,7 @@ uint8_t Tmgw_Modbus_IsMyAddr(uint16_t addr)
 * 输出参量：对应地址的数据值
 * 编写日期：2026-2-24
 ****************************************************************************************/
-uint32_t Tmgw_Modbus_Read(uint16_t addr)
+uint16_t Tmgw_Modbus_Read(uint16_t addr)
 {
     switch (addr) {
         case 0x0600: return g_Tmgw.ResolutionID;

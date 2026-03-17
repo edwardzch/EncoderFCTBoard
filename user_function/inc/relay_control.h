@@ -13,6 +13,8 @@ extern "C" {
 #define RELAY_COUNT     8
 
 /* function prototypes -------------------------------------------------------*/
+extern uint8_t g_RelayTestActive;
+
 void Relay_Init(void);
 void Relay_On(uint8_t relayNum);
 void Relay_Off(uint8_t relayNum);

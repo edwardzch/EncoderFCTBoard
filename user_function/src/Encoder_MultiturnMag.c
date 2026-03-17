@@ -814,7 +814,7 @@ void MulMag_ReadAllEeprom(void)
 
 /****************************************************************************************
 * 函数名称：MulMag_Initialize
-* 函数功能：编码器初始化流程（ced/CIP/OIP）
+* 函数功能：编码器初始化流程（ced）
 * 输入参量：无
 * 输出参量：无
 * 编写日期：2026-2-24
@@ -822,6 +822,11 @@ void MulMag_ReadAllEeprom(void)
 void MulMag_Initialize(void)
 {
     if (g_MulMag.Cnt.CFCED < 5) {
+        // 当 CFCED == 4 时，说明即将进行的是第 5 次发送
+        if(g_MulMag.Cnt.CFCED == 4) {
+            EncDrv_SetRxWaitDelay(1, ENC_UNIT_S); // 为即将发送的第5次数据配置长超时
+        }
+        
         MulMag_TX(0x6D, 0x00, Encoder_ced_Test);
         g_MulMag.Cnt.CFCED++;
     } else {
@@ -1072,7 +1077,7 @@ uint8_t MulMag_Modbus_IsMyAddr(uint16_t addr)
 * 输出参量：对应地址的数据值
 * 编写日期：2026-2-24
 ****************************************************************************************/
-uint32_t MulMag_Modbus_Read(uint16_t addr)
+uint16_t MulMag_Modbus_Read(uint16_t addr)
 {
     switch (addr) {
         case 0x0200: return g_MulMag.Hall.Result;

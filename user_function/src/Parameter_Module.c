@@ -41,9 +41,9 @@ void PM_Init(void)
     // 2. 尝试从 Flash 加载 (成功则覆盖上面的默认值)
     uint8_t flash_result = Flash_LoadParams(PA_Buffer, PA_SIZE);
     if (flash_result == 1) {
-        DTC_SetError(10); // Err.10: Flash 为空 (首次使用), 使用默认值
+        DTC_SetError(20); // Err.20: Flash 为空 (首次使用), 使用默认值
     } else if (flash_result == 2) {
-        DTC_SetError(11); // Err.11: Flash CRC 校验失败, 数据损坏
+        DTC_SetError(21); // Err.21: Flash CRC 校验失败, 数据损坏
     }
 }
 

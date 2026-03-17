@@ -164,7 +164,7 @@ void Tmgw_ReadMTPDefine(void);
 
 // ================= Modbus 接口 =================
 uint8_t  Tmgw_Modbus_IsMyAddr(uint16_t addr);
-uint32_t Tmgw_Modbus_Read(uint16_t addr);
+uint16_t Tmgw_Modbus_Read(uint16_t addr);
 uint8_t  Tmgw_Modbus_Write(uint16_t addr, uint16_t value);
 
 #endif /* __ENCODER_TAMAGAWA_H */

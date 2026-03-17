@@ -37,6 +37,14 @@ typedef enum {
     ENC_DRV_ERROR
 } EncDrvState_t;
 
+// ================= 时间单位 =================
+typedef enum
+{
+    ENC_UNIT_US = 0, // 微秒
+    ENC_UNIT_MS,     // 毫秒
+    ENC_UNIT_S       // 秒
+} EncTimeUnit_t;
+
 // ================= MotorEncoder 结构体 =================
 typedef struct {
     volatile uint8_t TestItem;      // 当前测试项 (各编码器模块共用, 值为各自枚举)
@@ -51,6 +59,7 @@ typedef struct {
     uint8_t TestDateCnt;            // MGT 日期写入: 当前写入地址偏移 (0x0304 + Cnt)
     uint16_t PitCnt;
     int16_t ActualSpeed;
+	  uint32_t RxWaitDelayCnt;
     
     // ASCII 协议响应缓冲区
     char HWRevBuffer[16];           // 硬件版本字符串 (如 "H.M.1.1")
@@ -105,6 +114,10 @@ uint16_t EncDrv_GetRxLen(void);
  */
 void EncDrv_TimeoutCheck(void);
 
+/**
+ * @brief  设置等待指定时间的额外超时 Delay 计数值
+ */
+void EncDrv_SetRxWaitDelay(uint32_t time_val, EncTimeUnit_t unit);
 /**
  * @brief  TX 完成回调 (由 DMA ISR 调用)
  */

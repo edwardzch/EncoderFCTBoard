@@ -297,6 +297,8 @@ void EncDrv_RxCompleteCallback(uint16_t len)
     
     s_RxLen = len;
     s_State = ENC_DRV_COMPLETE;
+	
+		g_MotorEncoder.RxWaitDelayCnt = 0;
     
     // 记录编码器回包
     BlackBox_Log(BB_b, s_RxBuffer, (uint8_t)len);
@@ -344,6 +346,11 @@ uint16_t EncDrv_GetRxLen(void)
 void EncDrv_TimeoutCheck(void)
 {
     if (s_State == ENC_DRV_RX_WAIT) {
+			  if(g_MotorEncoder.RxWaitDelayCnt > 0) {
+					g_MotorEncoder.RxWaitDelayCnt --;
+					return;
+				}
+			
         uint16_t remaining = DMA_RX_CH->CNDTR;
         uint16_t received = s_ExpectedRxLen - remaining;
         
@@ -353,6 +360,45 @@ void EncDrv_TimeoutCheck(void)
         // 如果一整个周期都没收够字节 (或者完全没收到), 作为超时/残缺包处理
         EncDrv_RxCompleteCallback(received);
     }
+}
+
+/****************************************************************************************
+* 函数名称：EncDrv_SetRxWaitDelay
+* 函数功能：设置等待指定时间的额外超时 Delay 计数值
+* 输入参量：time_val : 时间数值 (例如: 1, 500, 1000)
+* 输入参量：unit     : 时间单位 (ENC_UNIT_S, ENC_UNIT_MS, ENC_UNIT_US)
+* 输出参量：无
+* 编写日期：2026-3-16
+****************************************************************************************/
+void EncDrv_SetRxWaitDelay(uint32_t time_val, EncTimeUnit_t unit)
+{
+    float total_us = 0.0f;
+
+    /* 1. 安全检查：防止除以0导致死机 */
+    if (g_EncoderConfig.CommCycle_us == 0)
+    {
+        g_MotorEncoder.RxWaitDelayCnt = 0;
+        return; 
+    }
+
+    /* 2. 将输入的时间统一转换为微秒 (us) */
+    switch (unit)
+    {
+        case ENC_UNIT_S:
+            total_us = (float)time_val * 1000000.0f; // 秒 -> 微秒
+            break;
+        case ENC_UNIT_MS:
+            total_us = (float)time_val * 1000.0f;    // 毫秒 -> 微秒
+            break;
+        case ENC_UNIT_US:
+        default:
+            total_us = (float)time_val;              // 微秒 -> 微秒
+            break;
+    }
+
+    /* 3. 计算需要的周期次数 (去掉+100余量，直接计算) */
+    // 公式：总等待时间(us) / 单次通信周期(us)
+    g_MotorEncoder.RxWaitDelayCnt = (uint32_t)(total_us / g_EncoderConfig.CommCycle_us);
 }
 
 /****************************************************************************************

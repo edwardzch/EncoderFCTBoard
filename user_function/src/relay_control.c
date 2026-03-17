@@ -15,6 +15,8 @@ static GPIO_TypeDef* const RelayPorts[RELAY_COUNT] = {
     MCU_RLY_K5_GPIO_Port, MCU_RLY_K6_GPIO_Port, MCU_RLY_K7_GPIO_Port, MCU_RLY_K8_GPIO_Port
 };
 
+uint8_t g_RelayTestActive = 0;
+
 /**************************************************************************************
 * 函数名称：Relay_Init
 * 函数功能：初始化继电器GPIO（默认全部关闭）

@@ -10,8 +10,8 @@
 #include "main.h"
 
 // ================= 缓冲区大小定义 =================
-#define PA_SIZE 60                              // PA 参数组容量
-#define DP_SIZE 60                              // dP 参数组容量
+#define PA_SIZE 50                              // PA 参数组容量
+#define DP_SIZE 50                              // dP 参数组容量
 
 // ================= 枚举定义 =================
 

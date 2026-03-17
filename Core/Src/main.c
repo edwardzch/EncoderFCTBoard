@@ -33,6 +33,7 @@
 #include "DigitalTube_Control.h"
 #include "Flash_Storage.h"
 #include "Parameter_Module.h"
+#include "delay_function.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,10 +106,13 @@ int main(void)
 	MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 	uart_config();
-	Relay_AllOff();
+	
   PM_Init();  // 初始化参数模块 (自动加载Flash)
 	Modbus_ApplyConfig();  // 应用 PA000/PA001/PA002 配置到 Modbus
 	DTC_Init(); // 初始化数码管   
+	
+	// 确保继电器只在所有初始化完成后才彻底断开 (防止启动瞬间的 IO 波动)
+	Relay_AllOff();
     
 	HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
@@ -126,9 +130,23 @@ int main(void)
       Usart1.StringFlag = 0;
       Usart1_SendStringHandler();
     }		
-		if(testcnt){
-			testcnt = 0;
-			DTC_SetError(errcnt);
+		
+		// 继电器测试标志位判断 (非阻塞式设计)
+		if(g_RelayTestActive){
+			g_RelayTestActive = 0;
+			Relay_Test();
+		}
+		
+		if (Need_MCU_Reset) {
+			Need_MCU_Reset = 0;
+			HAL_Delay(5);
+			NVIC_SystemReset(); // 纯粹 MCU 复位
+		}
+		
+		if (Need_Reset_Board) {
+				Need_Reset_Board = 0;
+				HAL_Delay(2); 
+				PWR_CTRL_Enable(); // 数据发完了，安心复位！
 		}
   }
   /* USER CODE END 3 */

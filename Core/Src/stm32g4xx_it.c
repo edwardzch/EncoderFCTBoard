@@ -26,6 +26,8 @@
 #include "modbus_function.h"
 #include "DigitalTube_Control.h"
 #include "delay_function.h"
+#include "DigitalTube_Control.h"
+#include "encoder_driver.h"  // EncDrv_DMA_TX/RX_IRQHandler
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,7 +47,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-extern volatile uint8_t Need_Reset_Board;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -63,10 +65,9 @@ extern DMA_HandleTypeDef hdma_spi2_tx;
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim6;
 extern DMA_HandleTypeDef hdma_usart1_tx;
-#include "encoder_driver.h"  // EncDrv_DMA_TX/RX_IRQHandler
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart3;
-#include "DigitalTube_Control.h"
+
 
 /* USER CODE BEGIN EV */
 
@@ -336,12 +337,6 @@ void USART1_IRQHandler(void)
 		USART1->CR1 = USART1->CR1 & ~(USART_CR1_TCIE | USART_CR1_TE);	
 		EnableUARTReceive(&huart1);	
 		Usart1RxEnable();		
-	
-		if (Need_Reset_Board) {
-				Need_Reset_Board = 0;
-				HAL_Delay(2); 
-				PWR_CTRL_Enable(); // 数据发完了，安心复位！
-		}
 	}
 	// 空闲中断 (IDLE) - 一帧数据接收完成
 	else if(USART1->ISR & USART_ISR_IDLE){

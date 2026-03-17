@@ -588,6 +588,10 @@ static void DTC_HandleStartupAnimation(void)
 ****************************************************************************************/
 void DTC_Init(void)
 {
+    // 保存可能在 DTC_Init 之前（比如 PM_Init 中）设置的报错状态
+    uint8_t pre_mode = DTC_Dev.Mode;
+    uint16_t pre_err = DTC_Dev.ErrCode;
+    
     memset(&DTC_Dev, 0, sizeof(DTC_Dev));
     memset(DTC_Dev.RawData, SEG_OFF, 5);  // 初始化显存为全灭, 避免开机显示 0
     
@@ -597,11 +601,18 @@ void DTC_Init(void)
     DMA1_Channel1->CMAR = (uint32_t)DTC_DMA_Buffer;
     SPI2->CR1 |= SPI_CR1_SPE;       
 
-    // 设置初始模式为开机动画
-    DTC_Dev.Mode = DTC_MODE_ANIMATION;
-    DTC_Dev.AnimState = ANIM_TYPEWRITER;
-    DTC_Dev.AnimStep = 0;
-    DTC_Dev.AnimTimer = 0;
+    // 如果之前已经有报错 (例如 Flash 空 Err.10)
+    if (pre_mode == DTC_MODE_ERROR) {
+        DTC_Dev.Mode = DTC_MODE_ERROR;
+        DTC_Dev.ErrCode = pre_err;
+        DTC_Update_Buffer(); // 必须立刻更新显存，否则是全灭状态
+    } else {
+        // 否则设置初始模式为开机动画
+        DTC_Dev.Mode = DTC_MODE_ANIMATION;
+        DTC_Dev.AnimState = ANIM_TYPEWRITER;
+        DTC_Dev.AnimStep = 0;
+        DTC_Dev.AnimTimer = 0;
+    }
 }
 
 /****************************************************************************************

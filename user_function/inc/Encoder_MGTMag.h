@@ -158,7 +158,7 @@ void MGT_Test(uint8_t testItem);
 
 // ================= Modbus 接口 (0x0400-0x04FF) =================
 uint8_t  MGT_Modbus_IsMyAddr(uint16_t addr);
-uint32_t MGT_Modbus_Read(uint16_t addr);
+uint16_t MGT_Modbus_Read(uint16_t addr);
 uint8_t  MGT_Modbus_Write(uint16_t addr, uint16_t value);
 
 #endif /* __ENCODER_MGTMAG_H */

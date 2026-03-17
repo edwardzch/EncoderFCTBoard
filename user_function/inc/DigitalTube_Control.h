@@ -1,6 +1,6 @@
 /****************************************************************************************
 * @file      DigitalTube_Control.h
-* @brief     æ•°ç ç®¡é©±åŠ¨å¤´æ–‡ä»¶ (åŒ…å«å±æ€§é…ç½®ã€çŠ¶æ€æœºå®šä¹‰ä¸ç¡¬ä»¶æ˜ å°„)
+* @brief     ÊıÂë¹ÜÇı¶¯Í·ÎÄ¼ş (°üº¬ÊôĞÔÅäÖÃ¡¢×´Ì¬»ú¶¨ÒåÓëÓ²¼şÓ³Éä)
 * @author    Gemini
 * @date      2026-02-09
 ****************************************************************************************/
@@ -8,84 +8,84 @@
 #define __DIGITALTUBE_CONTROL_H
 
 #include "main.h"
-#include "Parameter_Module.h" // åŒ…å«å‚æ•°å®šä¹‰
+#include "Parameter_Module.h" // °üº¬²ÎÊı¶¨Òå
 
-// ================= ç¡¬ä»¶å¼•è„šæ˜ å°„ =================
-// é”å­˜å¼•è„š (RCLK/NSS)
+// ================= Ó²¼şÒı½ÅÓ³Éä =================
+// Ëø´æÒı½Å (RCLK/NSS)
 #define DTC_RCLK_PORT    SPI2_NSS_GPIO_Port
 #define DTC_RCLK_PIN     SPI2_NSS_Pin
 #define DTC_RCLK_L()     (DTC_RCLK_PORT->BRR  = (uint32_t)DTC_RCLK_PIN)
 #define DTC_RCLK_H()     (DTC_RCLK_PORT->BSRR = (uint32_t)DTC_RCLK_PIN)
 
-// æŒ‰é”®å¼•è„š
+// °´¼üÒı½Å
 #define DTC_KEY_PORT     GPIOB
-#define PIN_MODE         KEY1_Pin               // åŠŸèƒ½é”®: åˆ‡æ¢ç»„/é€€å‡º
-#define PIN_UP           KEY2_Pin               // åŠ é”®
-#define PIN_DOWN         KEY3_Pin               // å‡é”®
-#define PIN_SHIFT        KEY4_Pin               // ç§»ä½é”®: çŸ­æŒ‰ç¿»é¡µ/ç§»ä½, é•¿æŒ‰è¿›å…¥/ä¿å­˜
+#define PIN_MODE         KEY1_Pin               // ¹¦ÄÜ¼ü: ÇĞ»»×é/ÍË³ö
+#define PIN_UP           KEY2_Pin               // ¼Ó¼ü
+#define PIN_DOWN         KEY3_Pin               // ¼õ¼ü
+#define PIN_SHIFT        KEY4_Pin               // ÒÆÎ»¼ü: ¶Ì°´·­Ò³/ÒÆÎ», ³¤°´½øÈë/±£´æ
 
-// ================= äº¤äº’æ—¶é—´å‚æ•° =================
-#define KEY_DEBOUNCE_MS  20                     // æ¶ˆæŠ–æ—¶é—´ (ms)
-#define KEY_LONG_MS      1000                   // é•¿æŒ‰åˆ¤å®šé˜ˆå€¼ (ms)
-#define ACCEL_START_MS   250                    // è¿å‘åˆå§‹é—´éš” (ms)
-#define ACCEL_MIN_MS     30                     // è¿å‘æœ€å°é—´éš” (æœ€å¿«é€Ÿåº¦)
-#define ACCEL_STEP       15                     // è¿å‘åŠ é€Ÿæ­¥è¿› (ms)
+// ================= ½»»¥Ê±¼ä²ÎÊı =================
+#define KEY_DEBOUNCE_MS  20                     // Ïû¶¶Ê±¼ä (ms)
+#define KEY_LONG_MS      1000                   // ³¤°´ÅĞ¶¨ãĞÖµ (ms)
+#define ACCEL_START_MS   250                    // Á¬·¢³õÊ¼¼ä¸ô (ms)
+#define ACCEL_MIN_MS     30                     // Á¬·¢×îĞ¡¼ä¸ô (×î¿ìËÙ¶È)
+#define ACCEL_STEP       15                     // Á¬·¢¼ÓËÙ²½½ø (ms)
 
-// ================= æšä¸¾å®šä¹‰ =================
+// ================= Ã¶¾Ù¶¨Òå =================
 
-// 32ä½æ•°æ®åˆ†é¡µçŠ¶æ€
+// 32Î»Êı¾İ·ÖÒ³×´Ì¬
 typedef enum { 
-    PAGE_LOW = 0,                               // ä½ä½é¡µ (_ 1234)
-    PAGE_MID,                                   // ä¸­ä½é¡µ (- 5678)
-    PAGE_HIGH                                   // é«˜ä½é¡µ (FE 90)
+    PAGE_LOW = 0,                               // µÍÎ»Ò³ (_ 1234)
+    PAGE_MID,                                   // ÖĞÎ»Ò³ (- 5678)
+    PAGE_HIGH                                   // ¸ßÎ»Ò³ (FE 90)
 } DTC_Page_t;
 
-// ä¸»æ˜¾ç¤ºæ¨¡å¼
+// Ö÷ÏÔÊ¾Ä£Ê½
 typedef enum {
-    DTC_MODE_ANIMATION = 0,                     // å¼€æœºåŠ¨ç”»æ¨¡å¼
-    DTC_MODE_SELECT,                            // å‚æ•°é€‰æ‹©æ¨¡å¼ (PA 001)
-    DTC_MODE_EDIT,                              // å‚æ•°ç¼–è¾‘æ¨¡å¼ (æ•°å€¼)
-    DTC_MODE_ERROR,                             // æ•…éšœæŠ¥é”™æ¨¡å¼
-    DTC_MODE_MESSAGE                            // æ¶ˆæ¯æç¤ºæ¨¡å¼ (donE)
+    DTC_MODE_ANIMATION = 0,                     // ¿ª»ú¶¯»­Ä£Ê½
+    DTC_MODE_SELECT,                            // ²ÎÊıÑ¡ÔñÄ£Ê½ (PA 001)
+    DTC_MODE_EDIT,                              // ²ÎÊı±à¼­Ä£Ê½ (ÊıÖµ)
+    DTC_MODE_ERROR,                             // ¹ÊÕÏ±¨´íÄ£Ê½
+    DTC_MODE_MESSAGE                            // ÏûÏ¢ÌáÊ¾Ä£Ê½ (donE)
 } DTC_DispMode_t;
 
-// å¼€æœºåŠ¨ç”»å­çŠ¶æ€
+// ¿ª»ú¶¯»­×Ó×´Ì¬
 typedef enum {
-    ANIM_TYPEWRITER = 0,                        // æ‰“å­—æœºé˜¶æ®µ (E -> Et...)
-    ANIM_WAIT_KEY,                              // ç­‰å¾…æŒ‰é”®é˜¶æ®µ (Etest å¸¸äº®)
-    ANIM_DONE                                   // åŠ¨ç”»å®Œæˆ
+    ANIM_TYPEWRITER = 0,                        // ´ò×Ö»ú½×¶Î (E -> Et...)
+    ANIM_WAIT_KEY,                              // µÈ´ı°´¼ü½×¶Î (Etest ³£ÁÁ)
+    ANIM_DONE                                   // ¶¯»­Íê³É
 } DTC_AnimState_t;
 
-// å…¨å±€è¿è¡ŒçŠ¶æ€
+// È«¾ÖÔËĞĞ×´Ì¬
 typedef struct {
-    uint8_t  RawData[5];                        // æ˜¾å­˜ (å­˜å‚¨å­—åº“ç´¢å¼•æˆ–ç‰¹æ®Šæ®µç )
-    uint8_t  GroupIdx;                          // å½“å‰å‚æ•°ç»„ (0:PA, 1:dP)
-    uint16_t ParamNum;                          // å½“å‰å‚æ•°ç¼–å· (0 ~ SIZE-1)
+    uint8_t  RawData[5];                        // ÏÔ´æ (´æ´¢×Ö¿âË÷Òı»òÌØÊâ¶ÎÂë)
+    uint8_t  GroupIdx;                          // µ±Ç°²ÎÊı×é (0:PA, 1:dP)
+    uint16_t ParamNum;                          // µ±Ç°²ÎÊı±àºÅ (0 ~ SIZE-1)
     
-    DTC_DispMode_t Mode;                        // å½“å‰ UI æ¨¡å¼
-    DTC_Page_t     Page;                        // å½“å‰åˆ†é¡µçŠ¶æ€ (ä»…32ä½æœ‰æ•ˆ)
-    int32_t        EditVal;                     // æ­£åœ¨ç¼–è¾‘çš„ä¸´æ—¶æ•°å€¼
-    uint8_t        EditBit;                     // å½“å‰å…‰æ ‡ä½ç½® (0-3)
+    DTC_DispMode_t Mode;                        // µ±Ç° UI Ä£Ê½
+    DTC_Page_t     Page;                        // µ±Ç°·ÖÒ³×´Ì¬ (½ö32Î»ÓĞĞ§)
+    int32_t        EditVal;                     // ÕıÔÚ±à¼­µÄÁÙÊ±ÊıÖµ
+    uint8_t        EditBit;                     // µ±Ç°¹â±êÎ»ÖÃ (0-3)
 
-    uint16_t BlinkCnt;                          // é—ªçƒè®¡æ—¶å™¨
-    uint16_t KeyTimer;                          // æŒ‰é”®æŒ‰ä¸‹è®¡æ—¶å™¨
-    uint16_t RepeatTimer;                       // è¿å‘é—´éš”è®¡æ—¶å™¨
-    uint16_t CurrentSpeed;                      // å½“å‰è¿å‘é€Ÿåº¦
-    uint8_t  LastKey;                           // ä¸Šä¸€æ¬¡æŒ‰ä¸‹çš„é”®å€¼
-    uint8_t  LongPressDone;                     // é•¿æŒ‰å·²å¤„ç†æ ‡å¿—
-    uint16_t ErrCode;                           // é”™è¯¯ä»£ç  (æˆ–ä¸´æ—¶æ•°æ®)
+    uint16_t BlinkCnt;                          // ÉÁË¸¼ÆÊ±Æ÷
+    uint16_t KeyTimer;                          // °´¼ü°´ÏÂ¼ÆÊ±Æ÷
+    uint16_t RepeatTimer;                       // Á¬·¢¼ä¸ô¼ÆÊ±Æ÷
+    uint16_t CurrentSpeed;                      // µ±Ç°Á¬·¢ËÙ¶È
+    uint8_t  LastKey;                           // ÉÏÒ»´Î°´ÏÂµÄ¼üÖµ
+    uint8_t  LongPressDone;                     // ³¤°´ÒÑ´¦Àí±êÖ¾
+    uint16_t ErrCode;                           // ´íÎó´úÂë (»òÁÙÊ±Êı¾İ)
 
-    // åŠ¨ç”»ä¸“ç”¨å˜é‡
-    DTC_AnimState_t AnimState;                  // åŠ¨ç”»å­çŠ¶æ€
-    uint16_t        AnimTimer;                  // åŠ¨ç”»è®¡æ—¶å™¨
-    uint16_t        MsgTimer;                   // æ¶ˆæ¯è®¡æ—¶å™¨
-    uint8_t         AnimStep;                   // åŠ¨ç”»æ­¥éª¤ç´¢å¼•
+    // ¶¯»­×¨ÓÃ±äÁ¿
+    DTC_AnimState_t AnimState;                  // ¶¯»­×Ó×´Ì¬
+    uint16_t        AnimTimer;                  // ¶¯»­¼ÆÊ±Æ÷
+    uint16_t        MsgTimer;                   // ÏûÏ¢¼ÆÊ±Æ÷
+    uint8_t         AnimStep;                   // ¶¯»­²½ÖèË÷Òı
 } DTC_State_t;
 
-// ================= å¤–éƒ¨æ¥å£å£°æ˜ =================
-void DTC_Init(void);                            // åˆå§‹åŒ–å‡½æ•°
-void DTC_ScanHandler(void);                     // æ‰«æä¸­æ–­å¤„ç†å‡½æ•° (1ms)
-void DTC_SetError(uint16_t code);               // æŠ¥é”™æ˜¾ç¤ºå‡½æ•°
-void DTC_SaveParams_Callback(void);             // ä¿å­˜å›è°ƒ
+// ================= Íâ²¿½Ó¿ÚÉùÃ÷ =================
+void DTC_Init(void);                            // ³õÊ¼»¯º¯Êı
+void DTC_ScanHandler(void);                     // É¨ÃèÖĞ¶Ï´¦Àíº¯Êı (1ms)
+void DTC_SetError(uint16_t code);               // ±¨´íÏÔÊ¾º¯Êı
+void DTC_SaveParams_Callback(void);             // ±£´æ»Øµ÷
 
 #endif /* __DIGITALTUBE_CONTROL_H */

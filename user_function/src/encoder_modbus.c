@@ -269,7 +269,7 @@ static uint8_t BasicSettings(uint16_t addr, uint16_t value)
 * 输出参量：对应地址的数据值
 * 编写日期：2026-2-24
 ****************************************************************************************/
-uint32_t EncoderModbus_ReadReg(uint16_t addr)
+uint16_t EncoderModbus_ReadReg(uint16_t addr)
 {
     // 基础配置区 (0x0000-0x00FF)
     if (addr <= REG_CONFIG_END) {
@@ -290,7 +290,7 @@ uint32_t EncoderModbus_ReadReg(uint16_t addr)
         return Tmgw_Modbus_Read(addr);
     }
     
-    return 0xFFFFFFFF; // 未知地址
+    return 0xFFFF; // 未知地址
 }
 
 /****************************************************************************************

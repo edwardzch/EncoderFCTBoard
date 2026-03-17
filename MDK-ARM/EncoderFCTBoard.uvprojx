@@ -614,11 +614,6 @@
               <FilePath>..\user_function\src\Encoder_MGTMag.c</FilePath>
             </File>
             <File>
-              <FileName>Encoder_MultiturnOpt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\user_function\src\Encoder_MultiturnOpt.c</FilePath>
-            </File>
-            <File>
               <FileName>Encoder_Tamagawa.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user_function\src\Encoder_Tamagawa.c</FilePath>
@@ -637,6 +632,11 @@
               <FileName>blackbox.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user_function\src\blackbox.c</FilePath>
+            </File>
+            <File>
+              <FileName>Encoder_MultiturnOpt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_function\src\Encoder_MultiturnOpt.c</FilePath>
             </File>
           </Files>
         </Group>
