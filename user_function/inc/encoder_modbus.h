@@ -9,6 +9,11 @@
 
 #include "main.h"
 
+// ================= 初始化测试类型 =================
+#define Encoder_CED_Test        1
+#define Encoder_CIP_Test        2
+#define Encoder_OIP_Test        3
+
 // ================= 编码器类型定义 (对应原 Motor.EncoderType) =================
 typedef enum {
     ENC_TYPE_NONE = 0,

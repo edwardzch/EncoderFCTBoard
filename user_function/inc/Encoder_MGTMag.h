@@ -131,7 +131,7 @@ typedef struct {
     uint8_t         RxData[MGT_RX_SIZE];
     uint8_t         RxDataCnt;
     uint8_t         TimeoutCnt;
-    uint8_t         XorCrcError;
+    uint8_t         CrcError;
     uint8_t         CrcData;
     
     MGT_Eeprom_t    Eeprom;

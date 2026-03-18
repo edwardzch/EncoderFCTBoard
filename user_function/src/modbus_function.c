@@ -17,12 +17,12 @@
 #include "Parameter_Module.h"      // PA_Buffer
 #include "blackbox.h"
 
-extern volatile uint8_t Work_Alarm;
+
 extern UART_HandleTypeDef huart1;
 
 volatile strModBus ModBus = {0};
 volatile uint8_t Need_Reset_Board = 0, Need_MCU_Reset = 0;
-
+volatile uint8_t Work_Alarm = 0;
 /****************************************************************************************
 * 函数名称：Modbus_ApplyConfig
 * 函数功能：根据 PA 参数重新配置 Modbus 从机地址、波特率和校验位
@@ -547,61 +547,62 @@ void ModBus_SlaveRx10(void)
 ****************************************************************************************/
 void ModBus_SlaveRx(void)
 {
-    // 同步当前选中编码器模块的通讯底层错误标志
-    EncoderModbus_UpdateErrors();
-
-    // ================= 0. 白名单检查 =================
-    uint8_t is_whitelist = 0;
-    if (Usart1.DataCnt >= 4) { // 确保接收的数据长度足够提取地址
-        uint8_t cmd = Usart1.RxData[1];
-        uint16_t data_addr = ((uint16_t)Usart1.RxData[2] << 8) | Usart1.RxData[3];
-        
-        if (Usart1.RxData[0] == (uint8_t)PA_Buffer[0]) {
-            // === 在此添加不受编码器通讯错误阻塞的指令白名单 ===
-            if (cmd == MODBUS_FUNC_WRITE_SINGLE_REGISTER && data_addr == 0x100A) {
-                is_whitelist = 1; // 100A: 重启板卡指令
-            } else if (cmd == MODBUS_FUNC_WRITE_SINGLE_REGISTER && data_addr == 0x1000) {
-                is_whitelist = 1; // 1000: 按位控制继电器 (如强行复位电源等)
-            }
-            // 可以继续使用 else if 增加其他白名单寄存器 
-        }
-    }
-
-    // ================= 1. 优先检查错误标志 (用户逻辑) =================
-    // 对于非白名单指令，DC/EC 错误优先级最高, 拦截指令
-    if (!is_whitelist) {
-        if (ModBus.Error.bit.DC) {
-				ModBus.Error.bit.DC = 0;
-            Encoder_Timeout();
-            goto RX_END;
-        } 
-        if (ModBus.Error.bit.EC) {
-				ModBus.Error.bit.EC = 0;
-            Encoder_CrcError();
-            goto RX_END;
-        }
-		
-        if (ModBus.Error.bit.SN) {
-				ModBus.Error.bit.SN = 0; // 清除 SN 错误
-            SNDigitsAreIncorrect();
-            goto RX_END;
-        }
-    } else {
-        // 白名单放行，但也清空当前的错误位，防止堆积影响主流程，底层更新函数会再次获取最新状态
-        ModBus.Error.bit.DC = 0;
-        ModBus.Error.bit.EC = 0;
-        ModBus.Error.bit.SN = 0;
-    }
-
-    // ================= 2. 正常接收处理 =================
-    // 记录 FCT 上位机发给测试板的帧 (BB_A通道)
-    BlackBox_Log(BB_A, (uint8_t *)Usart1.RxData, (uint8_t)Usart1.DataCnt);
-    
-    ModBus.Slave.ADDR = Usart1.RxData[0];
-    ModBus.Slave.CMD = Usart1.RxData[1];
-
+	
     // 判断是否为本机地址 (Modbus)
-    if (Usart1.RxData[0] == (uint8_t)PA_Buffer[0]) {
+    if (Usart1.RxData[0] == (uint8_t)PA_Buffer[0]) {	
+				// 同步当前选中编码器模块的通讯底层错误标志
+				EncoderModbus_UpdateErrors();
+
+				// ================= 0. 白名单检查 =================
+				uint8_t is_whitelist = 0;
+				if (Usart1.DataCnt >= 4) { // 确保接收的数据长度足够提取地址
+						uint8_t cmd = Usart1.RxData[1];
+						uint16_t data_addr = ((uint16_t)Usart1.RxData[2] << 8) | Usart1.RxData[3];
+						
+						if (Usart1.RxData[0] == (uint8_t)PA_Buffer[0]) {
+								// === 在此添加不受编码器通讯错误阻塞的指令白名单 ===
+								if (cmd == MODBUS_FUNC_WRITE_SINGLE_REGISTER && data_addr == 0x100A) {
+										is_whitelist = 1; // 100A: 重启板卡指令
+								} else if (cmd == MODBUS_FUNC_WRITE_SINGLE_REGISTER && data_addr == 0x1000) {
+										is_whitelist = 1; // 1000: 按位控制继电器 (如强行复位电源等)
+								}
+								// 可以继续使用 else if 增加其他白名单寄存器 
+						}
+				}
+
+				// ================= 1. 优先检查错误标志 (用户逻辑) =================
+				// 对于非白名单指令，DC/EC 错误优先级最高, 拦截指令
+				if (!is_whitelist) {
+						if (ModBus.Error.bit.DC) {
+						ModBus.Error.bit.DC = 0;
+								Encoder_Timeout();
+								goto RX_END;
+						} 
+						if (ModBus.Error.bit.EC) {
+						ModBus.Error.bit.EC = 0;
+								Encoder_CrcError();
+								goto RX_END;
+						}
+				
+						if (ModBus.Error.bit.SN) {
+						ModBus.Error.bit.SN = 0; // 清除 SN 错误
+								SNDigitsAreIncorrect();
+								goto RX_END;
+						}
+				} else {
+						// 白名单放行，但也清空当前的错误位，防止堆积影响主流程，底层更新函数会再次获取最新状态
+						ModBus.Error.bit.DC = 0;
+						ModBus.Error.bit.EC = 0;
+						ModBus.Error.bit.SN = 0;
+				}
+
+				// ================= 2. 正常接收处理 =================
+				// 记录 FCT 上位机发给测试板的帧 (BB_A通道)
+				BlackBox_Log(BB_A, (uint8_t *)Usart1.RxData, (uint8_t)Usart1.DataCnt);
+				
+				ModBus.Slave.ADDR = Usart1.RxData[0];
+				ModBus.Slave.CMD = Usart1.RxData[1];
+
         switch (ModBus.Slave.CMD) {
             case MODBUS_FUNC_READ_HOLDING_REGISTERS: // 03H
                 ModBus_SlaveRx03();
@@ -616,8 +617,6 @@ void ModBus_SlaveRx(void)
                 Communication_FunctionCode_Error(); // 功能码不支持
                 break;
         }
-    } else {
-			//Communication_SlaveAddress_Error(); // 非法地址 不能有，有了会造成多从站测试的时候报错
     }
 
 RX_END:

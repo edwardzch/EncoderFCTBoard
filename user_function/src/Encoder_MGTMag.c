@@ -1,14 +1,9 @@
 /****************************************************************************************
  * @file      Encoder_MGTMag.c
- * @brief     MGT 磁编码器协议实现 (移植自 MGTMagneticEncoder.c)
- * @note      所有函数均按原始逻辑逐行移植，仅替换硬件抽象层调用:
- *            - UART_SendDMA0()     → EncDrv_SendDMA()
- *            - CRC8_Check()        → Enc_CRC8()
- *            - UART_EnableRx()     → 由 DMA 驱动自动管理
- *            - Encoder485DE()      → 由 EncDrv_SendDMA 内部控制
- *            - ModBus.Error.bit.xx → g_MGT.Error.bit.xx
- *            - MotorEncoder        → g_MotorEncoder
- *            - Motor.Flag.bit.ReadyTest / Motor_SpeedTest → 不再使用
+ * @brief     单圈磁编码器协议实现
+ * @author    
+ * @date      2026-02-09
+ * @note      用于测试单圈磁编
  ****************************************************************************************/
 #include "Encoder_MGTMag.h"
 #include "encoder_driver.h"
@@ -20,7 +15,6 @@
 // ================= 全局变量 =================
 MGT_t g_MGT = {0};
 
-extern volatile uint8_t Work_Alarm;
 
 /****************************************************************************************
 * 函数名称：MGT_Init
@@ -45,7 +39,7 @@ static void MGT_CrcError(void)
 {
     g_MGT.Error.bit.EC = 1;
     Work_Alarm = WORK_ALARM_CRC_ERROR;
-    g_MGT.XorCrcError = 1;
+    g_MGT.CrcError = 1;
     g_MGT.RxDataCnt = 0;
     g_MGT.TimeoutCnt = 0;
 }
@@ -172,10 +166,11 @@ void MGT_RxComplete(void)
         case 0x1A:
             if (g_MGT.RxDataCnt >= 11) {
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 10);
-                crc_ok = (g_MGT.CrcData == g_MGT.RxData[10]);
-                if (!crc_ok) { MGT_CrcError(); return; }
+                if (g_MGT.CrcData != g_MGT.RxData[10]) { 
+									MGT_CrcError(); 
+									return; 
+								}
                 g_MGT.TimeoutCnt = 0;
-                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxDataCnt = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.Status.all = g_MGT.RxData[1];
@@ -185,7 +180,6 @@ void MGT_RxComplete(void)
                 g_MGT.ResolutionID = g_MGT.RxData[5];
                 g_MGT.MultiTurnPosition = ((uint16_t)g_MGT.RxData[7] << 8) | g_MGT.RxData[6];
                 g_MGT.Alarm.all = g_MGT.RxData[9];
-                g_MGT.Error.bit.EC = 0;
             }
             return;
 

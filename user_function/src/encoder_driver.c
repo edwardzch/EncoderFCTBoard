@@ -15,6 +15,7 @@
 #include "Encoder_MGTMag.h"
 #include "Encoder_Tamagawa.h"
 #include "blackbox.h"
+#include "modbus_function.h"
 
 // ================= DMA 通道映射 =================
 // CubeMX 配置: USART3_RX -> DMA1_Channel4, USART3_TX -> DMA1_Channel5

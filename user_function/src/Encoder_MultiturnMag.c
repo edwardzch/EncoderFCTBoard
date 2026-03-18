@@ -1,9 +1,9 @@
 /****************************************************************************************
  * @file      Encoder_MultiturnMag.c
- * @brief     多圈磁编码器协议实现 (完整移植自 MultiturnMagneticEncoder.c)
- * @author    Gemini (移植优化)
+ * @brief     多圈磁编码器协议实现
+ * @author    
  * @date      2026-02-09
- * @note      保持原有寄存器地址 (0x0200-0x0213) 和测试逻辑完全一致
+ * @note      用于测试多圈磁编
  ****************************************************************************************/
 #include "Encoder_MultiturnMag.h"
 #include "encoder_driver.h"
@@ -17,7 +17,6 @@
 // ================= 全局变量 =================
 MulMag_t g_MulMag = {0};
 MT6835_Addr_t g_MT6835Addr = {0};
-volatile uint8_t Work_Alarm = 0;
 
 static uint8_t s_WriteRegStep = 0;
 static uint8_t s_ReadRegStep = 0;
@@ -121,14 +120,12 @@ void MulMag_TX(uint8_t cmd, uint16_t addr, uint8_t data)
             break;
             
         case 0xEA:
-            g_MulMag.TxData[0] = cmd;
             g_MulMag.TxData[1] = (uint8_t)addr;
             g_MulMag.TxData[2] = Enc_CRC8((uint8_t *)g_MulMag.TxData, 2);
             EncDrv_SendDMA((uint8_t *)g_MulMag.TxData, 3, 4);
             break;
             
         case 0x32:
-            g_MulMag.TxData[0] = cmd;
             g_MulMag.TxData[1] = (uint8_t)addr;
             g_MulMag.TxData[2] = data;
             g_MulMag.TxData[3] = Enc_CRC8((uint8_t *)g_MulMag.TxData, 3);
@@ -136,7 +133,6 @@ void MulMag_TX(uint8_t cmd, uint16_t addr, uint8_t data)
             break;
             
         case 0xAD:
-            g_MulMag.TxData[0] = cmd;
             g_MulMag.TxData[1] = g_MulMag.Eeprom.SetPage;
             g_MulMag.TxData[2] = g_MulMag.Eeprom.SetAddress;
             g_MulMag.TxData[3] = g_MulMag.Eeprom.SetDNum;
@@ -145,24 +141,20 @@ void MulMag_TX(uint8_t cmd, uint16_t addr, uint8_t data)
             break;
             
         case 0x35:
-            {
-                g_MulMag.TxData[0] = cmd;
-                g_MulMag.TxData[1] = g_MulMag.Eeprom.SetPage;
-                g_MulMag.TxData[2] = g_MulMag.Eeprom.SetAddress;
-                g_MulMag.TxData[3] = g_MulMag.Eeprom.SetDNum;
-                uint8_t j;
-                for (j = 0; j < g_MulMag.Eeprom.SetDNum; j++) {
-                    g_MulMag.TxData[4 + j] = g_MulMag.Eeprom.DataBuffer[g_MulMag.Eeprom.SetPage][g_MulMag.Eeprom.SetAddress + j];
-                }
-                g_MulMag.TxData[4 + j] = Enc_CRC8((uint8_t *)g_MulMag.TxData, 4 + j);
-                EncDrv_SendDMA((uint8_t *)g_MulMag.TxData, 5 + g_MulMag.Eeprom.SetDNum, 5 + g_MulMag.Eeprom.SetDNum);
-            }
+						g_MulMag.TxData[1] = g_MulMag.Eeprom.SetPage;
+						g_MulMag.TxData[2] = g_MulMag.Eeprom.SetAddress;
+						g_MulMag.TxData[3] = g_MulMag.Eeprom.SetDNum;
+						uint8_t j;
+						for (j = 0; j < g_MulMag.Eeprom.SetDNum; j++) {
+								g_MulMag.TxData[4 + j] = g_MulMag.Eeprom.DataBuffer[g_MulMag.Eeprom.SetPage][g_MulMag.Eeprom.SetAddress + j];
+						}
+						g_MulMag.TxData[4 + j] = Enc_CRC8((uint8_t *)g_MulMag.TxData, 4 + j);
+						EncDrv_SendDMA((uint8_t *)g_MulMag.TxData, 5 + g_MulMag.Eeprom.SetDNum, 5 + g_MulMag.Eeprom.SetDNum);
             break;
             
         case 0x6D:
             g_MulMag.IPID = data;
-            g_MulMag.TxData[0] = cmd;
-            if (data == Encoder_ced_Test) {
+            if (data == Encoder_CED_Test) {
                 g_MulMag.TxData[1] = 0x63;
                 g_MulMag.TxData[2] = 0x65;
                 g_MulMag.TxData[3] = 0x64;
@@ -181,13 +173,11 @@ void MulMag_TX(uint8_t cmd, uint16_t addr, uint8_t data)
             
         case 0x40:
             if (addr == 0x46) {
-                g_MulMag.TxData[0] = cmd;
                 g_MulMag.TxData[1] = 0x46;
                 g_MulMag.TxData[2] = data;
                 g_MulMag.TxData[3] = Enc_CRC8((uint8_t *)g_MulMag.TxData, 3);
                 EncDrv_SendDMA((uint8_t *)g_MulMag.TxData, 4, 4);
             } else if (addr == 0x45) {
-                g_MulMag.TxData[0] = cmd;
                 g_MulMag.TxData[1] = 0x45;
                 g_MulMag.TxData[2] = 0x00;
                 g_MulMag.TxData[3] = Enc_CRC8((uint8_t *)g_MulMag.TxData, 2);
@@ -225,21 +215,6 @@ void MulMag_TxRegister(uint8_t cmd, uint8_t status, uint8_t addr, uint8_t data)
         g_MulMag.TxData[3] = 0x00;
         g_MulMag.TxData[4] = Enc_CRC8((uint8_t *)g_MulMag.TxData, 4);
         EncDrv_SendDMA((uint8_t *)g_MulMag.TxData, 5, 6);
-    }
-}
-
-/****************************************************************************************
-* 函数名称：MulMag_RxHandler
-* 函数功能：接收处理（逐字节），存储接收数据
-* 输入参量：byte 接收到的字节
-* 输出参量：无
-* 编写日期：2026-2-24
-****************************************************************************************/
-void MulMag_RxHandler(uint8_t byte)
-{
-    g_MulMag.RxData[g_MulMag.RxDataCnt++] = byte;
-    if (g_MulMag.RxDataCnt >= MULENC_RX_SIZE) {
-        g_MulMag.Status0x6D = 0;
     }
 }
 
@@ -377,14 +352,12 @@ void MulMag_RxComplete(void)
     if (g_MulMag.RxDataCnt < 1) return;
     
     uint8_t cmd = g_MulMag.RxData[0];
-    uint8_t crc_ok = 0;
     
     switch (cmd) {
         case 0x1A:
             if (g_MulMag.RxDataCnt >= 11) {
                 g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 10);
-                crc_ok = (g_MulMag.CrcData == g_MulMag.RxData[10]);
-                if (!crc_ok) {
+                if (g_MulMag.CrcData != g_MulMag.RxData[10]) {
 										MulMag_CrcError();
                     return;
                 }
@@ -405,8 +378,7 @@ void MulMag_RxComplete(void)
         case 0x62:
             if (g_MulMag.RxDataCnt >= 6) {
                 g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 5);
-                crc_ok = (g_MulMag.CrcData == g_MulMag.RxData[5]);
-                if (!crc_ok) {
+                if (g_MulMag.CrcData != g_MulMag.RxData[5]) {
                     MulMag_CrcError();
                     return;
                 }
@@ -424,8 +396,7 @@ void MulMag_RxComplete(void)
         case 0x25:
             if (g_MulMag.RxDataCnt >= 10) {
                 g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 9);
-                crc_ok = (g_MulMag.CrcData == g_MulMag.RxData[9]);
-                if (!crc_ok) {
+                if (g_MulMag.CrcData != g_MulMag.RxData[9]) {
                     MulMag_CrcError();
                     return;
                 }
@@ -448,8 +419,7 @@ void MulMag_RxComplete(void)
         case 0x75:
             if (g_MulMag.RxDataCnt >= 5) {
                 g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 4);
-                crc_ok = (g_MulMag.CrcData == g_MulMag.RxData[4]);
-                if (!crc_ok) {
+                if (g_MulMag.CrcData != g_MulMag.RxData[4]) {
                     MulMag_CrcError();
                     return;
                 }							
@@ -462,15 +432,15 @@ void MulMag_RxComplete(void)
                 
                 g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 4);
 
-
+								g_MulMag.CrcError = 0;
             }
             break;
             
         case 0x3D:
             if (g_MulMag.RxDataCnt >= 6) {
                 g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 5);
-                crc_ok = (g_MulMag.CrcData == g_MulMag.RxData[5]);
-                if (!crc_ok) {
+                if (g_MulMag.CrcData != g_MulMag.RxData[5]) {
+                    MulMag_CrcError();
                     MulMag_CrcError();
                     return;
                 }
@@ -485,8 +455,7 @@ void MulMag_RxComplete(void)
         case 0x6D:
             if (g_MulMag.RxDataCnt >= 6) {
                 g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 5);
-                crc_ok = (g_MulMag.CrcData == g_MulMag.RxData[5]);
-                if (!crc_ok) {
+                if (g_MulMag.CrcData != g_MulMag.RxData[5]) {
                     MulMag_CrcError();
                     return;
                 }
@@ -506,8 +475,7 @@ void MulMag_RxComplete(void)
         case 0xAD:
             if (g_MulMag.RxDataCnt >= (g_MulMag.Eeprom.SetDNum + 5)) {
                 g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, (g_MulMag.Eeprom.SetDNum + 5) - 1);
-                crc_ok = (g_MulMag.CrcData == g_MulMag.RxData[(g_MulMag.Eeprom.SetDNum + 5) - 1]);
-                if (!crc_ok) {
+                if (g_MulMag.CrcData != g_MulMag.RxData[(g_MulMag.Eeprom.SetDNum + 5) - 1]) {
                     MulMag_CrcError();
                     return;
                 }
@@ -527,8 +495,7 @@ void MulMag_RxComplete(void)
         case 0x35:
             if (g_MulMag.RxDataCnt >= (g_MulMag.Eeprom.SetDNum + 5)) {
                 g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, (g_MulMag.Eeprom.SetDNum + 5) - 1);
-                crc_ok = (g_MulMag.CrcData == g_MulMag.RxData[(g_MulMag.Eeprom.SetDNum + 5) - 1]);
-                if (!crc_ok) {
+								if (g_MulMag.CrcData != g_MulMag.RxData[(g_MulMag.Eeprom.SetDNum + 5) - 1]) {
                     MulMag_CrcError();
                     return;
                 }
@@ -598,27 +565,30 @@ void MulMag_RxComplete(void)
                 switch (g_MulMag.RxData[1]) {
                     case 0x45:
                         if (g_MulMag.RxDataCnt == 4) {
-                            g_MulMag.TimeoutCnt = 0;
-                            g_MulMag.RxDataCnt = 0;
-                            g_MulMag.ResolutionID = g_MulMag.RxData[2];
                             g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 3);
                             if (g_MulMag.CrcData != g_MulMag.RxData[3]) {
                                 MulMag_CrcError();
-                            } else {
-                                g_MulMag.CrcError = 0;
-                            }
+																return;
+                            }													
+                            g_MulMag.TimeoutCnt = 0;
+                            g_MulMag.RxDataCnt = 0;                            
+                            g_MulMag.CrcError = 0;
+														
+														g_MulMag.ResolutionID = g_MulMag.RxData[2];
                         }
                         break;
                     case 0x46:
                         if (g_MulMag.RxDataCnt == 4) {
-                            g_MulMag.TimeoutCnt = 0;
-                            g_MulMag.RxDataCnt = 0;
                             g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 3);
                             if (g_MulMag.CrcData != g_MulMag.RxData[3]) {
                                 MulMag_CrcError();
-                            } else {
-                                g_MulMag.CrcError = 0;
-                            }													
+																return;
+                            }	
+														
+                            g_MulMag.TimeoutCnt = 0;
+                            g_MulMag.RxDataCnt = 0;
+                            g_MulMag.CrcError = 0;
+												
                             if (g_MulMag.RxData[2] != 0xF0) {
                                 g_MulMag.Error.bit.F0 = 1;
                                 Work_Alarm = WORK_ALARM_F0_ERROR;
@@ -629,52 +599,55 @@ void MulMag_RxComplete(void)
                         break;
                     case 0x51:
                         if (g_MulMag.RxDataCnt == 6) {
-                            g_MulMag.TimeoutCnt = 0;
-                            g_MulMag.RxDataCnt = 0;
                             g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 5);
                             if (g_MulMag.CrcData != g_MulMag.RxData[5]) {
                                 MulMag_CrcError();
-                            } else {
-                                g_MulMag.CrcError = 0;
-                            }
+																return;
+                            }														
+                            g_MulMag.TimeoutCnt = 0;
+                            g_MulMag.RxDataCnt = 0;
+														g_MulMag.CrcError = 0;
+
                         }
                         break;
                     case 0x52:
                         if (g_MulMag.RxDataCnt == 6) {
-                            g_MulMag.TimeoutCnt = 0;
-                            g_MulMag.RxDataCnt = 0;
                             g_MulMag.CrcData = Enc_CRC8((uint8_t *)g_MulMag.RxData, 5);
                             if (g_MulMag.CrcData != g_MulMag.RxData[5]) {
                                 MulMag_CrcError();
-                            } else {
-                                g_MulMag.CrcError = 0;
-                                if (g_MulMag.RxData[2] == 0x11) {
-                                    g_MT6835Addr.Reg0x11 = g_MulMag.RxData[4];
-                                    if (g_MT6835Addr.Reg0x11 == g_MT6835Addr.Reg0x11_True) {
-                                        g_MT6835Addr.RegBit.bit.Bit11 = 1;
-                                    }
-                                } else if (g_MulMag.RxData[2] == 0xDA) {
-                                    g_MT6835Addr.Reg0xDA = g_MulMag.RxData[4];
-                                    if (g_MT6835Addr.Reg0xDA == g_MT6835Addr.Reg0xDA_True) {
-                                        g_MT6835Addr.RegBit.bit.BitDA = 1;
-                                    }
-                                } else if (g_MulMag.RxData[2] == 0xEA) {
-                                    g_MT6835Addr.Reg0xEA = g_MulMag.RxData[4];
-                                    if (g_MT6835Addr.Reg0xEA == g_MT6835Addr.Reg0xEA_True) {
-                                        g_MT6835Addr.RegBit.bit.BitEA = 1;
-                                    }
-                                } else if (g_MulMag.RxData[2] == 0xEC) {
-                                    g_MT6835Addr.Reg0xEC = g_MulMag.RxData[4];
-                                    if (g_MT6835Addr.Reg0xEC == g_MT6835Addr.Reg0xEC_True) {
-                                        g_MT6835Addr.RegBit.bit.BitEC = 1;
-                                    }
-                                } else if (g_MulMag.RxData[2] == 0x12) {
-                                    g_MT6835Addr.Reg0x12 = g_MulMag.RxData[4];
-                                    if (g_MT6835Addr.Reg0x12 == g_MT6835Addr.Reg0x12_True) {
-                                        g_MT6835Addr.RegBit.bit.Bit12 = 1;
-                                    }
-                                }
-                            }
+																return;
+                            }													
+                            g_MulMag.TimeoutCnt = 0;
+                            g_MulMag.RxDataCnt = 0;
+
+														g_MulMag.CrcError = 0;
+														if (g_MulMag.RxData[2] == 0x11) {
+																g_MT6835Addr.Reg0x11 = g_MulMag.RxData[4];
+																if (g_MT6835Addr.Reg0x11 == g_MT6835Addr.Reg0x11_True) {
+																		g_MT6835Addr.RegBit.bit.Bit11 = 1;
+																}
+														} else if (g_MulMag.RxData[2] == 0xDA) {
+																g_MT6835Addr.Reg0xDA = g_MulMag.RxData[4];
+																if (g_MT6835Addr.Reg0xDA == g_MT6835Addr.Reg0xDA_True) {
+																		g_MT6835Addr.RegBit.bit.BitDA = 1;
+																}
+														} else if (g_MulMag.RxData[2] == 0xEA) {
+																g_MT6835Addr.Reg0xEA = g_MulMag.RxData[4];
+																if (g_MT6835Addr.Reg0xEA == g_MT6835Addr.Reg0xEA_True) {
+																		g_MT6835Addr.RegBit.bit.BitEA = 1;
+																}
+														} else if (g_MulMag.RxData[2] == 0xEC) {
+																g_MT6835Addr.Reg0xEC = g_MulMag.RxData[4];
+																if (g_MT6835Addr.Reg0xEC == g_MT6835Addr.Reg0xEC_True) {
+																		g_MT6835Addr.RegBit.bit.BitEC = 1;
+																}
+														} else if (g_MulMag.RxData[2] == 0x12) {
+																g_MT6835Addr.Reg0x12 = g_MulMag.RxData[4];
+																if (g_MT6835Addr.Reg0x12 == g_MT6835Addr.Reg0x12_True) {
+																		g_MT6835Addr.RegBit.bit.Bit12 = 1;
+																}
+														}
+
                         }
                         break;
                 }
@@ -682,10 +655,11 @@ void MulMag_RxComplete(void)
             break;
             
         default:
+						g_MulMag.RxDataCnt = 0;
             break;
     }
     
-    g_MulMag.RxDataCnt = 0;
+    
 }
 
 /****************************************************************************************
@@ -827,7 +801,7 @@ void MulMag_Initialize(void)
             EncDrv_SetRxWaitDelay(1, ENC_UNIT_S); // 为即将发送的第5次数据配置长超时
         }
         
-        MulMag_TX(0x6D, 0x00, Encoder_ced_Test);
+        MulMag_TX(0x6D, 0x00, Encoder_CED_Test);
         g_MulMag.Cnt.CFCED++;
     } else {
         g_MulMag.Cnt.CFCED = 0;

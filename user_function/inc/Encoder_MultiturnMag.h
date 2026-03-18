@@ -11,11 +11,6 @@
 #include "main.h"
 
 
-// ================= 初始化测试类型 =================
-#define Encoder_ced_Test        1
-#define Encoder_CIP_Test        2
-#define Encoder_OIP_Test        3
-
 
 // ================= 常量定义 =================
 #define MULENC_TX_SIZE          10
@@ -187,7 +182,6 @@ typedef struct {
 extern MulMag_t g_MulMag;
 
 extern MT6835_Addr_t g_MT6835Addr;
-extern volatile uint8_t Work_Alarm;
 
 // ================= 接口函数 =================
 void MulMag_Init(void);

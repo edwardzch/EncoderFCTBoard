@@ -15,8 +15,7 @@
 
 // 引用外部 SPI 句柄
 extern SPI_HandleTypeDef hspi2;
-// 引用外部报警变量
-extern volatile uint8_t Work_Alarm;
+
 
 // 全局变量定义
 DTC_State_t DTC_Dev;

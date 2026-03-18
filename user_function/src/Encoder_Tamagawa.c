@@ -1,8 +1,9 @@
 /****************************************************************************************
  * @file      Encoder_Tamagawa.c
- * @brief     多摩川编码器协议实现 (移植自 TamagawaEncoder.c)
- * @author    Gemini (移植优化)
+ * @brief     多摩川磁编码器协议实现
+ * @author    
  * @date      2026-02-09
+ * @note      用于测试多摩川编码器
  ****************************************************************************************/
 #include "Encoder_Tamagawa.h"
 #include "encoder_driver.h"
@@ -13,7 +14,6 @@
 Tmgw_t g_Tmgw = {0};
 Tmgw_MTP_t g_TmgwMTP = {0};
 
-extern volatile uint8_t Work_Alarm;
 
 /****************************************************************************************
 * 函数名称：Tmgw_Init
