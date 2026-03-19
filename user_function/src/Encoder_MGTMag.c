@@ -159,7 +159,6 @@ void MGT_RxComplete(void)
     if (g_MGT.RxDataCnt < 1) return;
 
     uint8_t cmd = g_MGT.RxData[0];
-    uint8_t crc_ok = 0;
 
     switch (cmd) {
         // ====== 0x1A: 读取全部数据 — 11字节响应 ======
@@ -170,6 +169,7 @@ void MGT_RxComplete(void)
 									MGT_CrcError(); 
 									return; 
 								}
+								g_MGT.CrcError = 0;
                 g_MGT.TimeoutCnt = 0;
                 g_MGT.RxDataCnt = 0;
                 g_MGT.RxID = cmd;
@@ -181,16 +181,18 @@ void MGT_RxComplete(void)
                 g_MGT.MultiTurnPosition = ((uint16_t)g_MGT.RxData[7] << 8) | g_MGT.RxData[6];
                 g_MGT.Alarm.all = g_MGT.RxData[9];
             }
-            return;
+            break;
 
         // ====== 0x02: 单圈位置读取 — 6字节响应 ======
         case 0x02:
             if (g_MGT.RxDataCnt >= 6) {
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 5);
-                crc_ok = (g_MGT.CrcData == g_MGT.RxData[5]);
-                if (!crc_ok) { MGT_CrcError(); return; }
+                if (g_MGT.CrcData != g_MGT.RxData[5]) { 
+									MGT_CrcError(); 
+									return; 
+								}
+								g_MGT.CrcError = 0;
                 g_MGT.TimeoutCnt = 0;
-                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxDataCnt = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.Status.all = g_MGT.RxData[1];
@@ -198,30 +200,34 @@ void MGT_RxComplete(void)
                                            ((uint32_t)g_MGT.RxData[3] << 8) |
                                            g_MGT.RxData[2];
             }
-            return;
+            break;
 
         // ====== 0xDA: 初始化 — 3字节响应 ======
         case 0xDA:
             if (g_MGT.RxDataCnt >= 3) {
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 2);
-                crc_ok = (g_MGT.CrcData == g_MGT.RxData[2]);
-                if (!crc_ok) { MGT_CrcError(); return; }
+                if (g_MGT.CrcData != g_MGT.RxData[2]) { 
+									MGT_CrcError(); 
+									return; 
+								}
+								g_MGT.CrcError = 0;
                 g_MGT.TimeoutCnt = 0;
-                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxDataCnt = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.Status.all = g_MGT.RxData[1];
             }
-            return;
+            break;
 
         // ====== 0x62: 多圈复位 — 6字节响应 ======
         case 0x62:
             if (g_MGT.RxDataCnt >= 6) {
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 5);
-                crc_ok = (g_MGT.CrcData == g_MGT.RxData[5]);
-                if (!crc_ok) { MGT_CrcError(); return; }
+                if (g_MGT.CrcData != g_MGT.RxData[5]) { 
+									MGT_CrcError(); 
+									return; 
+								}
+								g_MGT.CrcError = 0;
                 g_MGT.TimeoutCnt = 0;
-                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxDataCnt = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.Status.all = g_MGT.RxData[1];
@@ -229,16 +235,18 @@ void MGT_RxComplete(void)
                                            ((uint32_t)g_MGT.RxData[3] << 8) |
                                            g_MGT.RxData[2];
             }
-            return;
+            break;
 
         // ====== 0xEA: EEPROM 8位地址读 — 4字节响应 ======
         case 0xEA:
             if (g_MGT.RxDataCnt >= 4) {
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 3);
-                crc_ok = (g_MGT.CrcData == g_MGT.RxData[3]);
-                if (!crc_ok) { MGT_CrcError(); return; }
+                if (g_MGT.CrcData != g_MGT.RxData[3]) { 
+									MGT_CrcError(); 
+									return; 
+								}
+								g_MGT.CrcError = 0;
                 g_MGT.TimeoutCnt = 0;
-                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxDataCnt = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.Eeprom.ReturnAddress = g_MGT.RxData[1] & 0x7F;
@@ -248,18 +256,19 @@ void MGT_RxComplete(void)
                 } else if (g_MGT.Eeprom.ReturnAddress < 0x7F) {
                     g_MGT.Eeprom.DataBuffer[g_MGT.Eeprom.ReturnPage][g_MGT.Eeprom.ReturnAddress] = g_MGT.RxData[2];
                 }
-                g_MGT.Error.bit.EC = 0;
             }
-            return;
+            break;
 
         // ====== 0x32: EEPROM 8位地址写 — 4字节响应 ======
         case 0x32:
             if (g_MGT.RxDataCnt >= 4) {
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 3);
-                crc_ok = (g_MGT.CrcData == g_MGT.RxData[3]);
-                if (!crc_ok) { MGT_CrcError(); return; }
+                if (g_MGT.CrcData != g_MGT.RxData[3]) { 
+									MGT_CrcError(); 
+									return; 
+								}
+								g_MGT.CrcError = 0;
                 g_MGT.TimeoutCnt = 0;
-                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxDataCnt = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.Eeprom.ReturnAddress = g_MGT.RxData[1] & 0x7F;
@@ -269,18 +278,19 @@ void MGT_RxComplete(void)
                 } else if (g_MGT.Eeprom.ReturnAddress < 0x7F) {
                     g_MGT.Eeprom.DataBuffer[g_MGT.Eeprom.ReturnPage][g_MGT.Eeprom.ReturnAddress] = g_MGT.RxData[2];
                 }
-                g_MGT.Error.bit.EC = 0;
             }
-            return;
+            break;
 
         // ====== 0xA2: EEPROM 16位地址读 — 5字节响应 ======
         case 0xA2:
             if (g_MGT.RxDataCnt >= 5) {
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 4);
-                crc_ok = (g_MGT.CrcData == g_MGT.RxData[4]);
-                if (!crc_ok) { MGT_CrcError(); return; }
+                if (g_MGT.CrcData != g_MGT.RxData[4]) { 
+									MGT_CrcError(); 
+									return; 
+								}
+								g_MGT.CrcError = 0;
                 g_MGT.TimeoutCnt = 0;
-                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxDataCnt = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.Eeprom.Address = ((uint16_t)g_MGT.RxData[2] << 8 | g_MGT.RxData[1]) & 0x7FFF;
@@ -292,31 +302,35 @@ void MGT_RxComplete(void)
                     g_MGT.Eeprom.Data = g_MGT.RxData[3];
                 }
             }
-            return;
+            break;
 
         // ====== 0x7A: EEPROM 16位地址写 — 5字节响应 ======
         case 0x7A:
             if (g_MGT.RxDataCnt >= 5) {
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 4);
-                crc_ok = (g_MGT.CrcData == g_MGT.RxData[4]);
-                if (!crc_ok) { MGT_CrcError(); return; }
+                if (g_MGT.CrcData != g_MGT.RxData[4]) { 
+									MGT_CrcError(); 
+									return; 
+								}
+								g_MGT.CrcError = 0;
                 g_MGT.TimeoutCnt = 0;
-                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxDataCnt = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.Eeprom.Address = ((uint16_t)g_MGT.RxData[2] << 8 | g_MGT.RxData[1]) & 0x7FFF;
                 g_MGT.Eeprom.Status.bit.Busy = (g_MGT.RxData[2] >> 7) & 0x01;
             }
-            return;
+            break;
 
         // ====== 0x6D: OIP/CIP — 6字节响应 ======
         case 0x6D:
             if (g_MGT.RxDataCnt >= 6) {
                 g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 5);
-                crc_ok = (g_MGT.CrcData == g_MGT.RxData[5]);
-                if (!crc_ok) { MGT_CrcError(); return; }
+                if (g_MGT.CrcData != g_MGT.RxData[5]) { 
+									MGT_CrcError(); 
+									return; 
+								}
+								g_MGT.CrcError = 0;
                 g_MGT.TimeoutCnt = 0;
-                g_MGT.Error.bit.DC = 0;
                 g_MGT.RxDataCnt = 0;
                 g_MGT.RxID = cmd;
                 g_MGT.OIPStatus = g_MGT.RxData[4];
@@ -331,7 +345,7 @@ void MGT_RxComplete(void)
                     Work_Alarm = 0x08;
                 }
             }
-            return;
+            break;
 
         // ====== 0x40: 分辨率/固件 — 可变长度响应 ======
         case 0x40:
@@ -339,9 +353,12 @@ void MGT_RxComplete(void)
                 switch (g_MGT.RxData[1]) {
                     case 0x10:  // 固件信息 — 7字节响应
                         if (g_MGT.RxDataCnt >= 7) {
-                            g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 6);
-                            crc_ok = (g_MGT.CrcData == g_MGT.RxData[6]);
-                            if (!crc_ok) { MGT_CrcError(); return; }
+														g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 6);
+														if (g_MGT.CrcData != g_MGT.RxData[6]) { 
+															MGT_CrcError(); 
+															return; 
+														}
+														g_MGT.CrcError = 0;
                             g_MGT.TimeoutCnt = 0;
                             g_MGT.RxDataCnt = 0;
                             g_MGT.Firmware = ((uint32_t)g_MGT.RxData[2] << 24) |
@@ -349,35 +366,44 @@ void MGT_RxComplete(void)
                                              ((uint32_t)g_MGT.RxData[4] << 8) |
                                              g_MGT.RxData[5];
                         }
-                        return;
+                        break;
 
                     case 0x45:  // 读分辨率 — 4字节响应
                         if (g_MGT.RxDataCnt >= 4) {
-                            g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 3);
-                            crc_ok = (g_MGT.CrcData == g_MGT.RxData[3]);
-                            if (!crc_ok) { MGT_CrcError(); return; }
+														g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 3);
+														if (g_MGT.CrcData != g_MGT.RxData[3]) { 
+															MGT_CrcError(); 
+															return; 
+														}
+														g_MGT.CrcError = 0;
                             g_MGT.TimeoutCnt = 0;
                             g_MGT.RxDataCnt = 0;
                             g_MGT.ResolutionID = g_MGT.RxData[2];
                         }
-                        return;
+                        break;
 
                     case 0x46:  // 设置分辨率确认 — 3字节响应
                         if (g_MGT.RxDataCnt >= 3) {
+														g_MGT.CrcData = Enc_CRC8(g_MGT.RxData, 3);
+														if (g_MGT.CrcData != g_MGT.RxData[3]) { 
+															MGT_CrcError(); 
+															return; 
+														}
+														g_MGT.CrcError = 0;													
                             g_MGT.TimeoutCnt = 0;
                             g_MGT.RxDataCnt = 0;
                             if (g_MGT.RxData[2] != 0xF0) {
                                 MGT_CrcError();
                             }
                         }
-                        return;
+                        break;
                 }
             }
-            return;
+            break;
 
         default:
             g_MGT.RxDataCnt = 0;
-            return;
+            break;
     }
 }
 

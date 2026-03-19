@@ -663,36 +663,6 @@ void MulMag_RxComplete(void)
 }
 
 /****************************************************************************************
-* 函数名称：MulMag_Test
-* 函数功能：测试函数主入口，根据测试项目执行对应操作
-* 输入参量：testItem 测试项目编号
-* 输出参量：无
-* 编写日期：2026-2-24
-****************************************************************************************/
-void MulMag_Test(uint8_t testItem)
-{
-    switch (testItem) {
-        case MulMag_Test_Stop:               break;
-        case MulMag_Test_Multiturn:          MulMag_MultiturnReset(); break;
-        case MulMag_Test_GetAllData:         MulMag_GetAllData(); break;
-        case MulMag_Test_ReadAllEeprom:      MulMag_ReadAllEeprom(); break;
-        case MulMag_Test_Initialize:         MulMag_Initialize(); break;
-        case MulMag_Test_Hall:               MulMag_HallRead(); break;
-        case MulMag_Test_WriteResult:        MulMag_WriteResult(); break;
-        case MulMag_Test_TB:                 MulMag_TB(); break;
-        case MulMag_Test_OIP:                MulMag_OpenInternalProtocol(); break;
-        case MulMag_Test_CIP:                MulMag_CloseInternalProtocol(); break;
-        case MulMag_Test_WriteDate:          MulMag_WriteDate(); break;
-        case MulMag_Test_SetResolution:      MulMag_SetResolution(); break;
-        case MulMag_Test_ReadResolution:     MulMag_ReadResolution(); break;
-        case MulMag_Test_WriteHWRev:         MulMag_WriteHWRev(); break;
-        case MulMag_Test_WriteRegister:      MulMag_WriteRegister(); break;
-        case MulMag_Test_ReadRegister:       MulMag_ReadRegister(); break;
-        default: break;
-    }
-}
-
-/****************************************************************************************
 * 函数名称：MulMag_MultiturnReset
 * 函数功能：多圈复位操作
 * 输入参量：无
@@ -1174,5 +1144,35 @@ uint8_t MulMag_Modbus_Write(uint16_t addr, uint16_t value)
         default:
             Communication_Address_Error();
             return 1;  // 无效地址
+    }
+}
+
+/****************************************************************************************
+* 函数名称：MulMag_Test
+* 函数功能：测试函数主入口，根据测试项目执行对应操作
+* 输入参量：testItem 测试项目编号
+* 输出参量：无
+* 编写日期：2026-2-24
+****************************************************************************************/
+void MulMag_Test(uint8_t testItem)
+{
+    switch (testItem) {
+        case MulMag_Test_Stop:               break;
+        case MulMag_Test_Multiturn:          MulMag_MultiturnReset(); break;
+        case MulMag_Test_GetAllData:         MulMag_GetAllData(); break;
+        case MulMag_Test_ReadAllEeprom:      MulMag_ReadAllEeprom(); break;
+        case MulMag_Test_Initialize:         MulMag_Initialize(); break;
+        case MulMag_Test_Hall:               MulMag_HallRead(); break;
+        case MulMag_Test_WriteResult:        MulMag_WriteResult(); break;
+        case MulMag_Test_TB:                 MulMag_TB(); break;
+        case MulMag_Test_OIP:                MulMag_OpenInternalProtocol(); break;
+        case MulMag_Test_CIP:                MulMag_CloseInternalProtocol(); break;
+        case MulMag_Test_WriteDate:          MulMag_WriteDate(); break;
+        case MulMag_Test_SetResolution:      MulMag_SetResolution(); break;
+        case MulMag_Test_ReadResolution:     MulMag_ReadResolution(); break;
+        case MulMag_Test_WriteHWRev:         MulMag_WriteHWRev(); break;
+        case MulMag_Test_WriteRegister:      MulMag_WriteRegister(); break;
+        case MulMag_Test_ReadRegister:       MulMag_ReadRegister(); break;
+        default: break;
     }
 }

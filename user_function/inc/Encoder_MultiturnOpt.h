@@ -4,38 +4,44 @@
 #include "main.h"
 #include <stdint.h>
 
-// ================= 测试项目枚举 =================
+/**
+  * @brief  多圈光学编码器测试项枚举定义
+  * @note   用于标识不同类型的编码器测试项目
+  */
 typedef enum {
-    MulOpt_Test_Stop = 0,
-    MulOpt_Test_MultiturnReset,
-    MulOpt_Test_GetAllData,
-    MulOpt_Test_ReadAllEeprom,
-    MulOpt_Test_Initialize,
-		MulOpt_Test_ReadAnalogDataTest,
-    MulOpt_Test_WriteResult,
-    MulOpt_Test_TB,
-    MulOpt_Test_DAC,
-    MulOpt_Test_LightIntensity,
-    MulOpt_Test_Speed,
-    MulOpt_Test_ReadHWRev,
-    MulOpt_Test_ReadFWRev,
-    MulOpt_Test_Hall,
-    MulOpt_Test_MTAB,
-    MulOpt_Test_MNSAnalog,
-    MulOpt_Test_WriteDate,
-    MulOpt_Test_WriteHWRev,
-    MulOpt_Test_OIP,
-    MulOpt_Test_CIP,
-    MulOpt_Test_AnalogData,
-    MulOpt_Test_ReadInternalAlarm,
-    MulOpt_Test_RMRNRSInitialize,
-    MulOpt_Test_Sector,
-    MulOpt_Test_MNSPosition,
-    MulOpt_Test_MNSAnalogMaxCheck,
-    MulOpt_Test_ReadAnalogData,
-		MulOpt_Test_DACAdjustment,
-    MulOpt_Test_Count
+    /* 基础测试项 */
+    MulOpt_Test_Stop = 0,                   // 停止测试
+    MulOpt_Test_MultiturnReset,             // 多圈复位测试
+    MulOpt_Test_GetAllData,                 // 获取全部数据
+    MulOpt_Test_ReadAllEeprom,              // 读取全部EEPROM
+    MulOpt_Test_Initialize,                 // 初始化测试
+    MulOpt_Test_Speed,                      // 速度测试
+    MulOpt_Test_FirmwareVersion,            // 固件版本测试
+    MulOpt_Test_WriteAllEeprom,             // 写入全部EEPROM
+    MulOpt_Test_OIP,                        // 打开内部协议
+    MulOpt_Test_CIP,                        // 关闭内部协议
+	
+    /* 模拟量测试 */
+    MulOpt_Test_AnalogData,                 // 模拟量数据测试
+    MulOpt_Test_WriteResult,                // 写入测试结果
+    MulOpt_Test_TB,                         // 温度&电池电压测试
+    
+    /* 数据操作测试 */
+    MulOpt_Test_WriteDate,                  // 写入日期测试
+    MulOpt_Test_DAC,                        // DAC测试
+    MulOpt_Test_LightIntensity,             // 光强测试
+    MulOpt_Test_ReadAnalogData,             // 读取模拟数据
+    MulOpt_Test_ReadInternalAlarm,          // 读取内部报警
+    
+    /* 高级功能测试 */
+    MulOpt_Test_RMRNRSInitialize,           // RM/RN/RS初始化
+    MulOpt_Test_WriteHWRev,                 // 写入硬件版本
+    MulOpt_Test_Sector,                     // 扇区测试
+    MulOpt_Test_MNSPosition,                // MNS位置测试
+    MulOpt_Test_DACAdjustment,              // DAC调整测试
+    MulOpt_Test_MNSAnalogMaxCheck           // MNS模拟量最大值检查
 } MulOpt_TestItem_t;
+
 
 // ================= 常量定义 =================
 #define MULOPT_PAGE_NUMBER    4
@@ -203,6 +209,11 @@ typedef struct {
 		
 		uint16_t MarkPositionBuffer[2];  // 添加位置标记缓冲区
     int16_t MarkPositionDifference;  // 添加位置差值
+		
+		// R值
+		uint8_t  RMSQUA;
+		uint8_t  RNSQUA;
+		uint8_t  RSSQUA;			
 } MulOpt_PNH2612_t;
 
 // ================= EEPROM结构 =================
@@ -276,7 +287,7 @@ typedef struct {
     uint8_t CF62;
     uint8_t CFOIP;
     uint8_t CFCIP;
-    uint8_t CFced;
+    uint8_t CFCED;
 } MulOpt_Counter_t;
 
 // ================= 编码器主结构体 =================
@@ -294,8 +305,8 @@ typedef struct {
     MulOpt_Error_t Error;
     
     // 数据校验
-    uint8_t XorCrcData;
-    uint8_t XorCrcError;
+    uint8_t CrcData;
+    uint8_t CrcError;
     
     // 位置数据
     uint32_t SingleTurnPosition;
@@ -354,12 +365,12 @@ uint8_t  MulOpt_Modbus_IsMyAddr(uint16_t addr);
 uint16_t MulOpt_Modbus_Read(uint16_t addr);
 uint8_t  MulOpt_Modbus_Write(uint16_t addr, uint16_t value);
 
-static void MultiturnOpticalEncoderHallCheck(void);
-static void MultiturnOpticalEncoderMTABCheck(void);
-static void MultiturnOpticalEncoderMNSSpeedCheck(void);
-static void MultiturnOpticalEncoderMPositionMark(void);
-static void MultiturnOpticalEncoderMPositionMark1(void);
-static void MultiturnOpticalEncoderDACAdjustment(void);
-static void MultiturnOpticalEncoderMNSAnalogMaxCheck(void);
+static void MulOpt_HallCheck(void);
+static void MulOpt_MTABCheck(void);
+static void MulOpt_MNSSpeedCheck(void);
+static void MulOpt_MPositionMark(void);
+static void MulOpt_MPositionMark1(void);
+static void MulOpt_DACAdjustment(void);
+static void MulOpt_MNSAnalogMaxCheck(void);
 
 #endif /* __ENCODER_MULTITURN_OPT_H */

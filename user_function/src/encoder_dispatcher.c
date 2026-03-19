@@ -31,6 +31,7 @@ void Encoder_DispatchTest(void)
             break;
             
         case ENC_TYPE_MULTITURN_OPT:
+				case ENC_TYPE_INTEGRAL_OPT:
             MulOpt_Test(g_MotorEncoder.TestItem);
             break;
             
@@ -65,6 +66,7 @@ void Encoder_DispatchRx(uint8_t *data, uint16_t len)
             break;
             
         case ENC_TYPE_MULTITURN_OPT:
+				case ENC_TYPE_INTEGRAL_OPT:
             memcpy(g_MulOpt.RxData, data, len);
             g_MulOpt.RxDataCnt = len;
             MulOpt_RxComplete();
@@ -99,10 +101,15 @@ void Encoder_DispatchRx(uint8_t *data, uint16_t len)
 static uint32_t Encoder_GetSingleTurnPos(void)
 {
     switch (g_EncoderConfig.Type) {
-        case ENC_TYPE_MULTITURN_MAG: return g_MulMag.SingleTurnPos;
-        case ENC_TYPE_MULTITURN_OPT: return g_MulOpt.SingleTurnPosition;
-        case ENC_TYPE_MGT_MAG:       return g_MGT.SingleTurnPosition;
-        case ENC_TYPE_TAMAGAWA:      return g_Tmgw.SingleTurnPosition;
+        case ENC_TYPE_MULTITURN_MAG: 
+					return g_MulMag.SingleTurnPos;
+        case ENC_TYPE_MULTITURN_OPT: 
+				case ENC_TYPE_INTEGRAL_OPT: 
+					return g_MulOpt.SingleTurnPosition;
+        case ENC_TYPE_MGT_MAG:       
+					return g_MGT.SingleTurnPosition;
+        case ENC_TYPE_TAMAGAWA:      
+					return g_Tmgw.SingleTurnPosition;
         default: return 0;
     }
 }
@@ -117,10 +124,15 @@ static uint32_t Encoder_GetSingleTurnPos(void)
 static uint8_t Encoder_GetResolutionBits(void)
 {
     switch (g_EncoderConfig.Type) {
-        case ENC_TYPE_MULTITURN_MAG: return g_MulMag.ResolutionID;
-        case ENC_TYPE_MULTITURN_OPT: return g_MulOpt.ResolutionID;
-        case ENC_TYPE_MGT_MAG:       return g_MGT.ResolutionID;
-        case ENC_TYPE_TAMAGAWA:      return g_Tmgw.ResolutionID;
+        case ENC_TYPE_MULTITURN_MAG: 
+					return g_MulMag.ResolutionID;
+        case ENC_TYPE_MULTITURN_OPT: 
+				case ENC_TYPE_INTEGRAL_OPT: 
+					return g_MulOpt.ResolutionID;
+        case ENC_TYPE_MGT_MAG:       
+					return g_MGT.ResolutionID;
+        case ENC_TYPE_TAMAGAWA:      
+					return g_Tmgw.ResolutionID;
         default: return 0;
     }
 }

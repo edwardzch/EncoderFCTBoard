@@ -539,6 +539,33 @@ void ModBus_SlaveRx10(void)
 }
 
 /****************************************************************************************
+* 函数名称：ModBus_CheckWhitelist
+* 函数功能：检查当前接收的 Modbus 指令是否在白名单中
+* 输入参量：无
+* 输出参量：1=在白名单中，0=不在白名单中
+* 编写日期：2026-03-18
+****************************************************************************************/
+static uint8_t ModBus_CheckWhitelist(void)
+{
+    uint8_t is_whitelist = 0;
+    if (Usart1.DataCnt >= 4) { // 确保接收的数据长度足够提取地址
+        uint8_t cmd = Usart1.RxData[1];
+        uint16_t data_addr = ((uint16_t)Usart1.RxData[2] << 8) | Usart1.RxData[3];
+        
+        if (Usart1.RxData[0] == (uint8_t)PA_Buffer[0]) {
+            // === 在此添加不受编码器通讯错误阻塞的指令白名单 ===
+            if (cmd == MODBUS_FUNC_WRITE_SINGLE_REGISTER && data_addr == 0x100A) {
+                is_whitelist = 1; // 100A: 重启板卡指令
+            } else if (cmd == MODBUS_FUNC_WRITE_SINGLE_REGISTER && data_addr == 0x1000) {
+                is_whitelist = 1; // 1000: 按位控制继电器 (如强行复位电源等)
+            }
+            // 可以继续使用 else if 增加其他白名单寄存器 
+        }
+    }
+    return is_whitelist;
+}
+
+/****************************************************************************************
 * 函数名称：ModBus_SlaveRx
 * 函数功能：根据接收到的 Modbus 帧解析命令并调用对应的处理函数
 * 输入参量：无
@@ -554,21 +581,7 @@ void ModBus_SlaveRx(void)
 				EncoderModbus_UpdateErrors();
 
 				// ================= 0. 白名单检查 =================
-				uint8_t is_whitelist = 0;
-				if (Usart1.DataCnt >= 4) { // 确保接收的数据长度足够提取地址
-						uint8_t cmd = Usart1.RxData[1];
-						uint16_t data_addr = ((uint16_t)Usart1.RxData[2] << 8) | Usart1.RxData[3];
-						
-						if (Usart1.RxData[0] == (uint8_t)PA_Buffer[0]) {
-								// === 在此添加不受编码器通讯错误阻塞的指令白名单 ===
-								if (cmd == MODBUS_FUNC_WRITE_SINGLE_REGISTER && data_addr == 0x100A) {
-										is_whitelist = 1; // 100A: 重启板卡指令
-								} else if (cmd == MODBUS_FUNC_WRITE_SINGLE_REGISTER && data_addr == 0x1000) {
-										is_whitelist = 1; // 1000: 按位控制继电器 (如强行复位电源等)
-								}
-								// 可以继续使用 else if 增加其他白名单寄存器 
-						}
-				}
+				uint8_t is_whitelist = ModBus_CheckWhitelist();
 
 				// ================= 1. 优先检查错误标志 (用户逻辑) =================
 				// 对于非白名单指令，DC/EC 错误优先级最高, 拦截指令

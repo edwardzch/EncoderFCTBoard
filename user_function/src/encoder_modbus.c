@@ -169,7 +169,7 @@ static uint8_t BasicSettings(uint16_t addr, uint16_t value)
                         break;
                     case ENC_TYPE_MULTITURN_OPT:  // 2 - 23位
                         g_EncoderConfig.BaudRate = 2500000;
-                        g_EncoderConfig.CommCycle_us = 5000;
+                        g_EncoderConfig.CommCycle_us = 500;
                         res_bits = 23;
                         break;
                     case ENC_TYPE_MGT_MAG:        // 3 - 17位
@@ -182,7 +182,13 @@ static uint8_t BasicSettings(uint16_t addr, uint16_t value)
                         g_EncoderConfig.CommCycle_us = 125;
                         res_bits = 17;
                         break;
+										case ENC_TYPE_INTEGRAL_OPT:   // 8 - 23位
+                        g_EncoderConfig.BaudRate = 2500000;
+                        g_EncoderConfig.CommCycle_us = 125;
+                        res_bits = 23;											
+												break;
                     default:
+												Communication_Address_Error();
                         break;
                 }
                 EncoderModbus_ApplyConfig();
@@ -235,6 +241,7 @@ static uint8_t BasicSettings(uint16_t addr, uint16_t value)
                     g_MotorEncoder.TestItem = MulMag_Test_WriteDate;
                     break;
                 case ENC_TYPE_MULTITURN_OPT:
+								case ENC_TYPE_INTEGRAL_OPT:
                     g_MotorEncoder.TestItem = MulOpt_Test_WriteDate;
                     break;
                 case ENC_TYPE_MGT_MAG:
@@ -340,6 +347,7 @@ void EncoderModbus_UpdateErrors(void)
             break;
             
         case ENC_TYPE_MULTITURN_OPT:
+				case ENC_TYPE_INTEGRAL_OPT:
             ModBus.Error.bit.DC = g_MulOpt.Error.bit.DC;
             ModBus.Error.bit.EC = g_MulOpt.Error.bit.EC;
             break;

@@ -20,7 +20,11 @@ typedef enum {
     ENC_TYPE_MULTITURN_MAG,         // MULTITURNMagneticEncoder
     ENC_TYPE_MULTITURN_OPT,         // MULTITURNOpticalEncoder
     ENC_TYPE_MGT_MAG,               // MGTMagneticEncoder
+    ENC_TYPE_RESERVED_4,            // 保留
     ENC_TYPE_TAMAGAWA,              // TAMAGAWAEncoder
+    ENC_TYPE_RESERVED_6,            // 保留	
+    ENC_TYPE_RESERVED_7,            // 保留
+	  ENC_TYPE_INTEGRAL_OPT,					//整体式光编
     ENC_TYPE_COUNT
 } EncoderType_t;
 

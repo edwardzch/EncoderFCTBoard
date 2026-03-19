@@ -40,6 +40,7 @@ static volatile uint16_t s_RxLen = 0;
 static volatile uint16_t s_ExpectedRxLen = 0;
 
 MotorEncoder_t g_MotorEncoder = {0};
+Motor_t g_Motor = {0};
 /****************************************************************************************
 * 函数名称：EncDrv_Init
 * 函数功能：初始化编码器驱动，配置波特率

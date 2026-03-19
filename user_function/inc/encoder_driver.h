@@ -66,7 +66,23 @@ typedef struct {
     char FWRevBuffer[16];           // 固件版本字符串 (如 "2.1.1.R")
 } MotorEncoder_t;
 
+typedef struct{
+  int32_t       DifBuffer[2];
+  int32_t       Difference;
+  uint8_t       StartTime;
+  int32_t       ActualSpeed;
+  int32_t       FilterSpeed;
+  int16_t       SpeedBuffer[16];
+  uint32_t      Cnt;
+  int32_t       AllData; 
+  uint8_t       EncoderType;
+  uint8_t       MTPType;
+  uint32_t      FctPosition;
+  int32_t       FctPos_MPos_Diff[2];
+} Motor_t;
+
 extern MotorEncoder_t g_MotorEncoder;
+extern Motor_t g_Motor;
 // ================= 接口声明 =================
 
 /**
